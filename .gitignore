@@ -1,7 +1,9 @@
 # Visual Paradigm stuff
 
-diagrams/*.vpp~*
-diagrams/*.vpp.working
+*.*~
+
+*.vpp~*
+*.vpp.working
 
 # TeX
 
