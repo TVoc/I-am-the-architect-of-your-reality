@@ -330,9 +330,7 @@ in this analysis.
     \end{enumerate}
 
     \item \textbf{Alternative scenarios:} 
-    \begin{enumerate}
-        None.
-    \end{enumerate}
+    None
     
     \item \textbf{Remarks:}
         \begin{itemize}
@@ -340,35 +338,33 @@ in this analysis.
         \end{itemize}
 \end{itemize}
 
-\subsection{\emph{UC14}: Deliver document via print & postal service}
+\subsection{\emph{UC14}: Deliver document via print \& postal service}
 \begin{itemize}
     \item \textbf{Primary actor:} Recipient
     \item \textbf{Interested parties:} 
         \begin{itemize}
-            \item \textit{Print & postal service:} provides delivery of traditional mail
+            \item \textit{Print \& postal service:} provides delivery of traditional mail
         \end{itemize}
 
     \item \textbf{Preconditions:}
         \begin{itemize}
-            \item The document's associated raw data specifies print & postal service as the delivery method
+            \item The document's associated raw data specifies print \& postal service as the delivery method
             \item It is not the case that the System knows that the Recipient is registered with an Online Distribution Platform that distributes the type of the document to be delivered.
         \end{itemize}
 
     \item \textbf{Postconditions:}
         \begin{itemize}
-            \item The System has sent a PDF representing the document to the print & postal service via a web service.
+            \item The System has sent a PDF representing the document to the print \& postal service via a web service.
         \end{itemize}
         
     \item \textbf{Main scenario:} 
     \begin{enumerate}
        \item The System retrieves the Recipient's postal address from the raw data.
-       \item The System sends the PDF representing the document to the print & postal service via a web service, along with the Recipient's postal address.
+       \item The System sends the PDF representing the document to the print \& postal service via a web service, along with the Recipient's postal address.
     \end{enumerate}
 
     \item \textbf{Alternative scenarios:} 
-    \begin{enumerate}
-        None
-    \end{enumerate}
+    None
     
     \item \textbf{Remarks:}
         \begin{itemize}
@@ -441,13 +437,11 @@ in this analysis.
     \end{enumerate}
 
     \item \textbf{Alternative scenarios:} 
-    \begin{enumerate}
-        None
-    \end{enumerate}
+    None
     
     \item \textbf{Remarks:}
         \begin{itemize}
-            This use case is an extension of UC13: Deliver generated document
+          \item  This use case is an extension of UC13: Deliver generated document
         \end{itemize}
 \end{itemize}
 
@@ -487,9 +481,7 @@ in this analysis.
 	\end{enumerate}
 	
 	\item \textbf{Remarks:}
-	\begin{itemize}
-		None
-	\end{itemize}
+	None
 \end{itemize}
 
 \subsection{\emph{UC18}: Manage Customer Organization information}
@@ -603,14 +595,10 @@ in this analysis.
 	\end{enumerate}
 	
 	\item \textbf{Alternative scenarios:} 
-	\begin{enumerate}
-		None
-	\end{enumerate}
+	None
 	
 	\item \textbf{Remarks:}
-	\begin{itemize}
-		None
-	\end{itemize}
+	None
 \end{itemize}
 
 \subsection{\emph{UC21}: Register Recipient association with Online Distribution Platform}
@@ -623,13 +611,11 @@ in this analysis.
 	\end{itemize}
 	
 	\item \textbf{Preconditions:}
-	\begin{itemize}
-		None
-	\end{itemize}
+	None
 	
 	\item \textbf{Postconditions:}
 	\begin{itemize}
-		The System now sends documents addressed to the Recipient of the types that the Online Distribution Platform distributes to the Online Distribution Platform
+		\item The System now sends documents addressed to the Recipient of the types that the Online Distribution Platform distributes to the Online Distribution Platform
 	\end{itemize}
 	
 	\item \textbf{Main scenario:} 
@@ -648,9 +634,7 @@ in this analysis.
 	\end{enumerate}
 	
 	\item \textbf{Remarks:}
-	\begin{itemize}
-		None
-	\end{itemize}
+	None
 \end{itemize}
 
 \subsection{\emph{UC22}: Register Recipient unregistration with Online Distribution Platform}
@@ -719,9 +703,7 @@ in this analysis.
 	\end{enumerate}
 	
 	\item \textbf{Alternative scenarios:} 
-	\begin{enumerate}
-		None
-	\end{enumerate}
+	None
 	
 	\item \textbf{Remarks:}
 	\begin{itemize}
@@ -752,7 +734,6 @@ in this analysis.
 	\begin{enumerate}
 		\item The Recipient follows the unique URL provided in the e-mail
 		\item The System registers that the Recipient has followed the URL
-		\item The System marks the document as delivered
 	\end{enumerate}
 	
 	\item \textbf{Alternative scenarios:} 
@@ -790,13 +771,10 @@ in this analysis.
 	\item \textbf{Main scenario:} 
 	\begin{enumerate}
 		\item The Online Distribution platform indicates that the Recipient has received the document
-		\item The System marks the document as delivered
 	\end{enumerate}
 	
 	\item \textbf{Alternative scenarios:} 
-	\begin{enumerate}
-		None
-	\end{enumerate}
+	None
 	
 	\item \textbf{Remarks:}
 	\begin{itemize}
