@@ -291,160 +291,393 @@ in this analysis.
         \end{itemize}
 \end{itemize}
 
-\subsection{\emph{UC13}: Name of use case 13}
+\subsection{\emph{UC13}: Deliver generated document}
 \begin{itemize}
-    \item \textbf{Primary actor:} primary actor
+    \item \textbf{Primary actor:} Recipient
     \item \textbf{Interested parties:} 
         \begin{itemize}
-            \item \textit{Name of interested party:} reason why party is interested
+            \item \textit{eDocs:} wants documents to be delivered with as little human interaction as possible
+            \item \textit{Customer Organization:} wants their documents to be delivered
         \end{itemize}
 
     \item \textbf{Preconditions:}
         \begin{itemize}
-            \item First precondition.
-            \item Second precondition.
+            \item Either the Customer Organisation or a Customer Organisation Representative has delivered a Data Batch containing the information necessary to generate the document.
+            \item The document has been generated successfully.
         \end{itemize}
 
     \item \textbf{Postconditions:}
         \begin{itemize}
-            \item First postcondition.
-            \item Second postcondition.
+            \item The document has been sent on its way via the chosen Distribution Channel
         \end{itemize}
         
     \item \textbf{Main scenario:} 
     \begin{enumerate}
-       \item Step 1
-       \item Step 2
-       \item Step 3
-       \item \ldots
+       \item The System selects a Distribution Channel specified by the raw data or according to information the System knows about the Recipient (see remark 1)
+       \item If the document was not a part of an automatic Data Batch, the Customer Organisation is billed with the costs of delivering the document
+       \item The System marks the document as sent.
     \end{enumerate}
 
     \item \textbf{Alternative scenarios:} 
     \begin{enumerate}
-        \item [3b.] Alternative at step 3
+        None.
     \end{enumerate}
     
     \item \textbf{Remarks:}
         \begin{itemize}
-            \item First remark
+            \item Step 1 is an extension point for other use cases
         \end{itemize}
 \end{itemize}
 
-\subsection{\emph{UC14}: Name of use case 14}
+\subsection{\emph{UC14}: Deliver document via print & postal service}
 \begin{itemize}
-    \item \textbf{Primary actor:} primary actor
+    \item \textbf{Primary actor:} Recipient
     \item \textbf{Interested parties:} 
         \begin{itemize}
-            \item \textit{Name of interested party:} reason why party is interested
+            \item \textit{Print & postal service:} provides delivery of traditional mail
         \end{itemize}
 
     \item \textbf{Preconditions:}
         \begin{itemize}
-            \item First precondition.
-            \item Second precondition.
+            \item The document's associated raw data specifies print & postal service as the delivery method
+            \item It is not the case that the System knows that the Recipient is registered with an Online Distribution Platform that distributes the type of the document to be delivered.
         \end{itemize}
 
     \item \textbf{Postconditions:}
         \begin{itemize}
-            \item First postcondition.
-            \item Second postcondition.
+            \item The System has sent a PDF representing the document to the print & postal service via a web service.
         \end{itemize}
         
     \item \textbf{Main scenario:} 
     \begin{enumerate}
-       \item Step 1
-       \item Step 2
-       \item Step 3
-       \item \ldots
+       \item The System retrieves the Recipient's postal address from the raw data.
+       \item The System sends the PDF representing the document to the print & postal service via a web service, along with the Recipient's postal address.
     \end{enumerate}
 
     \item \textbf{Alternative scenarios:} 
     \begin{enumerate}
-        \item [3b.] Alternative at step 3
+        None
     \end{enumerate}
     
     \item \textbf{Remarks:}
         \begin{itemize}
-            \item First remark
+            \item This use case is an extension of UC13: Deliver generated document
         \end{itemize}
 \end{itemize}
 
-\subsection{\emph{UC15}: Name of use case 15}
+\subsection{\emph{UC15}: Deliver document via e-mail}
 \begin{itemize}
-    \item \textbf{Primary actor:} primary actor
+    \item \textbf{Primary actor:} Unregistered Recipient
     \item \textbf{Interested parties:} 
         \begin{itemize}
-            \item \textit{Name of interested party:} reason why party is interested
+            \item \textit{E-mail Provider:} Is responsible for delivering e-mail addressed to its clients
         \end{itemize}
 
     \item \textbf{Preconditions:}
         \begin{itemize}
-            \item First precondition.
-            \item Second precondition.
+            \item It is not the case that the System knows that the Recipient is registered with an Online Distribution Platform that distributes the type of the document to be delivered.
         \end{itemize}
 
     \item \textbf{Postconditions:}
         \begin{itemize}
-            \item First postcondition.
-            \item Second postcondition.
+            \item The System has sent an e-mail to the Recipient with PDF representing the document included as an attachment
         \end{itemize}
         
     \item \textbf{Main scenario:} 
     \begin{enumerate}
-       \item Step 1
-       \item Step 2
-       \item Step 3
-       \item \ldots
+       \item The System retrieves the Recipient's e-mail address from the document's raw data.
+       \item The System composes an e-mail and includes the PDF representing the document as an attachment
+       \item The System sends the e-mail on its way
     \end{enumerate}
 
     \item \textbf{Alternative scenarios:} 
     \begin{enumerate}
-        \item [3b.] Alternative at step 3
+        None
     \end{enumerate}
     
     \item \textbf{Remarks:}
         \begin{itemize}
-            \item First remark
+            \item This use case is an extension of UC13: Deliver generated document
         \end{itemize}
 \end{itemize}
 
-\subsection{\emph{UC16}: Name of use case 16}
+\subsection{\emph{UC16}: Deliver document via Online Distribution Platform}
 \begin{itemize}
-    \item \textbf{Primary actor:} primary actor
+    \item \textbf{Primary actor:} Recipient
     \item \textbf{Interested parties:} 
         \begin{itemize}
-            \item \textit{Name of interested party:} reason why party is interested
+            \item \textit{Online Distribution Platform:} wants to deliver documents addressed to its clients
         \end{itemize}
 
     \item \textbf{Preconditions:}
         \begin{itemize}
-            \item First precondition.
-            \item Second precondition.
+            \item The System knows that the Recipient is registered with an Online Distribution Platform
         \end{itemize}
 
     \item \textbf{Postconditions:}
         \begin{itemize}
-            \item First postcondition.
-            \item Second postcondition.
+            \item The System has sent the PDF representing the document to the Online Distribution Platform via a web service along with information
+            that identifies the Recipient
         \end{itemize}
         
     \item \textbf{Main scenario:} 
     \begin{enumerate}
-       \item Step 1
-       \item Step 2
-       \item Step 3
+       \item The System retrieves information that identifies the Recipient from the document's raw data
+       \item The System sends the PDF representing the information and the identifying information via a web service to the Online Distribution Platform
        \item \ldots
     \end{enumerate}
 
     \item \textbf{Alternative scenarios:} 
     \begin{enumerate}
-        \item [3b.] Alternative at step 3
+        None
     \end{enumerate}
     
     \item \textbf{Remarks:}
         \begin{itemize}
-            \item First remark
+            This use case is an extension of UC13: Deliver generated document
         \end{itemize}
+\end{itemize}
+
+\subsection{\emph{UC17}: Consult Billing Information}
+\begin{itemize}
+	\item \textbf{Primary actor:} Customer Organization
+	\item \textbf{Interested parties:} 
+	\begin{itemize}
+		\item \textit{eDocs:} wants to store all information concerning financial transactions
+		\item \textit{Social Secretary:} wants to know the costs it has incurred on behalf of the Customer Organization
+	\end{itemize}
+	
+	\item \textbf{Preconditions:}
+	\begin{itemize}
+		\item The user is logged in (UC1: Log in)
+	\end{itemize}
+	
+	\item \textbf{Postconditions:}
+	\begin{itemize}
+		\item The System has presented the user with an overview of billing information
+	\end{itemize}
+	
+	\item \textbf{Main scenario:} 
+	\begin{enumerate}
+		\item The user indicates he wishes to view the Customer Organization's billing information
+		\item The System collects the Customer Organization's billing information
+		\item The System presents the user with an overview of the retrieved billing information
+		\item The use case ends
+	\end{enumerate}
+	
+	\item \textbf{Alternative scenarios:} 
+	\begin{enumerate}
+		\item [4a.] The user indicates that he wants a more detailed view of a specific transaction
+		\item [5a.] The System presents the user with a more detailed view of that transaction
+		\item [6a.] The user indicates he wants to return to the overview
+		\item [7a.] The use case goes back to step 3
+	\end{enumerate}
+	
+	\item \textbf{Remarks:}
+	\begin{itemize}
+		None
+	\end{itemize}
+\end{itemize}
+
+\subsection{\emph{UC18}: Manage Customer Organization information}
+\begin{itemize}
+	\item \textbf{Primary actor:} eDocs System Administrator
+	\item \textbf{Interested parties:} 
+	\begin{itemize}
+		\item \textit{Customer Organization:} desires an adequate level of service from eDocs
+	\end{itemize}
+	
+	\item \textbf{Preconditions:}
+	\begin{itemize}
+		\item The Customer Organization has been registered with the System
+		\item The eDocs System Administrator is logged in (UC1: Log in)
+	\end{itemize}
+	
+	\item \textbf{Postconditions:}
+	\begin{itemize}
+		\item Any changes made by the eDocs System Administrator have been logged
+	\end{itemize}
+	
+	\item \textbf{Main scenario:} 
+	\begin{enumerate}
+		\item The Administrator indicates he wants to view the Customer Organization's information stored by the System
+		\item The System presents an overview of the Customer Organization's information
+		\item The use case ends
+	\end{enumerate}
+	
+	\item \textbf{Alternative scenarios:} 
+	\begin{enumerate}
+		\item [3a.] The Administrator indicates he wants to edit the Customer Organization's information (e.g. the Service Level Agreement has been revised and any changes need to be logged)
+		\item [4a.] The System provides the Administrator with the means to edit the relevant information
+		\item [5a.] The Administrator indicates he has finished editing the information
+		\item [6a.] The use case goes back to step 2
+	\end{enumerate}
+	
+	\item \textbf{Remarks:}
+	\begin{itemize}
+		\item First remark
+	\end{itemize}
+\end{itemize}
+
+\subsection{\emph{UC19}: Register Customer Organization}
+\begin{itemize}
+	\item \textbf{Primary actor:} eDocs System Administrator
+	\item \textbf{Interested parties:} 
+	\begin{itemize}
+		\item \textit{eDocs:} wants as many clients to use their services as possible
+		\item \textit{Customer Organization:} wants to use eDocs's services and is prepared to provide monetary compensation
+	\end{itemize}
+	
+	\item \textbf{Preconditions:}
+	\begin{itemize}
+		\item Negotiations regarding the Service Level Agreement were successful
+		\item The eDocs System Administrator is logged in (UC1: Log in)
+	\end{itemize}
+	
+	\item \textbf{Postconditions:}
+	\begin{itemize}
+		\item An account for the Customer Organization has been opened in addition to accounts for any representatives, if applicable
+	\end{itemize}
+	
+	\item \textbf{Main scenario:} 
+	\begin{enumerate}
+		\item The eDocs System Administrator indicates he wants to register a new Customer Organization
+		\item The System provides the Administrator with the means to input the required information (e.g. default priority level, credentials for any automatic data delivery channels, etc.)
+		\item The Administrator inputs the required information
+		\item The Administrator indicates he has finished providing the information
+		\item The System creates an account on behalf of the Customer Organization and any representatives, if applicable
+		\item The use case ends
+	\end{enumerate}
+	
+	\item \textbf{Alternative scenarios:} 
+	\begin{enumerate}
+		\item [5a.] The System indicates that the information provided was incomplete or invalid
+		\item [6a.] The use case goes back to step 3
+	\end{enumerate}
+	
+	\item \textbf{Remarks:}
+	\begin{itemize}
+		\item First remark
+	\end{itemize}
+\end{itemize}
+
+\subsection{\emph{UC20}: Unregister Customer Organization}
+\begin{itemize}
+	\item \textbf{Primary actor:} eDocs System Administrator
+	\item \textbf{Interested parties:} 
+	\begin{itemize}
+		\item \textit{eDocs:} wishes to have an accurate view of their client base
+		\item \textit{Customer Organization:} no longer wants to be serviced by eDocs
+	\end{itemize}
+	
+	\item \textbf{Preconditions:}
+	\begin{itemize}
+		\item The Customer Organization has been registered
+		\item The Customer Organization has authorized account removal
+		\item The eDocs System Administrator is logged in (UC1: Log in)
+		\item The eDocs System Administrator has consulted the Customer Organization's information (UC18: Manage Customer Organization Information)
+	\end{itemize}
+	
+	\item \textbf{Postconditions:}
+	\begin{itemize}
+		\item All accounts associated with the Customer Organization have been removed. Any documents generated on the Customer Organization's behalf remain untouched.
+	\end{itemize}
+	
+	\item \textbf{Main scenario:} 
+	\begin{enumerate}
+		\item The eDocs System Administrator indicates he wishes to unregister the Customer Organization
+		\item The System removes all accounts associated with the Customer Organization
+	\end{enumerate}
+	
+	\item \textbf{Alternative scenarios:} 
+	\begin{enumerate}
+		None
+	\end{enumerate}
+	
+	\item \textbf{Remarks:}
+	\begin{itemize}
+		None
+	\end{itemize}
+\end{itemize}
+
+\subsection{\emph{UC21}: Register Recipient association with Online Distribution Platform}
+\begin{itemize}
+	\item \textbf{Primary actor:} Online Distribution Platform
+	\item \textbf{Interested parties:} 
+	\begin{itemize}
+		\item \textit{eDocs:} wishes to comply to the Recipient's preferences as to how he wants his documents to be delivered
+		\item \textit{Recipient:} wants documents addressed to him to be delivered according to his wishes
+	\end{itemize}
+	
+	\item \textbf{Preconditions:}
+	\begin{itemize}
+		None
+	\end{itemize}
+	
+	\item \textbf{Postconditions:}
+	\begin{itemize}
+		The System now sends documents addressed to the Recipient of the types that the Online Distribution Platform distributes to the Online Distribution Platform
+	\end{itemize}
+	
+	\item \textbf{Main scenario:} 
+	\begin{enumerate}
+		\item The Online Distribution Platform indicates that the Recipient wishes to receive documents through them
+		\item The Online Distribution Platform supplies identifying information pertaining to the Recipient
+		\item The System logs that any documents addressed to the Recipient of the types that the Online Distribution Platform distributes are to be sent to the Online Distribution Platform
+		\item The use case ends
+	\end{enumerate}
+	
+	\item \textbf{Alternative scenarios:} 
+	\begin{enumerate}
+		\item [3a.] The System has determined that the identifying information does not allow the Recipient to be successfully identified (e.g. the Online Distribution Platform distributes invoices and the bank account number was not formatted correctly or no bank account number was supplied at all)
+		\item [4a.] This anomaly is logged for review by an eDocs System Administrator
+		\item [5a.] The use case ends
+	\end{enumerate}
+	
+	\item \textbf{Remarks:}
+	\begin{itemize}
+		None
+	\end{itemize}
+\end{itemize}
+
+\subsection{\emph{UC22}: Register Recipient unregistration with Online Distribution Platform}
+\begin{itemize}
+	\item \textbf{Primary actor:} Online Distribution Platform
+	\item \textbf{Interested parties:} 
+	\begin{itemize}
+		\item \textit{eDocs:} wishes to comply to the Recipient's preferences as to how he wants his documents to be delivered
+		\item \textit{Recipient:} wants documents addressed to him to be delivered according to his wishes
+	\end{itemize}
+	
+	\item \textbf{Preconditions:}
+	\begin{itemize}
+		\item The Recipient has been registered as associated with the Online Distribution Platform
+	\end{itemize}
+	
+	\item \textbf{Postconditions:}
+	\begin{itemize}
+		\item The System has logged that any overrides pertaining to document types distributed by the Online Distribution Platform no longer apply in the Recipient's case
+	\end{itemize}
+	
+	\item \textbf{Main scenario:} 
+	\begin{enumerate}
+		\item The Online Distribution Platform has indicated that they no longer service the Recipient
+		\item The Online Distribution Platform supplies identifying information pertaining to the Recipient
+		\item The System removes any overrides pertaining to document types distributed by the Online Distribution Platform
+		\item The use case ends
+	\end{enumerate}
+	
+	\item \textbf{Alternative scenarios:} 
+	\begin{enumerate}
+		\item [3a.] The System has determined that the identifying information fails to successfully identify the Recipient
+		\item [4a.] This anomaly is logged for review by an eDocs System Administrator
+		\item [5a.] The use case ends
+	\end{enumerate}
+	
+	\item \textbf{Remarks:}
+	\begin{itemize}
+		\item First remark
+	\end{itemize}
 \end{itemize}
 
 \section{Non-functional requirements}\label{sec:non-functional}
