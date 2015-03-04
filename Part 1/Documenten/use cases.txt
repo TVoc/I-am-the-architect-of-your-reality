@@ -1,10 +1,14 @@
 UC7 - Filter documents in PDS
 UC8 - Consult doc delivery status
-- Submit Raw Data (Company)
-- Handle Data error (Company Rep)
-- Signal Email Delivery Failure (System -> Company)
-- Unregister Personal Document Store (Registered Recipient)
-- Deliver Generated Document (System)
-- Consult Billing Information (Customer organisation)
-- User Management (EDocs Admin)
-- Register Company (EDocs Admin)
+
+F:
+UC9 - Submit Raw Data (Company)
+UC10 - Handle Data error (Company Rep)
+UC11 - Signal Email Delivery Failure (System -> Company)
+UC12 - Unregister Personal Document Store (Registered Recipient)
+
+T:
+UC13 - Deliver Generated Document (System)
+UC14 - Consult Billing Information (Customer organisation)
+UC15 - User Management (EDocs Admin)
+UC16 - Register Company (EDocs Admin)
