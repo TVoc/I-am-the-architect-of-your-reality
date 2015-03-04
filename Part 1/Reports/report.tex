@@ -135,42 +135,44 @@ in this analysis.
         \end{itemize}
 \end{itemize}
 
-\subsection{\emph{UC9}: Name of use case 9}
+\subsection{\emph{UC9}: Submit Raw Data}
 \begin{itemize}
-    \item \textbf{Primary actor:} primary actor
+    \item \textbf{Primary actor:} Customer Organisation or Social Secretary
     \item \textbf{Interested parties:} 
         \begin{itemize}
-            \item \textit{Name of interested party:} reason why party is interested
+            \item \textit{Customer Organisation Representative:} wants to make sure the documents he manages are correctly generated and delivered from the raw data
+            \item \textit{eDocs:} wants the system to correctly handle raw data or signal the company if errors exist
         \end{itemize}
 
     \item \textbf{Preconditions:}
         \begin{itemize}
-            \item First precondition.
-            \item Second precondition.
+            \item The primary actor is authenticated (UC1).
         \end{itemize}
 
     \item \textbf{Postconditions:}
         \begin{itemize}
-            \item First postcondition.
-            \item Second postcondition.
+            \item The System has received a correct batch of data which can be processed into docuents.
+            \item The Customer Organisation knows that no errors are present in the currently submitted data.
         \end{itemize}
         
     \item \textbf{Main scenario:} 
     \begin{enumerate}
-       \item Step 1
-       \item Step 2
-       \item Step 3
-       \item \ldots
+       \item The primary actor submits over agreed protocol a batch of raw data for processing.
+       \item The System verifies that the raw data entries are all correctly formatted.
+       \item The Use Case ends here.
     \end{enumerate}
 
     \item \textbf{Alternative scenarios:} 
     \begin{enumerate}
-        \item [3b.] Alternative at step 3
+        \item [3a.] The System finds one or more entries in the raw data which are not correctly formatted.
+        \item [4a.] The System collects all incorrect entries.
+        \item [5a.] The System sends a notice to the responsible Customer Organisation Representative(s), accompanied by the faulty data entries.
     \end{enumerate}
     
     \item \textbf{Remarks:}
         \begin{itemize}
-            \item First remark
+            \item The Customer Organisation as specified in the primary actors can mean a specific user periodically submitting data batches, but is mostly implied to be an automated system in the company, handling the batches of raw data. Analogous for the Social Secretary.
+            \item Authentication of the primary actor can be through an interactive login procedure, but could also be automated authentication for the company systems, so they can automatically and periodically submit accumulated batches of raw data without user intervention.
         \end{itemize}
 \end{itemize}
 
