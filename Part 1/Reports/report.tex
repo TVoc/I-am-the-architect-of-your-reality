@@ -32,8 +32,16 @@ This section shows the domain model(s).
 In this section we provide additional domain constraints.
 
 \begin{itemize}
-    \item This is a first constraint.
-    \item This is a second constraint.
+    \item A Document is only delivered to the Recipient it is addressed to
+    \item A Template must have the fields that are mandatory for the document type it is a Template for
+    \item A Payslip can only be sent to Employees the Customer Organization employs
+    \item If the Customer Organizations outsources Payslip management to a Social Secretary, it cannot submit Payslip data itself
+    \item While a Recipient is subscribed to a Personal Document Store, any document for which e-mail is specified as the Distribution Channel is instead delivered through the Personal Document Store
+    \item While a Recipient is subscribed to an Online Distribution Platform that is also an external party with respect to eDocs (i.e. not the Personal Document Store), any documents of the type the Online Distribution Platform distributes is sent via the Online Distribution Platform regardless of the Distribution Platform the Customer Organization has selected
+    \item If while constructing a Raw Data Entry no individual priority is explicitly selected, the individual priority is the same as the default processing priority of the Customer Organization
+    \item An Invoice cannot be its own advance invoice
+    \item An Invoice is always addressed to a Client
+    \item A Payslip is always addressed to an Employee
 \end{itemize}
 
 \subsection{Glossary}
@@ -705,7 +713,7 @@ in this analysis.
 	
 	\item \textbf{Remarks:}
 	\begin{itemize}
-		This use case only applies if the Online Distribution Platform is an external party (i.e. not the Personal Document Store)
+		\item This use case only applies if the Online Distribution Platform is an external party (i.e. not the Personal Document Store)
 	\end{itemize}
 \end{itemize}
 
