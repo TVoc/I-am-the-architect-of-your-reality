@@ -508,17 +508,27 @@ in this analysis.
 	
 	\item \textbf{Main scenario:} 
 	\begin{enumerate}
-		\item The Administrator indicates he wants to view the Customer Organization's information stored by the System
-		\item The System presents an overview of the Customer Organization's information
+		\item The Administrator indicates he wants an overview of all Customer Organizations
+		\item The System collects the information and provides the requested overview
+		\item The Administrator indicates he wants to edit a certain Customer Organization's information (e.g. the Service Level Agreement has been revised and any changes need to be logged)
+		\item The System provides the Administrator with an overview of the Customer Organization's information and provides the means to edit it
+		\item The Administrator offers to the System the information he wants to change
+		\item The System processes the changes and finds no problems; the Administrator is notified of success
+		\item The Representative indicates he has finished editing Customer Organization information
 		\item The use case ends
 	\end{enumerate}
 	
 	\item \textbf{Alternative scenarios:} 
 	\begin{enumerate}
-		\item [3a.] The Administrator indicates he wants to edit the Customer Organization's information (e.g. the Service Level Agreement has been revised and any changes need to be logged)
-		\item [4a.] The System provides the Administrator with the means to edit the relevant information
-		\item [5a.] The Administrator indicates he has finished editing the information
-		\item [6a.] The use case goes back to step 2
+		\item [6a.] During processing of the changes, the System finds a problem.
+		\item [7a.] The System indicates to the Administrator that the new Details are not valid and not updated internally.
+		\item [8a.] The Use Case resumes from step 4.
+		\item [7b.] The Representative indicates he wants to update the Details of another Recipient.
+		\item [8b.] The Use Case resumes from step 2.
+		\item [2c.] The Administrator indicates he is done managing Customer Organization Details.
+		\item [3c.] The Use Case ends here.
+		\item [4d.] The Representative indicates he does not want to update the presented Recipient's details.
+		\item [5d.] The Use Case resumes from step 2.
 	\end{enumerate}
 	
 	\item \textbf{Remarks:}
@@ -632,7 +642,7 @@ in this analysis.
 	\item \textbf{Alternative scenarios:} 
 	\begin{enumerate}
 		\item [3a.] The System has determined that the identifying information does not allow the Recipient to be successfully identified (e.g. the Online Distribution Platform distributes invoices and the bank account number was not formatted correctly or no bank account number was supplied at all)
-		\item [4a.] This anomaly is logged for review by an eDocs System Administrator
+		\item [4a.] The System sends a notification to the Online Distribution Platform and this anomaly is logged for review by an eDocs System Administrator
 		\item [5a.] The use case ends
 	\end{enumerate}
 	
@@ -670,7 +680,7 @@ in this analysis.
 	\item \textbf{Alternative scenarios:} 
 	\begin{enumerate}
 		\item [3a.] The System has determined that the identifying information fails to successfully identify the Recipient
-		\item [4a.] This anomaly is logged for review by an eDocs System Administrator
+		\item [4a.] The System sends a notification to the Online Distribution Platform and this anomaly is logged for review by an eDocs System Administrator
 		\item [5a.] The use case ends
 	\end{enumerate}
 	
@@ -774,10 +784,14 @@ in this analysis.
 	\item \textbf{Main scenario:} 
 	\begin{enumerate}
 		\item The Online Distribution platform indicates that the Recipient has received the document
+		\item The System identifies the document that has been received
 	\end{enumerate}
 	
 	\item \textbf{Alternative scenarios:} 
-	None
+	\begin{enumerate}
+		\item [2a.] The Online Distribution Platform does not supply sufficient information to identify the document that has been delivered
+		\item [3a.] The System sends a notification to the Online Distribution Platform and logs the anomaly for review by an eDocs System Administrator
+	\end{enumerate}
 	
 	\item \textbf{Remarks:}
 	\begin{itemize}
