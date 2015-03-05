@@ -87,7 +87,7 @@ in this analysis.
 	
 	\item \textbf{Remarks:}
 	\begin{itemize}
-		\item  This use case is an extension of UC13: Deliver generated document
+		\item  This use case is an extension of UC16: Deliver document via Online Distribution Platform
 	\end{itemize}
 \end{itemize}
 
@@ -174,7 +174,7 @@ in this analysis.
 
 \subsection{\emph{UC9}: Submit Raw Data}
 \begin{itemize}
-    \item \textbf{Primary actor:} Customer Organisation or Social Secretary
+    \item \textbf{Primary actor:} Customer Organisation or Social Secretary or Customer Organization Representative
     \item \textbf{Interested parties:} 
         \begin{itemize}
             \item \textit{Customer Organisation Representative:} wants to make sure the documents he manages are correctly generated and delivered from the raw data
@@ -359,7 +359,7 @@ in this analysis.
 
 \subsection{\emph{UC13}: Deliver generated document}
 \begin{itemize}
-    \item \textbf{Primary actor:} System
+    \item \textbf{Primary actor:} Recipient
     \item \textbf{Interested parties:} 
         \begin{itemize}
             \item \textit{eDocs:} wants documents to be delivered with as little human interaction as possible
@@ -397,7 +397,7 @@ in this analysis.
 
 \subsection{\emph{UC14}: Deliver document via print \& postal service}
 \begin{itemize}
-    \item \textbf{Primary actor:} System
+    \item \textbf{Primary actor:} Recipient
     \item \textbf{Interested parties:} 
         \begin{itemize}
             \item \textit{Print \& postal service:} provides delivery of traditional mail
@@ -494,11 +494,14 @@ in this analysis.
     \end{enumerate}
 
     \item \textbf{Alternative scenarios:} 
-    None
+    \begin{enumerate}
+    	\item [1a.] The main scenario only applies if the Online Distribution Platform is an external party. Other steps must be followed if that is not the case (see remark 2)
+    \end{enumerate}
     
     \item \textbf{Remarks:}
         \begin{itemize}
-          \item  This use case is an extension of UC13: Deliver generated document
+          \item This use case is an extension of UC13: Deliver generated document
+          \item Step 1a. is an extension point for other use cases
         \end{itemize}
 \end{itemize}
 
@@ -701,7 +704,9 @@ in this analysis.
 	\end{enumerate}
 	
 	\item \textbf{Remarks:}
-	None
+	\begin{itemize}
+		This use case only applies if the Online Distribution Platform is an external party (i.e. not the Personal Document Store)
+	\end{itemize}
 \end{itemize}
 
 \subsection{\emph{UC22}: Disable Online Distribution Platform as distribution channel}
@@ -740,7 +745,7 @@ in this analysis.
 	
 	\item \textbf{Remarks:}
 	\begin{itemize}
-		\item First remark
+		\item This use case only applies if the Online Distribution Platform is an external party (i.e. not the Personal Document Store)
 	\end{itemize}
 \end{itemize}
 
