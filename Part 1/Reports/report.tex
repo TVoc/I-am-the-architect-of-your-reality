@@ -37,8 +37,10 @@ In this section we provide additional domain constraints.
     \item A Payslip can only be sent to Employees the Customer Organization employs
     \item If the Customer Organizations outsources Payslip management to a Social Secretary, it cannot submit Payslip data itself
     \item While a Recipient is subscribed to a Personal Document Store, any document for which e-mail is specified as the Distribution Channel is instead delivered through the Personal Document Store
+    \item A Recipient can have only one Personal Document Store
     \item While a Recipient is subscribed to an Online Distribution Platform that is also an external party with respect to eDocs (i.e. not the Personal Document Store), any documents of the type the Online Distribution Platform distributes is sent via the Online Distribution Platform regardless of the Distribution Platform the Customer Organization has selected
     \item If while constructing a Raw Data Entry no individual priority is explicitly selected, the individual priority is the same as the default processing priority of the Customer Organization
+    \item The fields that are filled out in a Raw Data Entry must be a subset of the fields specified by its corresponding Template containing at least the mandatory fields
     \item An Invoice cannot be its own advance invoice
     \item An Invoice is always addressed to a Client
     \item A Payslip is always addressed to an Employee
@@ -49,8 +51,17 @@ In this section, we provide a glossary of the most important terminology used
 in this analysis.
 
 \begin{itemize}
-    \item \textbf{Term1}: definition
-    \item \textbf{Term2}: definition
+    \item \textbf{Customer Organization}: Those organizations that outsource their document processing to eDocs and are prepared to provide monetary compensation.
+    \item \textbf{Data Supplier:} Those individuals who are a potential source of raw document data.
+    \item \textbf{Customer Organization Representative}: Employees that are authorized by the Customer Organization that employs them to trigger document generation and delivery for certain types of documents according to their role in the Organization. Some examples are salespeople and human resources managers.
+    \item \textbf{Social Secretary:} An organization to which management of an organization's payroll can be outsourced.
+    \item \textbf{Template:} Provides the skeleton for a certain document type. It defines fields that can be filled out with the contents of a certain Raw Data Entry. It is possible that some fields are mandatory.
+    \item \textbf{Raw data entry:} Contains raw data from which a document can be generated. It provides content that fills out its corresponding template.
+    \item \textbf{Invoice:} A commercial document issued for the sale of products and/or services from a seller (i.e. the Customer Organization) to a buyer (i.e. the Client).
+    \item \textbf{Payslip:} A document detailing the wage or salary the Customer Organization owes the Employee and how it is calculated.
+    \item \textbf{Distribution Channel:} The medium through which a certain document is sent to its corresponding Recipient. Encompasses both off-line and on-line media.
+    \item \textbf{Online Distribution Platform:} An online platform that distributes one or more types of documents to its registered clients. Encompasses both platforms that are internal to eDocs (e.g. the Personal Document Store) and platforms that are external to eDocs (e.g. Zoomit)
+    \item \textbf{Personal Document Store:} A personal delivery channel that any Recipient can register for. Effectively replaces e-mail as Distribution Channel. Any documents that have been sent to a registered Recipient in the past can be consulted by the Recipient. 
 \end{itemize}
 
 \section{Functional requirements}\label{sec:functional}
