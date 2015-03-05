@@ -55,6 +55,42 @@ in this analysis.
     \caption{Use case diagram for the system.}\label{fig:use_case_model}
 \end{figure}
 
+\subsection{\emph{UC3}: Deliver document via Personal Document Store}
+\begin{itemize}
+	\item \textbf{Primary actor:} Registered Recipient
+	\item \textbf{Interested parties:} 
+	\begin{itemize}
+		\item \textit{Customer Organization:} wants their documents to be delivered
+	\end{itemize}
+	
+	\item \textbf{Preconditions:}
+	\begin{itemize}
+		\item A document has been generated that should be delivered via e-mail (as indicated by the Customer Organization)
+	\end{itemize}
+	
+	\item \textbf{Postconditions:}
+	\begin{itemize}
+		\item A new document has been added to the personal document store of the Registered recipient.
+		\item The System has sent a notification to the addressee of the document. This e-mail contains a short description of the document and a link to the document.
+		\item The System has marked the corresponding job as added to personal document store.
+	\end{itemize}
+	
+	\item \textbf{Main scenario:} 
+	\begin{enumerate}
+		\item The System adds the document to the personal document store of the Registered recipient.
+		\item The System constructs an e-mail. This e-mail is addressed to the name of the Registered recipient and contains a short description of the received document (i.e. the sender of the document, the type of the document and the date at which the document was sent) and a link to the document.
+		\item The System sends this e-mail to the e-mail address of the Registered recipient.
+	\end{enumerate}
+	
+	\item \textbf{Alternative scenarios:} 
+	None
+	
+	\item \textbf{Remarks:}
+	\begin{itemize}
+		\item  This use case is an extension of UC13: Deliver generated document
+	\end{itemize}
+\end{itemize}
+
 \subsection{\emph{UC7}: Filter documents in Personal Document Store}
 \begin{itemize}
     \item \textbf{Primary actor:} Registered Recipient
@@ -323,11 +359,12 @@ in this analysis.
 
 \subsection{\emph{UC13}: Deliver generated document}
 \begin{itemize}
-    \item \textbf{Primary actor:} Recipient
+    \item \textbf{Primary actor:} System
     \item \textbf{Interested parties:} 
         \begin{itemize}
             \item \textit{eDocs:} wants documents to be delivered with as little human interaction as possible
             \item \textit{Customer Organization:} wants their documents to be delivered
+            \item \textit{Customer Organization Representative:} want to have a clear and detailed overview of the status of their document processing jobs
         \end{itemize}
 
     \item \textbf{Preconditions:}
@@ -339,6 +376,7 @@ in this analysis.
     \item \textbf{Postconditions:}
         \begin{itemize}
             \item The document has been sent on its way via the chosen Distribution Channel
+            \item If this document is not part of a recurring batch of document processing jobs, the System has billed the customer organisation for it.
         \end{itemize}
         
     \item \textbf{Main scenario:} 
@@ -359,7 +397,7 @@ in this analysis.
 
 \subsection{\emph{UC14}: Deliver document via print \& postal service}
 \begin{itemize}
-    \item \textbf{Primary actor:} Recipient
+    \item \textbf{Primary actor:} System
     \item \textbf{Interested parties:} 
         \begin{itemize}
             \item \textit{Print \& postal service:} provides delivery of traditional mail
@@ -630,7 +668,7 @@ in this analysis.
 	None
 \end{itemize}
 
-\subsection{\emph{UC21}: Register Recipient association with Online Distribution Platform}
+\subsection{\emph{UC21}: Enable Online Distribution Platform as distribution channel}
 \begin{itemize}
 	\item \textbf{Primary actor:} Online Distribution Platform
 	\item \textbf{Interested parties:} 
@@ -666,7 +704,7 @@ in this analysis.
 	None
 \end{itemize}
 
-\subsection{\emph{UC22}: Register Recipient unregistration with Online Distribution Platform}
+\subsection{\emph{UC22}: Disable Online Distribution Platform as distribution channel}
 \begin{itemize}
 	\item \textbf{Primary actor:} Online Distribution Platform
 	\item \textbf{Interested parties:} 
@@ -777,7 +815,7 @@ in this analysis.
 	\end{itemize}
 \end{itemize}
 
-\subsection{\emph{UC25}: Confirm delivery through Online Distribution Service receipt tracking}
+\subsection{\emph{UC25}: Confirm delivery through Online Distribution Platform receipt tracking}
 \begin{itemize}
 	\item \textbf{Primary actor:} Online Distribution Platform
 	\item \textbf{Interested parties:} 
@@ -813,6 +851,44 @@ in this analysis.
 	\begin{itemize}
 		\item This use case is an extension of UC23: Confirm delivery through receipt tracking
 	\end{itemize}
+\end{itemize}
+
+\subsection{\emph{UC26}: Submit document template}
+\begin{itemize}
+	\item \textbf{Primary actor:} Customer Organization Representative
+	\item \textbf{Interested parties:} 
+	\begin{itemize}
+		\item \textit{eDocs:} wants to simplify document generation and delivery
+		\item \textit{Customer Organization:} wants to outsource document generation and delivery
+	\end{itemize}
+	
+	\item \textbf{Preconditions:}
+	\begin{itemize}
+		\item The Customer Organization Representative is logged in (UC1: Log in)
+	\end{itemize}
+	
+	\item \textbf{Postconditions:}
+	\begin{itemize}
+		\item The new template will be used for the specified document type
+	\end{itemize}
+	
+	\item \textbf{Main scenario:} 
+	\begin{enumerate}
+		\item The Representative indicates he wants to upload a new template for a certain document type he is authorized to generate
+		\item The System provides the Representative with the means to upload a new template
+		\item The Representative uploads the new template
+		\item The System verifies the validity of the template
+		\item The System logs that the new template will be used for the specified document type. In case a template for the document type already existed, it is overwritten
+	\end{enumerate}
+	
+	\item \textbf{Alternative scenarios:} 
+	\begin{enumerate}
+		\item [5a.] The System has determined that the template has been formatted incorrectly or is incomplete (e.g. the document type is invoice and there is no net amount field) and shows the Representative which errors he has made
+		\item [6a.] The use case goes back to step 2
+	\end{enumerate}
+	
+	\item \textbf{Remarks:}
+	None
 \end{itemize}
 
 \begin{comment}
