@@ -55,6 +55,42 @@ in this analysis.
     \caption{Use case diagram for the system.}\label{fig:use_case_model}
 \end{figure}
 
+\subsection{\emph{UC3}: Deliver document via Personal Document Store}
+\begin{itemize}
+	\item \textbf{Primary actor:} Registered Recipient
+	\item \textbf{Interested parties:} 
+	\begin{itemize}
+		\item \textit{Customer Organization:} wants their documents to be delivered
+	\end{itemize}
+	
+	\item \textbf{Preconditions:}
+	\begin{itemize}
+		\item A document has been generated that should be delivered via e-mail (as indicated by the Customer Organization)
+	\end{itemize}
+	
+	\item \textbf{Postconditions:}
+	\begin{itemize}
+		\item A new document has been added to the personal document store of the Registered recipient.
+		\item The System has sent a notification to the addressee of the document. This e-mail contains a short description of the document and a link to the document.
+		\item The System has marked the corresponding job as added to personal document store.
+	\end{itemize}
+	
+	\item \textbf{Main scenario:} 
+	\begin{enumerate}
+		\item The System adds the document to the personal document store of the Registered recipient.
+		\item The System constructs an e-mail. This e-mail is addressed to the name of the Registered recipient and contains a short description of the received document (i.e. the sender of the document, the type of the document and the date at which the document was sent) and a link to the document.
+		\item The System sends this e-mail to the e-mail address of the Registered recipient.
+	\end{enumerate}
+	
+	\item \textbf{Alternative scenarios:} 
+	None
+	
+	\item \textbf{Remarks:}
+	\begin{itemize}
+		\item  This use case is an extension of UC13: Deliver generated document
+	\end{itemize}
+\end{itemize}
+
 \subsection{\emph{UC7}: Filter documents in Personal Document Store}
 \begin{itemize}
     \item \textbf{Primary actor:} Registered Recipient
@@ -314,6 +350,7 @@ in this analysis.
         \begin{itemize}
             \item \textit{eDocs:} wants documents to be delivered with as little human interaction as possible
             \item \textit{Customer Organization:} wants their documents to be delivered
+            \item \textit{Customer Organization Representative:} want to have a clear and detailed overview of the status of their document processing jobs
         \end{itemize}
 
     \item \textbf{Preconditions:}
@@ -325,6 +362,7 @@ in this analysis.
     \item \textbf{Postconditions:}
         \begin{itemize}
             \item The document has been sent on its way via the chosen Distribution Channel
+            \item If this document is not part of a recurring batch of document processing jobs, the System has billed the customer organisation for it.
         \end{itemize}
         
     \item \textbf{Main scenario:} 
@@ -822,7 +860,7 @@ in this analysis.
 	
 	\item \textbf{Main scenario:} 
 	\begin{enumerate}
-		\item The Representative indicates he wants to upload a new template for a certain document type
+		\item The Representative indicates he wants to upload a new template for a certain document type he is authorized to generate
 		\item The System provides the Representative with the means to upload a new template
 		\item The Representative uploads the new template
 		\item The System verifies the validity of the template
