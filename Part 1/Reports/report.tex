@@ -225,46 +225,54 @@ in this analysis.
         \end{itemize}
 \end{itemize}
 
-\subsection{\emph{UC11}: Signal E-mail delivery error}
+\subsection{\emph{UC11}: Handle E-mail delivery error}
 \begin{itemize}
-    \item \textbf{Primary actor:} System
+    \item \textbf{Primary actor:} Customer Organisation Representative
     \item \textbf{Interested parties:} 
         \begin{itemize}
-            \item \textit{Customer Organisation:} wants their documents delivered correctly
-            \item \textit{Customer Organisation Representative:} wants to know when he has to correct a client's details
+            \item \textit{Customer Organisation:} wants their documents delivered correctly, and to have the correct Recipient Details
+            \item \textit{Customer Organisation Representative:} wants to know when a Document he manages is not delivered correctly
             \item \textit{Recepient:} wants to receive his/her documents
         \end{itemize}
 
     \item \textbf{Preconditions:}
         \begin{itemize}
             \item A document has been sent to the Recipient via e-mail, but was not delivered.
-            \item The Recipient's email address in the system is wrong and not an existing e-mail address.
-            \item The External E-mail Provider has a system to signal to a sender when an e-mail address of a receiver is not valid.
+            \item The Recipient's email address in the Customer Organisation's database is wrong and not an existing e-mail address.
+            \item The External E-mail Provider has sent a notice to the System that certain documents could not reach their destination.
+            \item The System has notified the Representative of the fact that certain documents under his responsibility could not reach their destination.
         \end{itemize}
 
     \item \textbf{Postconditions:}
         \begin{itemize}
             \item The document has been sent to the Recipient via e-mail, and has been delivered.
-            \item The Recipient's email address in the system is correct.
+            \item The Recipient's email address in the Customer Organisation's database is correct.
         \end{itemize}
         
     \item \textbf{Main scenario:} 
     \begin{enumerate}
-       \item The Representative receives a notice that some documents could not reach their destination.
+       \item The Representative receives a notice that certain documents under his responsibility could not reach their destination.
        \item The Representative logs in to the system (UC1).
-       \item The Representative indicates he wants to view the list of documents that could not reach their destination.
-       \item The System
-       \item UC26
+       \item The Representative indicates he wants to view the list of documents that could not reach their destination by email.
+       \item The System collects all documents which could not be delivered by email for which the Representative is responsible.
+       \item The System presents the Representative with an overview of the collected documents and the delivery details.
+       \item The Representative indicates a document and supplies a corrected e-mail address.
+       \item The System resends the document with the newly supplied e-mail address.
+       \item The Representative indicates he is done supplying correct e-mail addresses.
+       \item The Use Case ends here.
     \end{enumerate}
 
     \item \textbf{Alternative scenarios:} 
     \begin{enumerate}
-        \item [3b.] Alternative at step 3
+        \item [8a.] The Representative indicates he wants to supply a correct e-mail address to another document.
+        \item [9a.] The Use Case resumes from step 4.
     \end{enumerate}
     
     \item \textbf{Remarks:}
         \begin{itemize}
             \item Abstraction is made of the way the Representative receives the notification. This could be by email or an external notification system of the company or eDocs. In this case the Log-In step is necessary. If the notice is internal to the eDocs system, and the Representative only receives it after logging in, the Log-In (UC1) step becomes a precondition.
+            \item The gathering of correct e-mail addresses is implied as human interaction.
+            \item The fact that the Customer Organisation database is updated with the correct e-mail address is implied as human interaction.
         \end{itemize}
 \end{itemize}
 
@@ -273,37 +281,43 @@ in this analysis.
     \item \textbf{Primary actor:} Registered Recipient
     \item \textbf{Interested parties:} 
         \begin{itemize}
-            \item \textit{Name of interested party:} reason why party is interested
+            \item \textit{eDocs:} wants to know when a lot of users unregister so they can perform research why
+            \item \textit{Registered Recipient:} wants to use another distribution channel
         \end{itemize}
 
     \item \textbf{Preconditions:}
         \begin{itemize}
-            \item First precondition.
-            \item Second precondition.
+            \item The Recipient is a Registered Recipient.
+            \item The Recipient is logged in (UC1).
         \end{itemize}
 
     \item \textbf{Postconditions:}
         \begin{itemize}
-            \item First postcondition.
-            \item Second postcondition.
+            \item The Recipient is now an Unregistered Recipient.
+            \item The details of the Recipient are removed from the System.
+            \item The Recipient is logged out.
         \end{itemize}
         
     \item \textbf{Main scenario:} 
     \begin{enumerate}
-       \item Step 1
-       \item Step 2
-       \item Step 3
-       \item \ldots
+       \item The Recipient indicates he wants to unregister from the Personal Document Store.
+       \item The System prompts him if he wants to continue with this action.
+       \item The Recipient indicates that he wants to unregister.
+       \item The System removes the Recipients details internally.
+       \item The System marks the Recipient as unregistered.
+       \item The System notifies the user that he has been unregistered.
+       \item The System logs out the user.
     \end{enumerate}
 
     \item \textbf{Alternative scenarios:} 
     \begin{enumerate}
-        \item [3b.] Alternative at step 3
+        \item [3a.] The recipient indicates he does not want to unregister.
+        \item [4a.] The Use Case ends here.
     \end{enumerate}
     
     \item \textbf{Remarks:}
         \begin{itemize}
-            \item First remark
+            \item Documents in the Personal Document Store are not affected. The documents are present in the Document Archive, and a Personal Document Store can be reconstructed for a user from this Archive.
         \end{itemize}
 \end{itemize}
 
