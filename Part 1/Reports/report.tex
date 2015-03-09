@@ -848,33 +848,67 @@ form of \emph{quality attribute scenarios}. We provide for each type
 (availability, performance and modifiability) one requirement.
 
 \subsection{Availability}
-\subsubsection{\emph{Av1}: Name of the quality attribute scenario}
-Shortly describe the context of the scenario.
+\subsubsection{\emph{Av1}: Submission system failure}
+The subsystem accepting connections for raw data submission fails or crashed. External connections are refused and Customer Organisations and Social Secretaries are unable to submit new raw data batches.
 
 \begin{itemize}
-    \item \textbf{Source:} source
+    \item \textbf{Source:} Internal
     \item \textbf{Stimulus:}
         \begin{itemize}
-            \item Description of a first stimulus.
-            \item Description of a second stimulus.
+            \item The subsystem for accepting raw data batches fails or crashes
         \end{itemize}
 
-    \item \textbf{Artifact:} the stimulated artifact
-    \item \textbf{Environment:} the condition under which the stimulus occurs
+    \item \textbf{Artifact:} Internal subsystem and external communication channel(s)
+    \item \textbf{Environment:} Normal execution
     \item \textbf{Response:}
         \begin{itemize}
-            \item Describe how the system should respond to the stimulus.
+            \item Raw data which is still passing through the subsystem is not lost when the failure occurs.
+            \item This does not affect the generation of documents for which the raw data was already passed to the rest of the system by the submission subsystem.
+            \item Prevention:
+            \begin{itemize}
+                \item The submission system should have a guaranteed minimal up-time.
+            \end{itemize}
+            \item Detection:
+            \begin{itemize}
+                \item The eDocs Operators are notified of this problem.
+                \item The System is able to detect this problem and goes into degraded modus:
+                \begin{itemize}
+                    \item Raw data which passes through the subsystem is always saved to secondary (persistent) storage before an acknowledgement to the submitting is sent. This way, no raw data is acknowledged but lost when the system fails. This data is deleted from the secondary storage after being passed to the rest of the system.
+                    \item Fail gracefully: when a client tries to submit data while the subsystem has failed, he receives an alternate response over the submission protocol, stating that the submission system is temporarily unavailable. This response is given by a backup networking module, that takes over the external communication channel(s) when the submission subsystem fails.
+                \end{itemize}
+            \end{itemize}
+            \item Resolution:
+            \begin{itemize}
+                \item The eDocs Operators verify the integrity of the secondary storage and otherwise notify all clients that raw data might have been lost, and they should make contact to verify their data and documents.
+                \item The eDocs Operators replace or restart failed components, be it hardware or software.
+                \item The subsystem then resumes by processing the remaining data in the secondary storage and again accepting external connections.
+            \end{itemize}
         \end{itemize}
 
     \item \textbf{Response measure:}
         \begin{itemize}
-            \item Describe how the satisfaction of a response is measured.
+            \item Prevention
+            \begin{itemize}
+                \item The subsystem should accept raw data for at least 99.5 percent of the time.
+                \item Raw data can be corrupted or lost in only up to 5 percent of failure cases.
+            \end{itemize}
+            \item Detection
+            \begin{itemize}
+                \item The secondary storage should store at least the total amount of recurring data batches, agreed in each client's SLA.
+                \item Detection of the failure should happen within 30 seconds.
+                \item It should take the backup network module maximally 5 seconds to take over the external communication channels.
+            \end{itemize}
+            \item Resolution
+            \begin{itemize}
+                \item Verifying the secondary storage should take up to 1 minute per client.
+                \item The total problem addressing time of the eDocs Operators should be under 45 minutes or as many minutes as there are clients, whichever is the greatest.
+            \end{itemize}
         \end{itemize}
 \end{itemize}
 
 \subsection{Performance}
-\subsubsection{\emph{P1}: Name of the quality attribute scenario}
-Shortly describe the context of the scenario.
+\subsubsection{\emph{P1}: Generation of documents}
+The System should be able to keep up with data submissions from all clients, at the very least in the situation where the amount of submitted data is the bare minimum indicated in all SLA's.
 
 \begin{itemize}
     \item \textbf{Source:} source
@@ -898,8 +932,8 @@ Shortly describe the context of the scenario.
 \end{itemize}
 
 \subsection{Modifiability}
-\subsubsection{\emph{M1}: Name of the quality attribute scenario}
-Shortly describe the context of the scenario.
+\subsubsection{\emph{M1}: New Document Type}
+Due to multiple requests from different clients, a new Document Type, e.g. a newsletter should be offered by the system, as an economic strategy. This new document type should not add any new steps to the data submission procedure, and should target a specific type of Recipient.
 
 \begin{itemize}
     \item \textbf{Source:} source
