@@ -871,9 +871,9 @@ The subsystem accepting connections for raw data submission fails or crashed. Ex
             \item Detection:
             \begin{itemize}
                 \item The eDocs Operators are notified of this problem.
-                \item The System is able to detect this problem and goes into degraded modus:
+                \item The System is able to detect this problem and goes into degraded mode:
                 \begin{itemize}
-                    \item Raw data which passes through the subsystem is always saved to secondary (persistent) storage before an acknowledgement to the submitting is sent. This way, no raw data is acknowledged but lost when the system fails. This data is deleted from the secondary storage after being passed to the rest of the system.
+                    \item Raw data which passes through the subsystem is always saved to secondary (persistent) storage before an acknowledgement to the submitting client is sent. This way, no raw data is acknowledged but lost when the system fails. This data is deleted from the secondary storage after being passed to the rest of the system.
                     \item Fail gracefully: when a client tries to submit data while the subsystem has failed, he receives an alternate response over the submission protocol, stating that the submission system is temporarily unavailable. This response is given by a backup networking module, that takes over the external communication channel(s) when the submission subsystem fails.
                 \end{itemize}
             \end{itemize}
@@ -894,7 +894,7 @@ The subsystem accepting connections for raw data submission fails or crashed. Ex
             \end{itemize}
             \item Detection
             \begin{itemize}
-                \item The secondary storage should store at least the total amount of recurring data batches, agreed in each client's SLA.
+                \item The secondary storage should store at least the total amount of recurring data batches, as agreed in each client's SLA.
                 \item Detection of the failure should happen within 30 seconds.
                 \item It should take the backup network module maximally 5 seconds to take over the external communication channels.
             \end{itemize}
@@ -933,26 +933,28 @@ The System should be able to keep up with data submissions from all clients, at 
 
 \subsection{Modifiability}
 \subsubsection{\emph{M1}: New Document Type}
-Due to multiple requests from different clients, a new Document Type, e.g. a newsletter should be offered by the system, as an economic strategy. This new document type should not add any new steps to the data submission procedure, and should target a specific type of Recipient.
+Due to multiple requests from different clients or based on market research, a new Document Type, e.g. a newsletter should be offered by the system, as an economic strategy. This new document type should not add any new steps to the data submission procedure, and should target a specific type of Recipient.
 
 \begin{itemize}
-    \item \textbf{Source:} source
-    \item \textbf{Stimulus:}
+    \item \textbf{Source:} End user or the finance department
+    \item \textbf{Stimulus:} One of the following occurs
         \begin{itemize}
-            \item Description of a first stimulus.
-            \item Description of a second stimulus.
+            \item End users wish to be able to outsource document processing for a new document type
+            \item It is predicted that being able to process a new document type would generate a lot of business
         \end{itemize}
 
-    \item \textbf{Artifact:} the stimulated artifact
-    \item \textbf{Environment:} the condition under which the stimulus occurs
+    \item \textbf{Artifact:} The Raw Data Submission sub-system and Document Generation sub-system
+    \item \textbf{Environment:} Run-time or design time
     \item \textbf{Response:}
         \begin{itemize}
-            \item Describe how the system should respond to the stimulus.
+            \item The developer identifies what a document of the new document type should generally look like, taking into account mandatory fields and lay-out imposed by any legal constraints that apply.
+            \item The developer identifies which identifying information must be supplied to an Online Distribution Platform in case it is chosen as the Distribution Channel for a document of the new type.
+            \item The developer makes fitting changes to the Document Generation sub-system and the Raw Data Submission sub-system in order to support the new document type.
         \end{itemize}
 
     \item \textbf{Response measure:}
         \begin{itemize}
-            \item Describe how the satisfaction of a response is measured.
+            \item Providing support for a new document type should take no more than one man week.
         \end{itemize}
 \end{itemize}
 
