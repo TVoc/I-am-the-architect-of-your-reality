@@ -908,26 +908,44 @@ The subsystem accepting connections for raw data submission fails or crashed. Ex
 
 \subsection{Performance}
 \subsubsection{\emph{P1}: Generation of documents}
-The System should be able to keep up with data submissions from all clients, at the very least in the situation where the amount of submitted data is the bare minimum indicated in all SLA's.
+The System should be able to keep up with data submissions from all clients, at the very least in the situation where the amount of submitted data is the total of the standard periodic submissions as indicated in all individual SLA's. The System should also be able to honor the priority settings on the raw data batches as best as possible.
 
 \begin{itemize}
-    \item \textbf{Source:} source
+    \item \textbf{Source:} Customer Organisation(s) and/or Social Secretarie(s) and/or Customer Organisation Representative(s)
     \item \textbf{Stimulus:}
         \begin{itemize}
-            \item Description of a first stimulus.
-            \item Description of a second stimulus.
+            \item The source submits a batch of raw data.
+            \item The submission subsystem starts and processes raw data from the secondary storage.
         \end{itemize}
 
-    \item \textbf{Artifact:} the stimulated artifact
-    \item \textbf{Environment:} the condition under which the stimulus occurs
+    \item \textbf{Artifact:} The subsystem responsible for compiling raw data into documents and scheduling the generation relative to raw data priorities.
+    \item \textbf{Environment:} Normal Execution
     \item \textbf{Response:}
         \begin{itemize}
-            \item Describe how the system should respond to the stimulus.
+            \item The System should be provided with enough processing power to process at least the mean load of document generation as stipulated by the SLA's. When the load on the document generation is not over the capacity of the system, this is viewed as ``normal circumstances''.
+            \item Under normal circumstances, no extreme care should be taken with document priorities. They should be honored, and only lightly enforced, in case the system comes under heavy load at a near point in the future.
+            \item When the load on the system becomes too high, and raw data is not immediately processed anymore, priorities should be strictly enforced as deadlines, with earliest deadline scheduling. The deadline for a document's generation is its priority maximum handling time (see description), added to its submission time.
+            \item When the system comes under too heavy a load and priority honoring can not be guaranteed anymore, strict priority behaviour is still in effect:
+            \begin{itemize}
+                \item Of all conflicting/unreachable deadlines, documents with the Critical priority are the first to be handled.
+                \item Next most important in order are Diamond, Gold and Silver. These are each respectively more important than the next. This means that Silver priority documents are sacrificed for the other priorities when necessary, then Gold priority documents if necessary, etc.
+            \end{itemize}
         \end{itemize}
 
     \item \textbf{Response measure:}
+        The different document priority classes have different guarantees of priority honoring, apart from their maximum generation time:
         \begin{itemize}
-            \item Describe how the satisfaction of a response is measured.
+            \item For Silver priority documents, under heavy load, 90 percent of the documents should be generated within set deadline.
+            \item For Gold priority documents, under heavy load, 97.5 percent of the documents should be generated within set deadline.
+            \item For Diamond priority documents, under heavy load, 99 percent of the documents should be generated within set deadline.
+            \item For Critical priority documents, under heavy load, all of the documents should be generated within set deadline.
+        \end{itemize}
+        Mainly due to this last guarantee, the eDocs administrators should be able to acquire extra processing power to comply with these guarantees:
+        \begin{itemize}
+            \item The eDocs administrators should receive a notice within 5 seconds when the system has come under heavy load.
+            \item The eDocs administrators should receive a notice when the system has been under heavy load for a minute.
+            \item The eDocs administrators should receive an urgent notice when the system has been under heavy load for 15 minutes.
+            \item The eDocs administrators should be able to acquire external processing power within 1.5 hours of receiving this urgent notice.
         \end{itemize}
 \end{itemize}
 
