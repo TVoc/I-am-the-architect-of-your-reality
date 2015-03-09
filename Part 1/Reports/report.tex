@@ -79,24 +79,25 @@ in this analysis.
 	\item \textbf{Primary actor:} Registered Recipient
 	\item \textbf{Interested parties:} 
 	\begin{itemize}
-		\item \textit{Customer Organization:} wants their documents to be delivered
+		\item \textit{Customer Organization:} wants their documents to be delivered.
+        \item \textit{Registered Recipient:} wants their documents delivered via the Personal Document Store, as requested.
 	\end{itemize}
 	
 	\item \textbf{Preconditions:}
 	\begin{itemize}
-		\item A document has been generated that should be delivered via e-mail (as indicated by the Customer Organization)
+		\item A document has been generated that should be delivered via e-mail (as indicated by the Customer Organization).
 	\end{itemize}
 	
 	\item \textbf{Postconditions:}
 	\begin{itemize}
-		\item A new document has been added to the personal document store of the Registered recipient.
+		\item A new document has been added to the Personal Document Store of the Registered Recipient.
 		\item The System has sent a notification to the addressee of the document. This e-mail contains a short description of the document and a link to the document.
-		\item The System has marked the corresponding job as added to personal document store.
+		\item The System has marked the corresponding job as added to Personal Document Store.
 	\end{itemize}
 	
 	\item \textbf{Main scenario:} 
 	\begin{enumerate}
-		\item The System adds the document to the personal document store of the Registered recipient.
+		\item The System adds the document to the Personal Document Store of the Registered recipient.
 		\item The System constructs an e-mail. This e-mail is addressed to the name of the Registered recipient and contains a short description of the received document (i.e. the sender of the document, the type of the document and the date at which the document was sent) and a link to the document.
 		\item The System sends this e-mail to the e-mail address of the Registered recipient.
 	\end{enumerate}
@@ -115,31 +116,32 @@ in this analysis.
     \item \textbf{Primary actor:} Registered Recipient
     \item \textbf{Interested parties:} 
         \begin{itemize}
-            \item \textit{eDocs:} Wants to know popular searches for optimising document caching
+            \item \textit{eDocs:} wants to know popular searches for optimising document caching
+            \item \textit{Registered Recipient:} wants to be able to find (a) certain document(s) more easily.
         \end{itemize}
 
     \item \textbf{Preconditions:}
         \begin{itemize}
-            \item User has consulted his personal document store (UC4).
+            \item Registered Recipient has consulted his Personal Document Store (UC4).
         \end{itemize}
 
     \item \textbf{Postconditions:}
         \begin{itemize}
-            \item The Registered Recipient has received a new view of documents in his Personal document store, matching the query he gave to the system.
+            \item The Registered Recipient has received a new view of documents in his Personal Document Store, matching the query he gave to the system.
         \end{itemize}
         
     \item \textbf{Main scenario:} 
     \begin{enumerate}
-       \item The user indicates he wants to pose a filter query to the Personal Document Store
-       \item The user receives a form with filter choices, which he completes, and indicates he wants to filter with given parameters.
-       \item The System retrieves all documents of the Registered User matching his query.
-       \item The System provides an overview of all retrieved documents matching the User's query.
+       \item The Registered Recipient indicates he wants to pose a filter query to the Personal Document Store
+       \item The Registered Recipient receives a form with filter choices, which he completes, and indicates he wants to filter with given parameters.
+       \item The System retrieves all documents of the Registered Recipient matching his query.
+       \item The System provides an overview of all retrieved documents matching the Registered Recipient's query.
     \end{enumerate}
 
     \item \textbf{Alternative scenarios:} 
     \begin{enumerate}
-        \item [4a.] The System did not find any documents matching the User's query
-        \item [5a.] The Registered User receives a notification that no documents have matched his filter parameters.
+        \item [4a.] The System did not find any documents matching the Registered Recipient's query
+        \item [5a.] The Registered Recipient receives a notification that no documents have matched his filter parameters.
     \end{enumerate}
     
     \item \textbf{Remarks:}
@@ -154,6 +156,7 @@ in this analysis.
     \item \textbf{Interested parties:} 
         \begin{itemize}
             \item \textit{eDocs:} wants to let the organisation know their documents are actually being delivered
+            \item \textit{Customer Organisation:} wants to be able to check up on their document delivery
         \end{itemize}
 
     \item \textbf{Preconditions:}
@@ -163,7 +166,7 @@ in this analysis.
 
     \item \textbf{Postconditions:}
         \begin{itemize}
-            \item Representative has received Delivery information regarding the documents he is interested in.
+            \item Representative has received delivery information regarding the documents he is interested in.
         \end{itemize}
         
     \item \textbf{Main scenario:} 
@@ -171,7 +174,7 @@ in this analysis.
        \item The Representative signals he wants an overview of the company documents to which he has access (see remarks).
        \item The System retrieves all documents managed by the Representative.
        \item The System presents the Representative with an overview of the matching documents, including a small individual note per document whether it has been delivered or not.
-       \item The use case ends here.
+       \item The Use Case ends here.
     \end{enumerate}
 
     \item \textbf{Alternative scenarios:} 
@@ -185,9 +188,9 @@ in this analysis.
     
     \item \textbf{Remarks:}
         \begin{itemize}
-            \item A representative only has access to documents generated by his role in the company. E.g. Sales representatives cannot consult payslips, which are managed by Human Resources Representatives.
+            \item A Representative only has access to documents generated by his role in the company. E.g. Sales Representatives cannot consult payslips, which are managed by Human Resources Representatives.
             \item A document in an online distribution platform is only flagged as delivered after the document has also been opened by the Recipient.
-            \item Details of a document in this Use Case denote for example the chosen distribution channel, the contents of the document, the date of generation \ldots
+            \item Details of a document in this Use Case denote for example the chosen Distribution Channel, the contents of the document, the date of generation \ldots
         \end{itemize}
 \end{itemize}
 
@@ -198,6 +201,7 @@ in this analysis.
         \begin{itemize}
             \item \textit{Customer Organisation Representative:} wants to make sure the documents he manages are correctly generated and delivered from the raw data
             \item \textit{eDocs:} wants the system to correctly handle raw data or signal the company if errors exist
+            \item \textit{Customer Organisation:} wants to outsource document processing, generation and delivery.
         \end{itemize}
 
     \item \textbf{Preconditions:}
@@ -207,7 +211,7 @@ in this analysis.
 
     \item \textbf{Postconditions:}
         \begin{itemize}
-            \item The System has received a correct batch of data which can be processed into docuents.
+            \item The System has received a correct batch of raw data which can be processed into docuents.
             \item The Customer Organisation knows that no errors are present in the currently submitted data.
         \end{itemize}
         
@@ -239,6 +243,7 @@ in this analysis.
         \begin{itemize}
             \item \textit{Customer Organisation:} wants to make sure its documents are correctly generated and delivered
             \item \textit{Social Secretary:} wants know if errors existed in the data they submitted, to check if their bookkeeping is sound.
+            \item \textit{Customer Organisation Representative:} wants the documents they are responsible for to be generated and handled without errors.
         \end{itemize}
 
     \item \textbf{Preconditions:}
@@ -246,6 +251,8 @@ in this analysis.
             \item The System has received a batch of raw data and found errors in the entries
             \item The System has sent a notice to the responsible Customer Organisation Representative.
             \item The Customer Organisation Representative as primary actor is responsible for the document type for which an error was present in the raw data.
+            \item The Representative has received a notice that errors were present in a recently submitted raw data batch.
+            \item The Representative is logged in to the system (UC1).
         \end{itemize}
 
     \item \textbf{Postconditions:}
@@ -255,27 +262,25 @@ in this analysis.
         \end{itemize}
         
     \item \textbf{Main scenario:} 
-    \begin{enumerate}
-       \item The Representative receives a notice that errors were present in a recently submitted raw data batch.
-       \item The Representative logs in to the system (UC1).
-       \item The Representative indicates he wants to receive an overview of the data errors to be handled by him/her.
-       \item The System collects all raw data errors for which the Representative is responsible.
-       \item The System presents the Representative with an overview of retrieved errors.
-       \item the Representative gathers the correct data.
-       \item The Representative submits over agreed protocol the new batch of raw data for processing.
-       \item The System checks the new raw data for errors.
-       \item No errors are found and the system indicates to the Representative that his submission was succesful.
-    \end{enumerate}
+        \begin{enumerate}
+           \item The Representative indicates he wants to receive an overview of the data errors to be handled by him/her.
+           \item The System collects all raw data errors for which the Representative is responsible.
+           \item The System presents the Representative with an overview of retrieved errors.
+           \item the Representative gathers the correct data.
+           \item The Representative submits over agreed protocol the new batch of raw data for processing.
+           \item The System checks the new raw data for errors.
+           \item No errors are found and the system indicates to the Representative that his submission was succesful.
+        \end{enumerate}
 
     \item \textbf{Alternative scenarios:} 
-    \begin{enumerate}
-        \item [9a.] Errors are detected in the newly submitted data.
-        \item [10a.] The System sends a notice to the responsible Customer Organisation Representative(s) that errors have been found in recently submitted data.
-    \end{enumerate}
+        \begin{enumerate}
+            \item [9a.] Errors are detected in the newly submitted data.
+            \item [10a.] The System sends a notice to the responsible Customer Organisation Representative(s) that errors have been found in recently submitted data.
+        \end{enumerate}
     
     \item \textbf{Remarks:}
         \begin{itemize}
-            \item Abstraction is made of the way the Representative receives the notification. This could be by email or an external notification system of the company or eDocs. In this case the Log-In step is necessary. If the notice is internal to the eDocs system, and the Representative only receives it after logging in, the Log-In (UC1) step becomes a precondition.
+            \item Abstraction is made of the way the Representative receives the notification. This could be by e-mail or an external notification system of the company or eDocs. In this case the Log-In step is necessary. If the notice is internal to the eDocs system, and the Representative only receives it after logging in, the Log-In (UC1) step becomes a precondition.
             \item The agreed protocol for submission by the Representative should include a way to signal that the submitted raw data replaces erronous data. It could be a more interactive way of submitting data, for example, a field or button in the overview of the retrieved errors.
         \end{itemize}
 \end{itemize}
@@ -285,31 +290,31 @@ in this analysis.
     \item \textbf{Primary actor:} Customer Organisation Representative
     \item \textbf{Interested parties:} 
         \begin{itemize}
-            \item \textit{Customer Organisation:} wants their documents delivered correctly, and to have the correct Recipient Details
-            \item \textit{Customer Organisation Representative:} wants to know when a Document he manages is not delivered correctly
-            \item \textit{Recepient:} wants to receive his/her documents
+            \item \textit{Customer Organisation:} wants their documents delivered correctly, and to have the correct Recipient Details.
+            \item \textit{Customer Organisation Representative:} wants to know when a document he manages is not delivered correctly.
+            \item \textit{Recepient:} wants to receive his/her documents.
         \end{itemize}
 
     \item \textbf{Preconditions:}
         \begin{itemize}
             \item A document has been sent to the Recipient via e-mail, but was not delivered.
-            \item The Recipient's email address in the Customer Organisation's database is wrong and not an existing e-mail address.
+            \item The Recipient's e-mail address in the Customer Organisation's database is wrong and not an existing e-mail address.
             \item The External E-mail Provider has sent a notice to the System that certain documents could not reach their destination.
             \item The System has notified the Representative of the fact that certain documents under his responsibility could not reach their destination.
+            \item The Representative has received a notice that certain documents under his responsibility could not reach their destination.
+            \item The Representative has logged in to the system (UC1).
         \end{itemize}
 
     \item \textbf{Postconditions:}
         \begin{itemize}
             \item The document has been sent to the Recipient via e-mail, and has been delivered.
-            \item The Recipient's email address in the Customer Organisation's database is correct.
+            \item The Recipient's e-mail address in the Customer Organisation's database is correct.
         \end{itemize}
         
     \item \textbf{Main scenario:} 
     \begin{enumerate}
-       \item The Representative receives a notice that certain documents under his responsibility could not reach their destination.
-       \item The Representative logs in to the system (UC1).
-       \item The Representative indicates he wants to view the list of documents that could not reach their destination by email.
-       \item The System collects all documents which could not be delivered by email for which the Representative is responsible.
+       \item The Representative indicates he wants to view the list of documents that could not reach their destination by e-mail.
+       \item The System collects all documents which could not be delivered by e-mail for which the Representative is responsible.
        \item The System presents the Representative with an overview of the collected documents and the delivery details.
        \item The Representative indicates a document and supplies a corrected e-mail address.
        \item The System resends the document with the newly supplied e-mail address.
@@ -325,7 +330,7 @@ in this analysis.
     
     \item \textbf{Remarks:}
         \begin{itemize}
-            \item Abstraction is made of the way the Representative receives the notification. This could be by email or an external notification system of the company or eDocs. In this case the Log-In step is necessary. If the notice is internal to the eDocs system, and the Representative only receives it after logging in, the Log-In (UC1) step becomes a precondition.
+            \item Abstraction is made of the way the Representative receives the notification. This could be by e-mail or an external notification system of the company or eDocs. In this case the log-in step is necessary. If the notice is internal to the eDocs system, and the Representative only receives it after logging in, the log-in (UC1) step becomes a precondition.
             \item The gathering of correct e-mail addresses is implied as human interaction.
             \item The fact that the Customer Organisation database is updated with the correct e-mail address is implied as human interaction.
         \end{itemize}
@@ -360,19 +365,19 @@ in this analysis.
        \item The Recipient indicates that he wants to unregister.
        \item The System removes the Recipients details internally.
        \item The System marks the Recipient as unregistered.
-       \item The System notifies the user that he has been unregistered.
-       \item The System logs out the user.
+       \item The System notifies the Recipient that he has been unregistered.
+       \item The System logs out the Recipient.
     \end{enumerate}
 
     \item \textbf{Alternative scenarios:} 
     \begin{enumerate}
-        \item [3a.] The recipient indicates he does not want to unregister.
+        \item [3a.] The Recipient indicates he does not want to unregister.
         \item [4a.] The Use Case ends here.
     \end{enumerate}
     
     \item \textbf{Remarks:}
         \begin{itemize}
-            \item Documents in the Personal Document Store are not affected. The documents are present in the Document Archive, and a Personal Document Store can be reconstructed for a user from this Archive.
+            \item Documents in the Personal Document Store are not affected. The documents are present in the Document Archive, and a Personal Document Store can be reconstructed for a Recipient from this Archive.
         \end{itemize}
 \end{itemize}
 
@@ -384,6 +389,7 @@ in this analysis.
             \item \textit{eDocs:} wants documents to be delivered with as little human interaction as possible
             \item \textit{Customer Organization:} wants their documents to be delivered
             \item \textit{Customer Organization Representative:} want to have a clear and detailed overview of the status of their document processing jobs
+            \item \textit{Recipient:} wants to receive the documents addressed to them, with the requested delivery method.
         \end{itemize}
 
     \item \textbf{Preconditions:}
@@ -425,7 +431,7 @@ in this analysis.
     \item \textbf{Preconditions:}
         \begin{itemize}
             \item The document's associated raw data specifies print \& postal service as the delivery method
-            \item It is not the case that the System knows that the Recipient is registered with an Online Distribution Platform that distributes the type of the document to be delivered.
+            \item The System is not aware of any Online Distribution Platforms the Recipient is registered with and distributes the type of the document to be delivered. (See remark 2)
         \end{itemize}
 
     \item \textbf{Postconditions:}
@@ -458,7 +464,7 @@ in this analysis.
 
     \item \textbf{Preconditions:}
         \begin{itemize}
-            \item It is not the case that the System knows that the Recipient is registered with an Online Distribution Platform that distributes the type of the document to be delivered.
+            \item The System is not aware of any Online Distribution Platforms the Recipient is registered with and distributes the type of the document to be delivered. (See remark 2)
         \end{itemize}
 
     \item \textbf{Postconditions:}
@@ -483,6 +489,7 @@ in this analysis.
     \item \textbf{Remarks:}
         \begin{itemize}
             \item This use case is an extension of UC13: Deliver generated document
+            \item Finding no Online Distribution Platform matching the document to be delivered makes the system default to standard e-mail delivery.
         \end{itemize}
 \end{itemize}
 
@@ -540,27 +547,30 @@ in this analysis.
 	
 	\item \textbf{Postconditions:}
 	\begin{itemize}
-		\item The System has presented the user with an overview of billing information
+		\item The System has presented the User with an overview of billing information
 	\end{itemize}
 	
 	\item \textbf{Main scenario:} 
 	\begin{enumerate}
-		\item The user indicates he wishes to view the Customer Organization's billing information
+		\item The User indicates he wishes to view the Customer Organization's billing information
 		\item The System collects the Customer Organization's billing information
 		\item The System presents the user with an overview of the retrieved billing information
-		\item The use case ends
+		\item The Use Case ends
 	\end{enumerate}
 	
 	\item \textbf{Alternative scenarios:} 
 	\begin{enumerate}
-		\item [4a.] The user indicates that he wants a more detailed view of a specific transaction
-		\item [5a.] The System presents the user with a more detailed view of that transaction
-		\item [6a.] The user indicates he wants to return to the overview
-		\item [7a.] The use case goes back to step 3
+		\item [4a.] The User indicates that he wants a more detailed view of a specific transaction
+		\item [5a.] The System presents the User with a more detailed view of that transaction
+		\item [6a.] The User indicates he wants to return to the overview
+		\item [7a.] The Use Case goes back to step 3
 	\end{enumerate}
 	
 	\item \textbf{Remarks:}
-	None
+	   \begin{itemize}
+          \item The Billing Information in this Use Case pertains the cost of the Customer Organisation for using the eDocs system. E.g. monthly fees or priority costs.
+          \item The ``User'' is this Use Case is a Customer Organisation Employee or Representative who is responsible for the contractual interaction with the eDocs company.
+        \end{itemize}
 \end{itemize}
 
 \subsection{\emph{UC18}: Manage Customer Organization information}
@@ -608,9 +618,7 @@ in this analysis.
 	\end{enumerate}
 	
 	\item \textbf{Remarks:}
-	\begin{itemize}
-		\item First remark
-	\end{itemize}
+	None
 \end{itemize}
 
 \subsection{\emph{UC19}: Register Customer Organization}
@@ -619,7 +627,7 @@ in this analysis.
 	\item \textbf{Interested parties:} 
 	\begin{itemize}
 		\item \textit{eDocs:} wants as many clients to use their services as possible
-		\item \textit{Customer Organization:} wants to use eDocs's services and is prepared to provide monetary compensation
+		\item \textit{Customer Organization:} wants to use eDocs' services and is prepared to provide monetary compensation
 	\end{itemize}
 	
 	\item \textbf{Preconditions:}
@@ -650,9 +658,7 @@ in this analysis.
 	\end{enumerate}
 	
 	\item \textbf{Remarks:}
-	\begin{itemize}
-		\item First remark
-	\end{itemize}
+	None
 \end{itemize}
 
 \subsection{\emph{UC20}: Unregister Customer Organization}
@@ -690,6 +696,7 @@ in this analysis.
 	None
 \end{itemize}
 
+\begin{comment}
 \subsection{\emph{UC21}: Enable Online Distribution Platform as distribution channel}
 \begin{itemize}
 	\item \textbf{Primary actor:} Online Distribution Platform
@@ -697,6 +704,7 @@ in this analysis.
 	\begin{itemize}
 		\item \textit{eDocs:} wishes to comply to the Recipient's preferences as to how he wants his documents to be delivered
 		\item \textit{Recipient:} wants documents addressed to him to be delivered according to his wishes
+        \item \textit{Online Distribution Platform:} wants Recipients to use their services.
 	\end{itemize}
 	
 	\item \textbf{Preconditions:}
@@ -735,6 +743,7 @@ in this analysis.
 	\begin{itemize}
 		\item \textit{eDocs:} wishes to comply to the Recipient's preferences as to how he wants his documents to be delivered
 		\item \textit{Recipient:} wants documents addressed to him to be delivered according to his wishes
+        \item \texit{Online Distribution Platform:} wants to grasp the size of their userbase
 	\end{itemize}
 	
 	\item \textbf{Preconditions:}
@@ -767,8 +776,9 @@ in this analysis.
 		\item This use case only applies if the Online Distribution Platform is an external party (i.e. not the Personal Document Store)
 	\end{itemize}
 \end{itemize}
+\end{comment}
 
-\subsection{\emph{UC23}: Confirm delivery through receipt tracking}
+\subsection{\emph{UC21}: Confirm delivery through receipt tracking}
 \begin{itemize}
 	\item \textbf{Primary actor:} Recipient
 	\item \textbf{Interested parties:} 
@@ -802,7 +812,7 @@ in this analysis.
 	\end{itemize}
 \end{itemize}
 
-\subsection{\emph{UC24}: Confirm delivery through e-mail receipt tracking}
+\subsection{\emph{UC22}: Confirm delivery through e-mail receipt tracking}
 \begin{itemize}
 	\item \textbf{Primary actor:} Recipient
 	\item \textbf{Interested parties:} 
@@ -839,13 +849,14 @@ in this analysis.
 	\end{itemize}
 \end{itemize}
 
-\subsection{\emph{UC25}: Confirm delivery through Online Distribution Platform receipt tracking}
+\subsection{\emph{UC23}: Confirm delivery through Online Distribution Platform receipt tracking}
 \begin{itemize}
 	\item \textbf{Primary actor:} Online Distribution Platform
 	\item \textbf{Interested parties:} 
 	\begin{itemize}
 		\item \textit{eDocs:} wishes to assure the Company Organization that their documents are being delivered
 		\item \textit{Customer Organization:} wishes to be certain that documents sent on their behalf have been delivered
+        \item \textit{Online Distribution Platform:} wants to signal accurately to the sender when a documents has been delivered.
 	\end{itemize}
 	
 	\item \textbf{Preconditions:}
@@ -877,7 +888,7 @@ in this analysis.
 	\end{itemize}
 \end{itemize}
 
-\subsection{\emph{UC26}: Submit document template}
+\subsection{\emph{UC24}: Submit document template}
 \begin{itemize}
 	\item \textbf{Primary actor:} Customer Organization Representative
 	\item \textbf{Interested parties:} 
