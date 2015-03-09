@@ -76,7 +76,7 @@ in this analysis.
 
 \subsection{\emph{UC3}: Deliver document via Personal Document Store}
 \begin{itemize}
-	\item \textbf{Primary actor:} Registered Recipient
+	\item \textbf{Primary actor:} Registered Recipient (see remark 2)
 	\item \textbf{Interested parties:} 
 	\begin{itemize}
 		\item \textit{Customer Organization:} wants their documents to be delivered.
@@ -107,7 +107,8 @@ in this analysis.
 	
 	\item \textbf{Remarks:}
 	\begin{itemize}
-		\item  This use case is an extension of UC16: Deliver document via Online Distribution Platform
+		\item This use case is an extension of UC15: Deliver document via e-mail
+        \item The Recipient being a registered recipient implies the fact that they have a Personal Document Store, and documents marked to be delivered by e-mail should be instead delivered to this Personal Document Store.
 	\end{itemize}
 \end{itemize}
 
@@ -292,7 +293,7 @@ in this analysis.
         \begin{itemize}
             \item \textit{Customer Organisation:} wants their documents delivered correctly, and to have the correct Recipient Details.
             \item \textit{Customer Organisation Representative:} wants to know when a document he manages is not delivered correctly.
-            \item \textit{Recepient:} wants to receive his/her documents.
+            \item \textit{Recipient:} wants to receive their documents.
         \end{itemize}
 
     \item \textbf{Preconditions:}
@@ -341,7 +342,7 @@ in this analysis.
     \item \textbf{Primary actor:} Registered Recipient
     \item \textbf{Interested parties:} 
         \begin{itemize}
-            \item \textit{eDocs:} wants to know when a lot of users unregister so they can perform research why
+            \item \textit{eDocs:} wants to manage the Registered Recipients and not offer services to Recipients against their will.
             \item \textit{Registered Recipient:} wants to use another distribution channel
         \end{itemize}
 
@@ -431,7 +432,6 @@ in this analysis.
     \item \textbf{Preconditions:}
         \begin{itemize}
             \item The document's associated raw data specifies print \& postal service as the delivery method
-            \item The System is not aware of any Online Distribution Platforms the Recipient is registered with and distributes the type of the document to be delivered. (See remark 2)
         \end{itemize}
 
     \item \textbf{Postconditions:}
@@ -456,7 +456,7 @@ in this analysis.
 
 \subsection{\emph{UC15}: Deliver document via e-mail}
 \begin{itemize}
-    \item \textbf{Primary actor:} Unregistered Recipient
+    \item \textbf{Primary actor:} Unregistered Recipient (see remark 3)
     \item \textbf{Interested parties:} 
         \begin{itemize}
             \item \textit{E-mail Provider:} Is responsible for delivering e-mail addressed to its clients
@@ -464,7 +464,7 @@ in this analysis.
 
     \item \textbf{Preconditions:}
         \begin{itemize}
-            \item The System is not aware of any Online Distribution Platforms the Recipient is registered with and distributes the type of the document to be delivered. (See remark 2)
+            \item The document's associated raw data specifies e-mail as the delivery method
         \end{itemize}
 
     \item \textbf{Postconditions:}
@@ -488,8 +488,9 @@ in this analysis.
     
     \item \textbf{Remarks:}
         \begin{itemize}
-            \item This use case is an extension of UC13: Deliver generated document
-            \item Finding no Online Distribution Platform matching the document to be delivered makes the system default to standard e-mail delivery.
+            \item This use case is an extension of UC13: Deliver generated document.
+            \item Step 2 is an extension point for other use cases.
+            \item The Recipient being Unregistered implies he is not the owner of a Personal document store.
         \end{itemize}
 \end{itemize}
 
@@ -503,13 +504,12 @@ in this analysis.
 
     \item \textbf{Preconditions:}
         \begin{itemize}
-            \item The System knows that the Recipient is registered with an Online Distribution Platform that distributes the type of the document to be delivered
+            \item The document's associated raw data specifies a certain Online Distribution Platform as the delivery method, accompanied by the necessary details for the Platform
         \end{itemize}
 
     \item \textbf{Postconditions:}
         \begin{itemize}
-            \item The System has sent the PDF representing the document to the Online Distribution Platform via a web service along with information
-            that identifies the Recipient
+            \item The System has sent the PDF representing the document to the Online Distribution Platform via a web service along with information that identifies the Recipient
         \end{itemize}
         
     \item \textbf{Main scenario:} 
@@ -520,14 +520,11 @@ in this analysis.
     \end{enumerate}
 
     \item \textbf{Alternative scenarios:} 
-    \begin{enumerate}
-    	\item [1a.] The main scenario only applies if the Online Distribution Platform is an external party. Other steps must be followed if that is not the case (see remark 2)
-    \end{enumerate}
+    None
     
     \item \textbf{Remarks:}
         \begin{itemize}
           \item This use case is an extension of UC13: Deliver generated document
-          \item Step 1a. is an extension point for other use cases
         \end{itemize}
 \end{itemize}
 
@@ -696,88 +693,6 @@ in this analysis.
 	None
 \end{itemize}
 
-\begin{comment}
-\subsection{\emph{UC21}: Enable Online Distribution Platform as distribution channel}
-\begin{itemize}
-	\item \textbf{Primary actor:} Online Distribution Platform
-	\item \textbf{Interested parties:} 
-	\begin{itemize}
-		\item \textit{eDocs:} wishes to comply to the Recipient's preferences as to how he wants his documents to be delivered
-		\item \textit{Recipient:} wants documents addressed to him to be delivered according to his wishes
-        \item \textit{Online Distribution Platform:} wants Recipients to use their services.
-	\end{itemize}
-	
-	\item \textbf{Preconditions:}
-	None
-	
-	\item \textbf{Postconditions:}
-	\begin{itemize}
-		\item The System now sends documents addressed to the Recipient of the types that the Online Distribution Platform distributes to the Online Distribution Platform
-	\end{itemize}
-	
-	\item \textbf{Main scenario:} 
-	\begin{enumerate}
-		\item The Online Distribution Platform indicates that the Recipient wishes to receive documents through them
-		\item The Online Distribution Platform supplies identifying information pertaining to the Recipient
-		\item The System logs that any documents addressed to the Recipient of the types that the Online Distribution Platform distributes are to be sent to the Online Distribution Platform
-		\item The use case ends
-	\end{enumerate}
-	
-	\item \textbf{Alternative scenarios:} 
-	\begin{enumerate}
-		\item [3a.] The System has determined that the identifying information does not allow the Recipient to be successfully identified (e.g. the Online Distribution Platform distributes invoices and the bank account number was not formatted correctly or no bank account number was supplied at all)
-		\item [4a.] The System sends a notification to the Online Distribution Platform and this anomaly is logged for review by an eDocs System Administrator
-		\item [5a.] The use case ends
-	\end{enumerate}
-	
-	\item \textbf{Remarks:}
-	\begin{itemize}
-		\item This use case only applies if the Online Distribution Platform is an external party (i.e. not the Personal Document Store)
-	\end{itemize}
-\end{itemize}
-
-\subsection{\emph{UC22}: Disable Online Distribution Platform as distribution channel}
-\begin{itemize}
-	\item \textbf{Primary actor:} Online Distribution Platform
-	\item \textbf{Interested parties:} 
-	\begin{itemize}
-		\item \textit{eDocs:} wishes to comply to the Recipient's preferences as to how he wants his documents to be delivered
-		\item \textit{Recipient:} wants documents addressed to him to be delivered according to his wishes
-        \item \texit{Online Distribution Platform:} wants to grasp the size of their userbase
-	\end{itemize}
-	
-	\item \textbf{Preconditions:}
-	\begin{itemize}
-		\item The Recipient has been registered as associated with the Online Distribution Platform
-	\end{itemize}
-	
-	\item \textbf{Postconditions:}
-	\begin{itemize}
-		\item The System has logged that any overrides pertaining to document types distributed by the Online Distribution Platform no longer apply in the Recipient's case
-	\end{itemize}
-	
-	\item \textbf{Main scenario:} 
-	\begin{enumerate}
-		\item The Online Distribution Platform has indicated that they no longer service the Recipient
-		\item The Online Distribution Platform supplies identifying information pertaining to the Recipient
-		\item The System removes any overrides pertaining to document types distributed by the Online Distribution Platform
-		\item The use case ends
-	\end{enumerate}
-	
-	\item \textbf{Alternative scenarios:} 
-	\begin{enumerate}
-		\item [3a.] The System has determined that the identifying information fails to successfully identify the Recipient
-		\item [4a.] The System sends a notification to the Online Distribution Platform and this anomaly is logged for review by an eDocs System Administrator
-		\item [5a.] The use case ends
-	\end{enumerate}
-	
-	\item \textbf{Remarks:}
-	\begin{itemize}
-		\item This use case only applies if the Online Distribution Platform is an external party (i.e. not the Personal Document Store)
-	\end{itemize}
-\end{itemize}
-\end{comment}
-
 \subsection{\emph{UC21}: Confirm delivery through receipt tracking}
 \begin{itemize}
 	\item \textbf{Primary actor:} Recipient
@@ -926,60 +841,6 @@ in this analysis.
 	None
 \end{itemize}
 
-\begin{comment}
-\subsection{\emph{UC26}: Recipient Detail Management}
-\begin{itemize}
-    \item \textbf{Primary actor:} Customer Organisation Representative
-    \item \textbf{Interested parties:} 
-        \begin{itemize}
-            \item \textit{Customer Organisation:} Wants the details of their Recipients to be correct.
-            \item \textit{Recipient:} Wants their details to be correct and up-to-date.
-        \end{itemize}
-
-    \item \textbf{Preconditions:}
-        \begin{itemize}
-            \item One or more details of one or more Recipients has to be corrected or added.
-            \item The Representative is logged in (UC1).
-        \end{itemize}
-
-    \item \textbf{Postconditions:}
-        \begin{itemize}
-            \item The required Recipient Details have been added/updated.
-        \end{itemize}
-        
-    \item \textbf{Main scenario:} 
-    \begin{enumerate}
-       \item The Representative indicates he want to manage Recipient Details
-       \item The System collects the details of all Recipients
-       \item The System presents the Representative with an overview of the Recipients
-       \item The Representative indicates a Recipient of whom he wants to update the Details
-       \item The System presents the Representative with an overview of the current Details for chosen Recipient
-       \item The Representative indicates which Details he wants to change and supplies the new Details
-       \item The System verifies the validity of the new Details and finds no problems.
-       \item The System updates the Details of the Recipient internally and notifies the Representative of this.
-       \item The Representative indicates he is done managing Recipient Details.
-       \item The Use Case ends here.
-    \end{enumerate}
-
-    \item \textbf{Alternative scenarios:} 
-    \begin{enumerate}
-        \item [7a.] The System verifies the validity of the new Details and finds problems.
-        \item [8a.] The System indicates to the Representative that the new Details are not valid and not updated internally.
-        \item [9a.] The Use Case resumes form step 6.
-        \item [9b.] The Representative indicates he wants to update the Details of another Recipient.
-        \item [10b.] The Use Case resumes from step 2.
-        \item [4c.] The Representative indicates he is done managing Recipient Details.
-        \item [5c.] The Use Case ends here.
-        \item [6d.] The Representative indicates he does not want to update the presented Recipient's details.
-        \item [7d.] The Use Case resumes from step 2.
-    \end{enumerate}
-    
-    \item \textbf{Remarks:}
-        \begin{itemize}
-            \item Recipient Details in this Use Case denote elements such as e-mail address, home address, telephone number, name \ldots
-        \end{itemize}
-\end{itemize}
-\end{comment}
 
 \section{Non-functional requirements}\label{sec:non-functional}
 In this section, we model the non-functional requirements for the system in the
