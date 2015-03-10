@@ -913,21 +913,21 @@ The subsystem accepting connections for raw data submission fails or crashed. Ex
 The System should be able to keep up with data submissions from all clients, at the very least in the situation where the amount of submitted data is the total of the standard periodic submissions as indicated in all individual SLA's. The System should also be able to honor the priority settings on the raw data batches as best as possible.
 
 \begin{itemize}
-    \item \textbf{Source:} Customer Organisation(s) and/or Social Secretarie(s) and/or Customer Organisation Representative(s)
+    \item \textbf{Source:} Customer Organisation(s) and/or Social Secretarie(s) and/or Customer Organisation Representative(s) or Internal in case of second stimulus.
     \item \textbf{Stimulus:}
         \begin{itemize}
             \item The source submits a batch of raw data.
             \item The submission subsystem starts and processes raw data from the secondary storage.
         \end{itemize}
 
-    \item \textbf{Artifact:} The subsystem responsible for compiling raw data into documents and scheduling the generation relative to raw data priorities.
+    \item \textbf{Artifact:} The subsystem(s) responsible for compiling raw data into documents and scheduling the generation relative to raw data priorities.
     \item \textbf{Environment:} Normal Execution
     \item \textbf{Response:}
         \begin{itemize}
             \item The System should be provided with enough processing power to process at least the mean load of document generation as stipulated by the SLA's. When the load on the document generation is not over the capacity of the system, this is viewed as ``normal circumstances''.
             \item Under normal circumstances, no extreme care should be taken with document priorities. They should be honored, and only lightly enforced, in case the system comes under heavy load at a near point in the future.
             \item When the load on the system becomes too high, and raw data is not immediately processed anymore, priorities should be strictly enforced as deadlines, with earliest deadline scheduling. The deadline for a document's generation is its priority maximum handling time (see description), added to its submission time.
-            \item When the system comes under too heavy a load and priority honoring can not be guaranteed anymore, strict priority behaviour is still in effect:
+            \item When the system comes under too heavy a load and priority honoring can not be guaranteed anymore, extremely strict priority behaviour comes into effect:
             \begin{itemize}
                 \item Of all conflicting/unreachable deadlines, documents with the Critical priority are the first to be handled.
                 \item Next most important in order are Diamond, Gold and Silver. These are each respectively more important than the next. This means that Silver priority documents are sacrificed for the other priorities when necessary, then Gold priority documents if necessary, etc.
@@ -963,13 +963,13 @@ Due to multiple requests from different clients or based on market research, a n
             \item It is predicted that being able to process a new document type would generate a lot of business
         \end{itemize}
 
-    \item \textbf{Artifact:} The Raw Data Submission sub-system and Document Generation sub-system
+    \item \textbf{Artifact:} The subsystem(s) responsible for Raw Data Submission and Document Generation
     \item \textbf{Environment:} Run-time or design time
     \item \textbf{Response:}
         \begin{itemize}
             \item The developer identifies what a document of the new document type should generally look like, taking into account mandatory fields and lay-out imposed by any legal constraints that apply.
-            \item The developer identifies which identifying information must be supplied to an Online Distribution Platform in case it is chosen as the Distribution Channel for a document of the new type.
-            \item The developer makes fitting changes to the Document Generation sub-system and the Raw Data Submission sub-system in order to support the new document type.
+            \item The developer investigates which identifying information must be supplied to an Online Distribution Platform in case it is chosen as the Distribution Channel for a document of the new type. This implies that the Online Distribution Platform either already supports the new document type or the Distribution Platform has agreed to provide support for the document type.
+            \item The developer makes fitting changes to the subsystem(s) responsible for Raw Data Submission and Document Generation, in order to support the new document type.
         \end{itemize}
 
     \item \textbf{Response measure:}
