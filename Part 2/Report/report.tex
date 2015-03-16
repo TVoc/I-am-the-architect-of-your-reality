@@ -17,30 +17,47 @@
 \section{Introduction}\label{sec:introduction}
 
 \section{Attribute-driven design documentation}\label{sec:add}
-\subsection{Decomposition 1: ModuleA (X1, Y3, UCa, UCb, UCc)}
+\subsection{Decomposition 1: eDocs System (Av1, P1, UC4, UC5)}
 \subsubsection{Module to decompose}
-In this run we decompose \texttt{ModuleA}.
+In this (first) run we decompose \texttt{the eDocs System}.
 
 \subsubsection{Selected architectural drivers}
 The non-functional drivers for this decomposition are:
 
 \begin{itemize}
-    \item \emph{X1}: name
-    \item \emph{Y3}: name
+    \item \emph{Av1}: Document Generation Failure
+    \item \emph{P1}: Document Generation
 \end{itemize}
 
 The related functional drivers are:
 
 \begin{itemize}
-    \item \emph{UCa}: name
-    \item \emph{UCb}: name
-    \item \emph{UCc}: name
+    \item \emph{UC4}: Generate Payslip
+    \item \emph{UC5}: Generate Invoice
 \end{itemize}
 
 \paragraph{Rationale}
-A short discussion of why these drivers were selected for this decomposition.
+Both of these non-functional drivers and both use-cases handle the generation of documents by the system. This is one of two core functionalities of the system as a whole, the other being the delivery of said documents. Because they are so important (as also implied by their high priority), makes them both an excellent and cohesive group of drivers for the first run.
 
 \subsubsection{Architectural design}
+\paragraph{Raw data queueing for \emph{P1}}
+\emph{P1} describes the generation of documents out of raw data. This raw data comes generally comes from a submission subsystem to the generation subsystem. Requiring the generation subsystem to immediately process all received raw data makes for a very strict implementation and possible dropped data when under sudden unforseen load. Due to this, we chose to introduce a component, the \texttt{Raw Data Pool}, which receives the submitted raw data to be processed. The generation subsystem will select raw data out of this pool and mark it as being processed. After a document is generated, the pool is notified that the raw data should be removed. The \texttt{Raw Data Pool} accepts a scheduling strategy. This strategy allows the pool to sort its contents in a way that is useful for the generation system to more easily find the document to be generated next. The \texttt{Raw Data Pool} is dynamically resizable to store all received raw data entries at any given time. The \texttt{Scheduling Module} (see paragraph ``Recurring load scheduling for P1'') notifies the pool when a large(r) batch of raw data is due, so the pool can expand to accomodate this load. The System will try to keep this pool filled at most half-way, while keeping the parallel document generation jobs to a minimum. \todo{Pattern or tactic for this behaviour?} When the pool reaches half capacity, the System will instantiate more parallel generation jobs to keep the pool from reaching full capacity. When this measure is ineffective, the pool will expand further as necessary to ensure full capacity is never reached.
+
+\paragraph{Recurring load scheduling for \emph{P1}}
+According to \emph{P1}, the System should anticipate when recurring batches of data are received. For this purpose, a \texttt{Scheduling Module} is introduced. This module knows when a recurring batch is scheduled to be received. It will signal the system how many parallel Document Generation jobs and how much \texttt{Raw Data Pool} capacity should be present, when a recurring batch will be received shortly. This knowledge is introduced/added to the module when a (new) SLA is signed.
+
+\paragraph{Dynamic load anticipation for \emph{P1}}
+Discussion of the solution selected for (a part of) one of the architectural
+drivers.
+
+\paragraph{Failure Detection for \emph{Av1}}
+The System should be able to detect when the Document Generation \todo{rename ``subsystem''?} subsystem fails. 
+
+
+\paragraph{Topic}
+Discussion of the solution selected for (a part of) one of the architectural
+drivers.
+
 \paragraph{Topic}
 Discussion of the solution selected for (a part of) one of the architectural
 drivers.

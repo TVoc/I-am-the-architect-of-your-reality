@@ -1,0 +1,17 @@
+First run:
+Av1 (H) + P1 (H)
+UC: 4, 5
+
+Av1:
+"System is able to autonomously detect..."
+--> Fault detection:
+Heartbeat, piggybacking on generated documents. If no documents have been generated for a set time, the generation module will send a heartbeat signal to the listener at set intervals.
+
+Statistics module: accomodate dynamic data batches and predict future "unplanned" loads
+
+Scheduler module: accomodates recurring data batches and signals the system when to prepare for planned heavier loads on the system
+
+Raw data pool: Storage pool for unprocessed raw data. Raw data is pulled form this pool and signalled when processed. This pull-behaviour makes scaling the performance of the system easier.
+
+Other choices:
+Av2 (H) + P2 (M)
