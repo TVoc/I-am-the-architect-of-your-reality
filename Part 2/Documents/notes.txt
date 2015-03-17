@@ -15,3 +15,9 @@ Raw data pool: Storage pool for unprocessed raw data. Raw data is pulled form th
 
 Other choices:
 Av2 (H) + P2 (M)
+
+Alternatives:
+- listener connected to individual generators instead of dispatcher listening to generators (not scalable)
+- priority scheduler module instead of the pool sorting the raw data entries on its own
+- recovery from failure of dispatcher is fast in principle, but a spare has been implemented regardless since document generation is critical
+
