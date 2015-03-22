@@ -50,7 +50,7 @@ According to \emph{P1}, the System should anticipate when recurring batches of d
 Apart from recurring batches, the system should provide enough resources (\texttt{Raw Data Pool} capacity and parallel Document Generation jobs) for document generation of non-recurring batches. To regulate the amount of resources available in between recurring batches, a \texttt{Statistics Module} is introduced in the system. This module records the mean amount of processed documents for given time intervals, and supplies the \texttt{Resource Manager} with an estimate of how many document generation resources will be necessary in between recurring batches.
 
 \paragraph{Document Generation Subsystem Structure}
-In principle, the Raw Data Pool subcontracts the generation of Documents to several \texttt{Document Generator Processes}. In order to manage the complexity and scalability of this, we propose a \texttt{Raw Data Dispatcher Module}. This module is responsible for knowing which \texttt{Document Generator Processes} are active/instantiated and which Raw Data Entries have been assigned to which \texttt{Processes}. It also records at which time it assigned a specific Entry to which \texttt{Process}. The Raw Data Entry flow is as follows: a \texttt{Document Generator Process} has finished generating a Document according to its assigned Raw Data Entry. The \texttt{Dispatcher Module} temporarily stores the generated Document. The \texttt{Process} simultaneously submits the finished Document to the \texttt{Raw Data Dispatcher Module} and requests a new Raw Data Entry. The \texttt{Dispatcher Module} submits the finished document to the Document Delivery Subsystem and, when acknowledged, signals the \texttt{Raw Data Pool} that the corresponding Raw Data Entry has been successfully processed and requests the next Raw Data Entry that must be processed. It also deletes the temporarily stores generated Document upon acknowledgement. Upon receipt of the next Raw Data Entry, the \texttt{Dispatcher Module} gives the Entry to the \texttt{Document Generator Process} that initiated the flow and then records the following: the time at which the Entry was assigned, the responsible \texttt{Process} and a reference to the assigned Raw Data Entry. There is also a spare \texttt{Raw Data Dispatcher Module}. This is necessary in case the \texttt{Dispatcher Module} fails (see paragraph ``Raw Data Dispatcher Module Failure Detection and Resolution for \emph{Av1}''). Whenever the active \texttt{Dispatcher Module} records a new Raw Data assignment, it also signals the spare \texttt{Dispatcher Module} to record that assignment as well. The spare \texttt{Dispatcher Module} is aware of the \texttt{Raw Data Pool} and kept up to date on all currently active/instantiated \texttt{Document Generator Processes}. This is done in order to enable the spare \texttt{Dispatcher Module} to assume the responsibilities of the active \texttt{Dispatcher Module} as seamlessly as possible.
+In principle, the Raw Data Pool subcontracts the generation of Documents to several \texttt{Document Generator Processes}. In order to manage the complexity and scalability of this, we propose a \texttt{Raw Data Dispatcher Module}. This module is responsible for knowing which \texttt{Document Generator Processes} are active/instantiated and which Raw Data Entries have been assigned to which \texttt{Processes}. It also records at which time it assigned a specific Entry to which \texttt{Process}. The Raw Data Entry flow is as follows: a \texttt{Document Generator Process} has finished generating a Document according to its assigned Raw Data Entry. The \texttt{Dispatcher Module} temporarily stores the generated Document. The \texttt{Process} simultaneously submits the finished Document to the \texttt{Raw Data Dispatcher Module}, makes the \texttt{Billing Manager} bill the Customer Organization if the Raw Data Entry was from a non-recurring batch, and requests a new Raw Data Entry. The \texttt{Dispatcher Module} submits the finished document to the Document Delivery Subsystem and, when acknowledged, signals the \texttt{Raw Data Pool} that the corresponding Raw Data Entry has been successfully processed and requests the next Raw Data Entry that must be processed. It also deletes the temporarily stores generated Document upon acknowledgement. Upon receipt of the next Raw Data Entry, the \texttt{Dispatcher Module} gives the Entry to the \texttt{Document Generator Process} that initiated the flow and then records the following: the time at which the Entry was assigned, the responsible \texttt{Process} and a reference to the assigned Raw Data Entry. There is also a spare \texttt{Raw Data Dispatcher Module}. This is necessary in case the \texttt{Dispatcher Module} fails (see paragraph ``Raw Data Dispatcher Module Failure Detection and Resolution for \emph{Av1}''). Whenever the active \texttt{Dispatcher Module} records a new Raw Data assignment, it also signals the spare \texttt{Dispatcher Module} to record that assignment as well. The spare \texttt{Dispatcher Module} is aware of the \texttt{Raw Data Pool} and kept up to date on all currently active/instantiated \texttt{Document Generator Processes}. This is done in order to enable the spare \texttt{Dispatcher Module} to assume the responsibilities of the active \texttt{Dispatcher Module} as seamlessly as possible.
 
 \paragraph{Document Generator Process Failure Detection and Resolution for \emph{Av1}}
 An individual \texttt{Document Generator Process} may fail. There are two situations in which this may happen: the first (and rather trivial) is when a \texttt{Process} has finished generating a Document and has requested a new Raw Data Entry. When the \texttt{Dispatcher Module} offers a new Raw Data Entry, it is able to detect failure when the \texttt{Process} does not respond. The \texttt{Process} should then be terminated and a new \texttt{Process} instantiated that subsequently starts work on the previously offered Raw Data Entry. The second (and more interesting) case is when a \texttt{Process} fails while generating a Document. In order to counteract Raw Data loss, there is a leasing system in place. The \texttt{Raw Data Dispatcher Module} knows which Raw Data Entries have been assigned to which \texttt{Document Generator Processes}, and each \texttt{Process} has a set lease time during which it should submit the generated Document or renew its lease. A \texttt{Process} may only renew its lease a set amount of times to prevent it from holding on to a Raw Data Entry indefinitely. When a lease has expired, the \texttt{Dispatcher Module} pings the offending \texttt{Process}. If it does not respond with an echo, the \texttt{Process} is marked as failed. If it does respond, the lease is implicitly renewed except if the \texttt{Process} has already reached the maximum amount of lease renewals, in which case it is also marked as failed. As in the first case, when a \texttt{Process} is terminated, a new \texttt{Process} is instantiated and the Raw Data Entry that was previously assigned to the failed \texttt{Process} is then offered to the new \texttt{Process}. 
@@ -75,7 +75,7 @@ In principle, instantiating a new \texttt{Raw Data Dispatcher} and bringing it u
 Figure \ref{fig:it1-cc_main} shows the components resulting from the decomposition in this run. Extra attention is required concerning the \texttt{Dispatcher Module} and \texttt{Spare Dispatcher Module}. These components are actually two instances of the same dispatching component. Therefore, they provide and require the same interfaces. But depending on their run-time role, i.e. primary or standby dispatcher (cf. the decisions concerning \emph{Av1} above), a specific set of these is activated. This is indicated by having both component instances provide and require the same interfaces, but differing the connections between components dependent on the role of the instance. Additional notes are added to the diagram where deemed necessary.
 
 \subparagraph{Dispatcher Module}
-Responsible for serving the \texttt{Document Generator Processes} with new Raw Data Entries when asked. Also responsible for recording the leases on each served Entry, and monitoring these leases to ping \texttt{Document Generator Processes} when leases expire. When a \texttt{Generator Process} has failed, it removes the failed \texttt{Process} and instantiates a new one. It also instantiates and destroys \texttt{Generator Processes} when instructed to by the \texttt{Resource Manager}. Receives generated Documents form the \texttt{Generator Processes} and submits these to the delivery system (\texttt{Other Functionality}). Also responsible for sending a Heartbeat pulse to the \texttt{Dispatcher Supervisor}, piggybacked on a document submission whenever possible. At every change to its internal data, the \texttt{Dispatcher Module} should send this change to the \texttt{Spare Dispatcher Module} to keep their states consistent. When the \texttt{Spare Dispatcher Module} does not acknowledge the changes, it should be pinged by the \texttt{Dispatcher Module}, and if it has failed, the latter should request a new \texttt{Spare Dispatcher Module} from the \texttt{Dispatcher Supervisor}.
+Responsible for serving the \texttt{Document Generator Processes} with new Raw Data Entries when asked. Also responsible for recording the leases on each served Entry, and monitoring these leases to ping \texttt{Document Generator Processes} when leases expire. When a \texttt{Generator Process} has failed, it removes the failed \texttt{Process} and instantiates a new one. It also instantiates and destroys \texttt{Generator Processes} when instructed to by the \texttt{Resource Manager}. Receives generated Documents form the \texttt{Generator Processes} and submits these to the delivery system (\texttt{Other Functionality}). Signals the Billing Manager when a document from a non-recurring Raw Data batch has been processed so that the Customer Organization can be billed. Also responsible for sending a Heartbeat pulse to the \texttt{Dispatcher Supervisor}, piggybacked on a document submission whenever possible. At every change to its internal data, the \texttt{Dispatcher Module} should send this change to the \texttt{Spare Dispatcher Module} to keep their states consistent. When the \texttt{Spare Dispatcher Module} does not acknowledge the changes, it should be pinged by the \texttt{Dispatcher Module}, and if it has failed, the latter should request a new \texttt{Spare Dispatcher Module} from the \texttt{Dispatcher Supervisor}.
 
 \subparagraph{Raw Data Pool}
 Responsible for storing Raw Data Entries that have not yet been processed. Also responsible for sorting/scheduling these Entries according to deadline priorities, and recording which Entries are currently being processed. Submits statistics about its capacity usage to the \texttt{Statistics Module}.
@@ -99,13 +99,14 @@ Responsible for accepting data statistics for the \texttt{Raw Data Pool} and int
 Manages and receives the schedule of recurring Raw Data batches. If a batch is imminent, it should the \texttt{Resource Manager} about the resources it should allocate for document generation of the recurring batch(es).
 
 \subparagraph{Resource Manager}
-Per introduced component a paragraph describing its responsibilities.
+Responsible for allocating adequate space in the \texttt{Raw Data Pool} and giving guidelines to the \texttt{Dispatcher Module} as to how many \texttt{Document Generator Process}es it would be appropriate to maintain. It should do this based on information it receives from the \texttt{Statistics Module} and the \texttt{Scheduler Module}.
 
 \subparagraph{Billing Manager}
-Tekst
+Responsible for managing billing information for each Customer Organization. It must be possible to bill Customer Organizations for both recurring batches and non-recurring batches. The \texttt{Billing Manager} must supply billing information on Customer Organizations on demand.
 
 \subparagraph{Other Functionality}
-Per introduced component a paragraph describing its responsibilities.
+Encapsulates requirements not tackled in this run and which cannot be
+assigned to other introduced components.
 
 \begin{figure}[!htp]
     \centering
@@ -136,25 +137,279 @@ The entry main entry point and accompanying storage components of the system are
 \end{figure}
 
 \subsubsection{Interfaces for child modules}
-\subsubsection*{ModuleB}
+\subsubsection*{Dispatcher Module}
 \begin{itemize}
-    \item InterfaceA
+    \item DataProcessingManagement
     \begin{itemize}
-        \item \texttt{returnType operation1(ParamType param1)} throws TypeOfException
+        \item \texttt{RawDataEntry requestNewData()}
         \begin{itemize}
-            \item Effect: Describe the effect of calling this operation.
+            \item Effect: Supply a new Raw Data Entry. May be an empty entry if no Raw Data Entry is available.
+
+        \item \texttt{void submitGeneratedDocument(DocumentData generated)} throws InvalidDocumentDataException
+        \begin{itemize}
+            \item Effect: Accept a generated document so that it may be delivered and the Customer Organization billed if appropriate.
             \item Exceptions:
             \begin{itemize}
-                \item TypeOfException: Describe when this exception is thrown.
+            	\item InvalidDocumentDataException: The DocumentData argument is badly structured
             \end{itemize}
-        \end{itemize}
-
-        \item \texttt{returnType operation2()}
-        \begin{itemize}
-            \item Effect: Describe the effect of calling this operation.
-            \item Exceptions: None
          \end{itemize}
     \end{itemize}
+\end{itemize}
+
+\begin{itemize}
+	\item Ping
+		\item \texttt{Echo ping()}
+		\begin{itemize}
+			\item Effect: Returns an Echo to reassure the caller that the callee is still available. 
+			\item Exceptions: None
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+
+\begin{itemize}
+	\item ResourceManagement
+	\begin{itemize}
+		\item \texttt{void notify(ResourceGuidelineReport report)}
+		\begin{itemize}
+			\item Effect: Supply information that is relevant to how many \texttt{Document Generator Process}es the \texttt{Dispatcher Module} should maintain. The \texttt{Dispatcher Module} returns immediately and thereafter takes appropriate actions (e.g. instantiate new \texttt{Document Generator Process}es).
+			\item Exceptions: None
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+
+\todo{Verification of data when spare becomes active}
+\begin{itemize}
+	\item InternalInfoManagement
+	\begin{itemize}
+		\item \texttt{void recordNewDocumentGeneratorProcess(DocumentGeneratorProcessID id)}
+		\begin{itemize}
+			\item Effect: Records the identifier of a new \texttt{DocumentGeneratorProcess}. No effect if the identifier has been supplied previously.
+			\item Exceptions: None
+		\end{itemize}
+		
+		\item \texttt{void recordDocumentGeneratorProcessRemoval(DocumentGeneratorProcessID id)}
+		\begin{itemize}
+			\item Effect: Records that the \texttt{DocumentGeneratorProcess} with the specified identifier has been removed from the system. No effect if the identifier was not supplied earlier through \texttt{recordNewDocumentGeneratorProcess(DocumentGeneratorProcessID)}.
+			\item Exceptions: None
+		\end{itemize}
+		
+		\item \texttt{void recordRawDataAssignment(RawDataEntry entry, DocumentGeneratorProcessID id}
+		\begin{itemize}
+			\item Effect: Records that the specified Raw Data Entry has been assigned to the specified \texttt{DocumentGeneratorProcess}. No effect if that pair has already been recorded.
+			\item Exceptions: None
+		\end{itemize}
+		
+		\item \texttt{void removeRawDataAssignment(RawDataEntry entry, DocumentGeneratorProcessID id}
+		\begin{itemize}
+			\item Effect: Removes the assignment of the specified Raw Data Entry to the specified \texttt{DocumentGeneratorProcess}. No effect if that pair is not recorded.
+			\item Exceptions: None
+		\end{itemize}
+		
+		\item \texttt{void recordGeneratedDocument(DocumentData generated)}
+		\begin{itemize}
+			\item Effect: Stores the supplied generated document in secondary storage.
+			\item Exceptions: None
+		\end{itemize}
+		
+		\item \texttt{void removeGeneratedDocument(DocumentDataID id)} throws DocumentNotFoundException
+		\begin{itemize}
+			\item Effect: Deletes the corresponding DocumentData from secondary storage.
+			\item Exceptions:
+			\begin{itemize}
+				\item DocumentNotFoundException: No corresponding DocumentData exists in storage.
+			\end{itemize}
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+
+\begin{itemize}
+	\item SetActive
+	\begin{itemize}
+		\item \texttt{void activate} throws AlreadyActiveException
+		\begin{itemize}
+			\item Effect: 
+			\begin{itemize}
+				\item Looks up and assumes control of all \texttt{DocumentGeneratorProcess}es it has an identifier of.
+				\item Verifies the correctness of its internal state by contacting the \texttt{RawDataPool} (to verify which Raw Data Entries have been marked as work in progress), \texttt{DocumentGeneratorProcess}es (to verify assignments of Raw Data Entries to \texttt{Processes}) and \texttt{OtherFunctionality} (to verify which generated documents it has in storage have already been delivered.
+				\item Requests a new spare \texttt{DispatcherModule} from the \texttt{DispatcherSupervisor}
+				\item Copies its state to the new spare
+				\item Returns and resumes normal operation
+			\end{itemize}
+			\item Exceptions: 
+			\begin{itemize}
+				\item AlreadyActiveException: This \texttt{DispatcherModule} is the active \texttt{DispatcherModule}
+			\end{itemize}
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+
+\subsubsection*{DocumentGeneratorProcess}
+\begin{itemize}
+	\item ProcessManagement
+	\begin{itemize}
+		\item \texttt{ProcessStatusReport getStatusReport(RawDataEntryID id)}
+		\begin{itemize}
+			\item Effect: Indicates through the returned object whether it is working on the specified Raw Data Entry and if it has finished or not
+			\item Exceptions: None
+		\end{itemize}
+		
+		\item \texttt{Echo ping()}
+		\begin{itemize}
+			\item Effect: Returns an Echo to reassure the caller that the callee is still available.
+			\item Exceptions: None
+		\end{itemize}
+		
+		\item \texttt{void assignRawData(RawDataEntry entry)} throws NotIdleException
+		\begin{itemize}
+			\item Effect: Assigns the specified RawDataEntry to this \texttt{DocumentGeneratorProcess}
+			\item Exceptions: 
+			\begin{itemize}
+				\item NotIdleException: This \texttt{DocumentGeneratorProcess} is already working on another RawDataEntry.
+			\end{itemize}
+		\end{itemize}
+		
+		\item \texttt{DocumentData getGeneratedDocument()} throws NoDocumentDataAvailableException
+		\begin{itemize}
+			\item Effect: Supplies the document generated from its assigned Raw Data Entry
+			\item Exceptions: 
+			\begin{itemize}
+				\item TypeOfException: Document generation has not yet been finished or no RawDataEntry has been assigned.
+			\end{itemize}
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+
+\subsubsection*{RawDataPool}
+\begin{itemize}
+	\item GetNextRawData
+	\begin{itemize}
+		\item \texttt{RawDataEntry requestNewData()}
+		\begin{itemize}
+			\item Effect: Supplies the next RawDataEntry that should be processed. If no Entry is available, an empty Entry is returned.
+			\item Exceptions: None
+		\end{itemize}
+		
+		\item \texttt{PoolDataReport getDataReport()}
+		\begin{itemize}
+			\item Effect: Supplies information about which RawDataEntry entries have been marked as work in progress.
+			\item Exceptions: None
+		\end{itemize}
+		
+		\item \texttt{void removeData(RawDataEntryID id)} throws NoSuchRawDataEntryException
+		\begin{itemize}
+			\item Effect: Removes the corresponding RawDataEntry from the pool.
+			\item Exceptions: 
+			\begin{itemize}
+				\item NoSuchRawDataEntryException: There is no corresponding RawDataEntry.
+			\end{itemize}
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+
+\begin{itemize}
+	\item SubmitDataForProcessing
+	\begin{itemize}
+		\item \texttt{void submitRawDataBatch(RawDataBatch data)}
+		\begin{itemize}
+			\item Effect: Adds the RawData in the specified RawDataBatch to the pool. A unique identifier is generated for each RawData and the resulting RawDataEntry entries are scheduled according to the scheduling policy.
+			\item Exceptions: None
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+
+\subsubsection*{DispatcherSupervisor}
+\begin{itemize}
+	\item Heartbeat
+	\begin{itemize}
+		\item \texttt{void supplyHeartbeat()} throws TypeOfException
+		\begin{itemize}
+			\item Effect: Records a heartbeat from the supervised component.
+			\item Exceptions: None
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+
+\begin{itemize}
+	\item RequestNewSpare
+	\begin{itemize}
+		\item \texttt{DispatcherID requestNewSpareDispatcher()}
+		\begin{itemize}
+			\item Effect: Initialises a new spare \texttt{DispatcherModule} and generates an ID for it such that callee can find the new spare.
+			\item Exceptions: None
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+
+\subsubsection*{StatisticsModule}
+\begin{itemize}
+	\item DataStatisticsManagement
+	\begin{itemize}
+		\item \texttt{void deliver(StatisticsReport report)}
+		\begin{itemize}
+			\item Effect: Integrates the information supplied by the given report into its own information (e.g. mean pool capacity during a certain period in a certain month).
+			\item Exceptions: None
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+
+\subsubsection*{SchedulerModule}
+\begin{itemize}
+	\item RecurringBatchInfoManagement
+	\begin{itemize}
+		\item \texttt{void recordRecurringBatch(Date date, int maxAmount)}
+		\begin{itemize}
+			\item Effect: Records that a batch with the specified maximal amount is expected at the specified date.
+			\item Exceptions: None
+		\end{itemize}
+		
+		\item \texttt{void deleteRecurringBatch(Date date, int maxAmount)}
+		\begin{itemize}
+			\item Effect: Records that a batch on the specified date with the specified maximal amount will no longer occur.
+			\item Exceptions: None
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+
+\subsubsection*{SubmissionSubsystem}
+\begin{itemize}
+	\item SubmitRawDataBatch
+	\begin{itemize}
+		\item \texttt{void submitRawDataBatch(RawDataBatch batch)}
+		\begin{itemize}
+			\item Effect: Submits the given RawDataBatch for processing.
+			\item Exceptions: None
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+
+\subsubsection*{BillingManager}
+\begin{itemize}
+	\item BillingManagement
+	\begin{itemize}
+		\item \texttt{void billCustomer(RawDataEntry entry)}
+		\begin{itemize}
+			\item Effect: Extracts the required information to bill the Customer Organization for generation of the document from the RawDataEntry (e.g. document type, priority) on the one hand and from Customer Organization information stored elsewhere in the system on the other hand and records a new billing for the Customer Organization.
+			\item Exceptions: None
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+
+\subsubsection*{OtherFunctionality}
+\begin{itemize}
+	\item SubmitDocument
+	\begin{itemize}
+		\item \texttt{void submitDocument(DocumentData data)}
+		\begin{itemize}
+			\item Effect: Initiates the submission process for the specified generated document
+			\item Exceptions: None
+		\end{itemize}
+		
+		\item \texttt{boolean getDocumentSubmissionReport(DocumentDataID data)}
+		\begin{itemize}
+			\item Effect: Indicates whether the generated document corresponding to the given DocumentDataID has already been delivered.
+			\item Exceptions: None
+		\end{itemize}
+	\end{itemize}
 \end{itemize}
 
 \subsubsection{Data type definitions}
