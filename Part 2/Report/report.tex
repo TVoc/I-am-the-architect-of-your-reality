@@ -145,7 +145,7 @@ The entry main entry point and accompanying storage components of the system are
         \begin{itemize}
             \item Effect: Supply a new Raw Data Entry. May be an empty entry if no Raw Data Entry is available.
         \end{itemize}
-
+        
         \item \texttt{void submitGeneratedDocument(DocumentData generated)} throws InvalidDocumentDataException
         \begin{itemize}
             \item Effect: Accept a generated document so that it may be delivered and the Customer Organization billed if appropriate.
@@ -153,11 +153,8 @@ The entry main entry point and accompanying storage components of the system are
             \begin{itemize}
             	\item InvalidDocumentDataException: The DocumentData argument is badly structured
             \end{itemize}
-         \end{itemize}
+        \end{itemize}
     \end{itemize}
-\end{itemize}
-
-\begin{itemize}
 	\item Ping
 	\begin{itemize}
 		\item \texttt{Echo ping()}
@@ -422,19 +419,60 @@ Describe per complex data type used in the interfaces what it represents.
 \paragraph{ParamType} This data element represents Y.
 
 \subsubsection{Verify and refine}
-This section describes per component which (parts of) the remaining
-requirements it is responsible for.
+This section describes per component which (parts of) the remaining requirements it is responsible for. If requirements are split, a letter is added to its name (e.g. Av1a) to indicate that the component will only satisfy a part of the original requirement. If requirements are split, it will also be indicated what part of the original requirement each new requirement contains. If new derived requirements are introduced they will receive a new identifier and are marked as a new requirement.
 
-\paragraph{ModuleB}
+\paragraph{OtherFunctionality}
 \begin{itemize}
-    \item \emph{Z1}: name
-    \item \emph{UCd}: name
+    \item \emph{UC1}: Log in
+    \item \emph{UC2}: Log out
+    \item \emph{UC6}: Deliver document via e-mail
+    \item \emph{UC7}: Notify of e-mail delivery failure
+    \item \emph{UC8}: Deliver document via postal mail
+    \item \emph{UC9}: Deliver invoice via Zoomit
+    \item \emph{UC10}: Confirm document delivery (Zoomit)
+    \item \emph{UC11}: Deliver document via personal document store
+    \item \emph{UC12}: Consult personal document store
+    \item \emph{UC13}: Search documents in personal document store
+    \item \emph{UC14}: Consult document in personal document store
+    \item \emph{UC15}: Download document via unique link
+    \item \emph{UC16}: Register to personal document store
+    \item \emph{UC17}: Unregister from personal document store
+    \item \emph{UC18}: Register customer organization
+    \item \emph{UC19}: Unregister customer organization
+    \item \emph{UC20}: Update document template
+    \item \emph{UC21a}: Consult status of all document processing jobs\\
+    Handling the (visual) interfacing with the user. Determining the finished jobs.
+    \item \emph{UC22}: Notify customer administrator
+    \item \emph{Av2}: Personal document storage failure 
+    \item \emph{Av3}: Zoomit failure
+    \item \emph{P2}: Document lookups
+    \item \emph{P3a}: Status overview for customer administrators\\
+    Handling the flow of this requirement and the overal processing of the status reports in a timely fashion.
+    \item \emph{M1a}: New type of document: bank statements\\
+    The delivery and template handling for the new document.
+    \item \emph{M2}: Multiple print \& postal services
+    \item \emph{M3}: Dynamic selection of the cheapest of print \& postal services
 \end{itemize}
 
-\paragraph{ModuleC}
+\paragraph{SubmissionSubsystem}
 \begin{itemize}
-    \item \emph{UCba}: name\\Description which part of the original use case is
-        the responsibility of this component.
+    \item \emph{UC3}: Initiate document processing
+    \item \emph{M1b}: New type of document: bank statements\\
+    Being able to receive and verify the integrity of Raw Data for the new type of document.
+\end{itemize}
+
+\paragraph{RawDataPool}
+\begin{itemize}
+    \item \emph{UC21b}: Consult status of all document processing jobs\\
+    Determining the unfinished and currently processing jobs.
+    \item \emph{P3b}: Status overview for customer administrators\\
+    Calculating and delivering information about all unfinished and currently processing jobs for a certain \texttt{Customer Organisation} in a timely fashion.
+\end{itemize}
+
+\paragraph{DocumentGenerationProcess}
+\begin{itemize}
+    \item \emph{M1c}: New type of document: bank statements\\
+    Being able to generate documents of the new type with the accompanying new template.
 \end{itemize}
 
 \subsection{Decomposition 2: Module (drivers)}
