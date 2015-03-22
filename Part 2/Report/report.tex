@@ -110,21 +110,19 @@ assigned to other introduced components.
 
 \begin{figure}[!htp]
     \centering
-    \includegraphics[width=0.8\textwidth]{comp_diag_1.png}
+    \includegraphics[width=\textwidth]{comp_diag_1.png}
     %\missingfigure[figwidth=0.8\textwidth]{Component-and-connector diagram}
     \caption{Component-and-connector diagram of this decomposition.}\label{fig:it1-cc_main}
 \end{figure}
 
 \paragraph{Behaviour}
-If needed and explanation of the behaviour of certain aspects of the design so
-far.
+Figure \ref{fig:it1-seq_aspect1} illustrates the standard flow of document generation in the system. This flow is initiated by the \texttt{Generator Processes} themselves. When new Raw Data is requested and none is found, \texttt{Generator Processes} go into standby. When the \texttt{Dispatcher Module} is notified of new data being available, it can reactivate the \texttt{Generator Processes}.
 
 \begin{figure}[!htp]
     \centering
-    %\includegraphics[width=0.8\textwidth]{}
-    \missingfigure[figwidth=0.8\textwidth]{Sequence diagram}
-    \caption{Sequence diagram illustrating a key behavioural aspect.
-        }\label{fig:it1-seq_aspect1}
+    \includegraphics[width=\textwidth]{seq_diag_1_-_doc_gen.png}
+    %\missingfigure[figwidth=0.8\textwidth]{Sequence diagram}
+    \caption{Sequence diagram illustrating the flow of document generation.}\label{fig:it1-seq_aspect1}
 \end{figure}
 
 \paragraph{Deployment}
