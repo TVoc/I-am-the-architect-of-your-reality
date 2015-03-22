@@ -176,7 +176,7 @@ The entry main entry point and accompanying storage components of the system are
 	\end{itemize}
 \end{itemize}
 
-\todo{Verification of data when spare becomes active}
+%\todo{Verification of data when spare becomes active}
 \begin{itemize}
 	\item InternalInfoManagement
 	\begin{itemize}
@@ -192,21 +192,21 @@ The entry main entry point and accompanying storage components of the system are
 			\item Exceptions: None
 		\end{itemize}
 		
-		\item \texttt{void recordRawDataAssignment(RawDataEntry entry, DocumentGeneratorProcessID id}
+		\item \texttt{void recordRawDataAssignment(RawDataEntry entry, DocumentGeneratorProcessID id,Time t)}
 		\begin{itemize}
-			\item Effect: Records that the specified Raw Data Entry has been assigned to the specified \texttt{DocumentGeneratorProcess}. No effect if that pair has already been recorded.
+			\item Effect: Records that the specified Raw Data Entry has been assigned to the specified \texttt{DocumentGeneratorProcess} on timepoint \texttt{t}. If that pair of Raw Data Entry and \texttt{DocumentGeneratorProcess} has already been recorded with a certain time \texttt{t2}, the new time overwrites the old.
 			\item Exceptions: None
 		\end{itemize}
 		
-		\item \texttt{void removeRawDataAssignment(RawDataEntry entry, DocumentGeneratorProcessID id}
+		\item \texttt{void removeRawDataAssignment(DocumentData generated, DocumentGeneratorProcessID id)}
 		\begin{itemize}
-			\item Effect: Removes the assignment of the specified Raw Data Entry to the specified \texttt{DocumentGeneratorProcess}. No effect if that pair is not recorded.
+			\item Effect: Removes the assignment of the Raw Data Entry in the specified DocumentData to the specified \texttt{DocumentGeneratorProcess}. No effect if that pair is not recorded.
 			\item Exceptions: None
 		\end{itemize}
 		
-		\item \texttt{void recordGeneratedDocument(DocumentData generated)}
+		\item \texttt{void recordGeneratedDocument(DocumentData generated, DocumentGeneratorProcessID id)}
 		\begin{itemize}
-			\item Effect: Stores the supplied generated document in secondary storage.
+			\item Effect: Stores the supplied generated document in secondary storage, along with an ID for the \texttt{GeneratorProcess}, to be able to deliver an acknowledgement.
 			\item Exceptions: None
 		\end{itemize}
 		
@@ -217,6 +217,12 @@ The entry main entry point and accompanying storage components of the system are
 			\begin{itemize}
 				\item DocumentNotFoundException: No corresponding DocumentData exists in storage.
 			\end{itemize}
+		\end{itemize}
+		
+		\item \texttt{void recordDocumentGeneratorProcessInactivation(DocumentGeneratorProcessID id)}
+		\begin{itemize}
+			\item Effect: Marks the corresponding \texttt{GeneratorProcess} as inactive due to no new Raw Data being available.
+			\item Exceptions: None
 		\end{itemize}
 	\end{itemize}
 \end{itemize}
@@ -272,7 +278,7 @@ The entry main entry point and accompanying storage components of the system are
 			\item Effect: Supplies the document generated from its assigned Raw Data Entry
 			\item Exceptions: 
 			\begin{itemize}
-				\item TypeOfException: Document generation has not yet been finished or no RawDataEntry has been assigned.
+				\item NoDocumentDataAvailableException: Document generation has not yet been finished or no RawDataEntry has been assigned.
 			\end{itemize}
 		\end{itemize}
 	\end{itemize}
@@ -371,7 +377,7 @@ The entry main entry point and accompanying storage components of the system are
 
 \subsubsection*{SubmissionSubsystem}
 \begin{itemize}
-	\item SubmitRawDataBatch
+	\item RawDataSubmission
 	\begin{itemize}
 		\item \texttt{void submitRawDataBatch(RawDataBatch batch)}
 		\begin{itemize}
@@ -408,6 +414,22 @@ The entry main entry point and accompanying storage components of the system are
 			\item Effect: Indicates whether the generated document corresponding to the given DocumentDataID has already been delivered.
 			\item Exceptions: None
 		\end{itemize}
+	\end{itemize}
+	\item CustomerOrganisationInformationManagement
+	\begin{itemize}
+	    \item \texttt{Template getTemplateOfType(DocumentType type, OrganisationID id)} throws InvalidIDException, UnsupportedTypeException
+	    \begin{itemize}
+	        \item Effect: Look up and returns the Template, registered by \texttt{Customer Organisation} for given Document Type.
+	        \item Exceptions:
+	        \begin{itemize}
+	            \item InvalidIDException: When an ID is supplied that does not match any \texttt{Customer Organisation}.
+	            \item UnsupportedTypeException: When \texttt{Customer Organisation} with given ID is not registered for given Document Type (relevant for \emph{M1: New type of document: bank statements}, where adoption of a new Document Type is not mandatory for a \texttt{Customer Organisation}, while in the base case it may be).
+	        \end{itemize}
+	    \end{itemize}
+	    \item \texttt{DocumentData signDocument(DocumentData data)} throws AlreadySignedException
+	    \begin{itemize}
+	        \item Effect: Signs the Document in the Document Data with the signing key of the Customer Organisation, which can be looked up with the ID found in the Document Data. Afterwards, returns the Document Data, with as only alteration the signing of the Document inside.
+	    \end{itemize}
 	\end{itemize}
 \end{itemize}
 
