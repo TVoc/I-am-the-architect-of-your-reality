@@ -144,7 +144,7 @@ The entry main entry point and accompanying storage components of the system are
         \item \texttt{RawDataEntry requestNewData()}
         \begin{itemize}
             \item Effect: Supply a new Raw Data Entry. May be an empty entry if no Raw Data Entry is available.
-
+        \end{itemize}
         \item \texttt{void submitGeneratedDocument(DocumentData generated)} throws InvalidDocumentDataException
         \begin{itemize}
             \item Effect: Accept a generated document so that it may be delivered and the Customer Organization billed if appropriate.
@@ -152,12 +152,10 @@ The entry main entry point and accompanying storage components of the system are
             \begin{itemize}
             	\item InvalidDocumentDataException: The DocumentData argument is badly structured
             \end{itemize}
-         \end{itemize}
+        \end{itemize}
     \end{itemize}
-\end{itemize}
-
-\begin{itemize}
 	\item Ping
+	\begin{itemize}
 		\item \texttt{Echo ping()}
 		\begin{itemize}
 			\item Effect: Returns an Echo to reassure the caller that the callee is still available. 
