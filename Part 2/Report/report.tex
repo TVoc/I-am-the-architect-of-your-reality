@@ -281,6 +281,139 @@ The entry main entry point and accompanying storage components of the system are
 	\end{itemize}
 \end{itemize}
 
+\subsubsection*{RawDataPool}
+\begin{itemize}
+	\item GetNextRawData
+	\begin{itemize}
+		\item \texttt{RawDataEntry requestNewData()}
+		\begin{itemize}
+			\item Effect: Supplies the next RawDataEntry that should be processed. If no Entry is available, an empty Entry is returned.
+			\item Exceptions: None
+		\end{itemize}
+		
+		\item \texttt{PoolDataReport getDataReport()}
+		\begin{itemize}
+			\item Effect: Supplies information about which RawDataEntry entries have been marked as work in progress.
+			\item Exceptions: None
+		\end{itemize}
+		
+		\item \texttt{void removeData(RawDataEntryID id)} throws NoSuchRawDataEntryException
+		\begin{itemize}
+			\item Effect: Removes the corresponding RawDataEntry from the pool.
+			\item Exceptions: 
+			\begin{itemize}
+				\item NoSuchRawDataEntryException: There is no corresponding RawDataEntry.
+			\end{itemize}
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+
+\begin{itemize}
+	\item SubmitDataForProcessing
+	\begin{itemize}
+		\item \texttt{void submitRawDataBatch(RawDataBatch data)}
+		\begin{itemize}
+			\item Effect: Adds the RawData in the specified RawDataBatch to the pool. A unique identifier is generated for each RawData and the resulting RawDataEntry entries are scheduled according to the scheduling policy.
+			\item Exceptions: None
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+
+\subsubsection*{DispatcherSupervisor}
+\begin{itemize}
+	\item Heartbeat
+	\begin{itemize}
+		\item \texttt{void supplyHeartbeat()} throws TypeOfException
+		\begin{itemize}
+			\item Effect: Records a heartbeat from the supervised component.
+			\item Exceptions: None
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+
+\begin{itemize}
+	\item RequestNewSpare
+	\begin{itemize}
+		\item \texttt{DispatcherID requestNewSpareDispatcher()}
+		\begin{itemize}
+			\item Effect: Initialises a new spare \texttt{DispatcherModule} and generates an ID for it such that callee can find the new spare.
+			\item Exceptions: None
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+
+\subsubsection*{StatisticsModule}
+\begin{itemize}
+	\item DataStatisticsManagement
+	\begin{itemize}
+		\item \texttt{void deliver(StatisticsReport report)}
+		\begin{itemize}
+			\item Effect: Integrates the information supplied by the given report into its own information (e.g. mean pool capacity during a certain period in a certain month).
+			\item Exceptions: None
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+
+\subsubsection*{SchedulerModule}
+\begin{itemize}
+	\item RecurringBatchInfoManagement
+	\begin{itemize}
+		\item \texttt{void recordRecurringBatch(Date date, int maxAmount)}
+		\begin{itemize}
+			\item Effect: Records that a batch with the specified maximal amount is expected at the specified date.
+			\item Exceptions: None
+		\end{itemize}
+		
+		\item \texttt{void deleteRecurringBatch(Date date, int maxAmount)}
+		\begin{itemize}
+			\item Effect: Records that a batch on the specified date with the specified maximal amount will no longer occur.
+			\item Exceptions: None
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+
+\subsubsection*{SubmissionSubsystem}
+\begin{itemize}
+	\item SubmitRawDataBatch
+	\begin{itemize}
+		\item \texttt{void submitRawDataBatch(RawDataBatch batch)}
+		\begin{itemize}
+			\item Effect: Submits the given RawDataBatch for processing.
+			\item Exceptions: None
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+
+\subsubsection*{BillingManager}
+\begin{itemize}
+	\item BillingManagement
+	\begin{itemize}
+		\item \texttt{void billCustomer(RawDataEntry entry)}
+		\begin{itemize}
+			\item Effect: Extracts the required information to bill the Customer Organization for generation of the document from the RawDataEntry (e.g. document type, priority) on the one hand and from Customer Organization information stored elsewhere in the system on the other hand and records a new billing for the Customer Organization.
+			\item Exceptions: None
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+
+\subsubsection*{OtherFunctionality}
+\begin{itemize}
+	\item SubmitDocument
+	\begin{itemize}
+		\item \texttt{void submitDocument(DocumentData data)}
+		\begin{itemize}
+			\item Effect: Initiates the submission process for the specified generated document
+			\item Exceptions: None
+		\end{itemize}
+		
+		\item \texttt{boolean getDocumentSubmissionReport(DocumentDataID data)}
+		\begin{itemize}
+			\item Effect: Indicates whether the generated document corresponding to the given DocumentDataID has already been delivered.
+			\item Exceptions: None
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+
 \subsubsection{Data type definitions}
 Describe per complex data type used in the interfaces what it represents.
 
