@@ -75,13 +75,13 @@ In principle, instantiating a new \texttt{DispatcherModule} and bringing it up t
 Figure \ref{fig:it1-cc_main} shows the components resulting from the decomposition in this run. Extra attention is required concerning the \texttt{DispatcherModule} and \texttt{SpareDispatcherModule}. These components are actually two instances of the same dispatching component. Therefore, they provide and require the same interfaces, but depending on their run-time role, i.e. primary or standby dispatcher (cf. the decisions concerning \emph{Av1} above), a specific set of these is activated. This is indicated by having both component instances provide and require the same interfaces, but differing the connections between components dependent on the role of the instance. Additional notes are added to the diagram where deemed necessary.
 
 \subparagraph{DispatcherModule}
-Responsible for serving the \texttt{DocumentGeneratorProcesses} with new Raw Data Entries when asked. Also responsible for recording the leases on each served Entry, and monitoring these leases to ping \texttt{DocumentGeneratorProcesses} when leases expire. When a \texttt{Generator Process} has failed, it removes the failed \texttt{Process} and instantiates a new one. It also instantiates and destroys \texttt{GeneratorProcesses} when instructed to by the \texttt{ResourceManager}. Receives generated Documents form the \texttt{GeneratorProcesses} and submits these to the delivery system (\texttt{OtherFunctionality}). Signals the BillingManager when a document from a non-recurring Raw Data batch has been processed so that the Customer Organization can be billed. Also responsible for sending a Heartbeat pulse to the \texttt{DispatcherSupervisor}, piggybacked on a document submission whenever possible. At every change to its internal data, the \texttt{DispatcherModule} should send this change to the \texttt{SpareDispatcherModule} to keep their states consistent. When the \texttt{SpareDispatcherModule} does not acknowledge the changes, it should be pinged by the \texttt{DispatcherModule}, and if it has failed, the latter should request a new \texttt{SpareDispatcherModule} from the \texttt{DispatcherSupervisor}.
+Responsible for serving the \texttt{DocumentGeneratorProcesses} with new Raw Data Entries when asked. Also responsible for recording the leases on each served Entry, and monitoring these leases to ping \texttt{DocumentGeneratorProcesses} when leases expire. When a \texttt{Generator Process} has failed, it removes the failed \texttt{Process} and instantiates a new one. It also instantiates and destroys \texttt{GeneratorProcesses} when instructed to by the \texttt{ResourceManager}. Receives generated Documents form the \texttt{GeneratorProcesses} and submits these to the delivery system (\texttt{OtherFunctionality1}). Signals the BillingManager when a document from a non-recurring Raw Data batch has been processed so that the Customer Organization can be billed. Also responsible for sending a Heartbeat pulse to the \texttt{DispatcherSupervisor}, piggybacked on a document submission whenever possible. At every change to its internal data, the \texttt{DispatcherModule} should send this change to the \texttt{SpareDispatcherModule} to keep their states consistent. When the \texttt{SpareDispatcherModule} does not acknowledge the changes, it should be pinged by the \texttt{DispatcherModule}, and if it has failed, the latter should request a new \texttt{SpareDispatcherModule} from the \texttt{DispatcherSupervisor}.
 
 \subparagraph{RawDataPool}
 Responsible for storing Raw Data Entries that have not yet been processed. Also responsible for sorting/scheduling these Entries according to deadline priorities, and recording which Entries are currently being processed. Submits statistics about its capacity usage to the \texttt{StatisticsModule}.
 
 \subparagraph{DocumentGeneratorProcess}
-Responsible for generating Documents out of Raw Data Entries. Queries the \texttt{DispatcherModule} for a new Entry when it has finished generating a document along with submitting the generated document back to the \texttt{DispatcherModule}. Requests the Template for use with its Raw Data (\texttt{OtherFunctionality}), and when a PDF has been generated, hands this to the System for signing (\texttt{OtherFunctionality}) when necessary (E.g. invoices), before submission.
+Responsible for generating Documents out of Raw Data Entries. Queries the \texttt{DispatcherModule} for a new Entry when it has finished generating a document along with submitting the generated document back to the \texttt{DispatcherModule}. Requests the Template for use with its Raw Data (\texttt{OtherFunctionality1}), and when a PDF has been generated, hands this to the System for signing (\texttt{OtherFunctionality1}) when necessary (E.g. invoices), before submission.
 
 \subparagraph{DispatcherSupervisor}
 Responsible for listening to the heartbeat of the \texttt{DispatcherModule}. If the heartbeat fails, it should terminate the active \texttt{DispatcherModule} and activate the \texttt{SpareDispatcherModule}. Should the \texttt{DispatcherModule} request a new \texttt{SpareDispatcherModule}, it terminates the current \texttt{Spare\-Dispatcher\-Module} and instantiates a new one and informs the \texttt{DispatcherModule} about it.
@@ -104,7 +104,7 @@ Responsible for allocating adequate space in the \texttt{RawDataPool} and giving
 \subparagraph{BillingManager}
 Responsible for managing billing information for each Customer Organization. It must be possible to bill Customer Organizations for both recurring batches and non-recurring batches. The \texttt{BillingManager} must supply billing information on Customer Organizations on demand.
 
-\subparagraph{OtherFunctionality}
+\subparagraph{OtherFunctionality1}
 Encapsulates requirements not tackled in this run and which cannot be
 assigned to other introduced components.
 
@@ -245,7 +245,7 @@ The main entry point and accompanying storage components of the system are gathe
 			\item Effect: 
 			\begin{itemize}
 				\item Looks up and assumes control of all \texttt{DocumentGeneratorProcess}es it has an identifier of.
-				\item Verifies the correctness of its internal state by contacting the \texttt{RawDataPool} (to verify which Raw Data Entries have been marked as work in progress), \texttt{DocumentGeneratorProcess}es (to verify assignments of Raw Data Entries to \texttt{Processes}) and \texttt{OtherFunctionality} (to verify which generated documents it has in storage have already been delivered.
+				\item Verifies the correctness of its internal state by contacting the \texttt{RawDataPool} (to verify which Raw Data Entries have been marked as work in progress), \texttt{DocumentGeneratorProcess}es (to verify assignments of Raw Data Entries to \texttt{Processes}) and \texttt{OtherFunctionality1} (to verify which generated documents it has in storage have already been delivered.
 				\item Requests a new \texttt{SpareDispatcherModule} from the \texttt{DispatcherSupervisor}
 				\item Copies its state to the new spare
 				\item Returns and resumes normal operation
@@ -427,7 +427,7 @@ The main entry point and accompanying storage components of the system are gathe
 	\end{itemize}
 \end{itemize}
 
-\subsubsection*{OtherFunctionality}
+\subsubsection*{OtherFunctionality1}
 \begin{itemize}
 	\item SubmitDocument
 	\begin{itemize}
@@ -499,7 +499,7 @@ This section provides an overview of all complex data types used in the interfac
 \subsubsection{Verify and refine}
 This section describes per component which (parts of) the remaining requirements it is responsible for. If requirements are split, a letter is added to its name (e.g. Av1a) to indicate that the component will only satisfy a part of the original requirement. If requirements are split, it will also be indicated what part of the original requirement each new requirement contains. If new derived requirements are introduced they will receive a new identifier and are marked as a new requirement.
 
-\paragraph{OtherFunctionality}
+\paragraph{OtherFunctionality1}
 \begin{itemize}
     \item \emph{UC1}: Log in
     \item \emph{UC2}: Log out
@@ -553,10 +553,50 @@ This section describes per component which (parts of) the remaining requirements
     Being able to generate documents of the new type with the accompanying new template.
 \end{itemize}
 
-\subsection{Decomposition 2: Module (drivers)}
+\subsection{Decomposition 2: OtherFunctionality1 (Av2, UC11, UC12, UC13, UC14)}
 \subsubsection{Module to decompose}
+In this run we decompose \texttt{OtherFunctionality1}. This component is an aggregate of leftover behaviour in the previous run.
+
 \subsubsection{Selected architectural drivers}
+The non-functional driver for this decomposition is:
+
+\begin{itemize}
+    \item \emph{Av2}: Personal document storage failure
+\end{itemize}
+
+The related functional drivers are:
+
+\begin{itemize}
+    \item \emph{UC11}: Deliver document via personal document store
+    \item \emph{UC12}: Consult personal document store
+    \item \emph{UC13}: Search documents in personal document store
+    \item \emph{UC14}: Consult document in personal document store
+\end{itemize}
+
+\paragraph{Rationale}
+These drivers are the main drivers concerned with normal usage of the personal document store. No components regarding authentication or registering are considered.
+
 \subsubsection{Architectural design}
+\paragraph{Topic}
+Discussion of the solution selected for (a part of) one of the architectural
+drivers.
+
+\subsubsection*{Alternatives considered}
+\paragraph{Alternatives for solution}
+A discussion of the alternative solutions and why that were not selected.
+
+\subsubsection{Instantiation and allocation of functionality}
+\paragraph{Decomposition}
+Main aspects of the resulting decomposition.
+
+\subparagraph{ModuleB}
+Per introduced component a paragraph describing its responsibilities.
+
+\subparagraph{ModuleC}
+Per introduced component a paragraph describing its responsibilities.
+
+\todo{figures}
+
 \subsubsection{Instantiation and allocation of functionality}
 \subsubsection{Interfaces for child modules}
 \subsubsection{Data type definitions}

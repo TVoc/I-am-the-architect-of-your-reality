@@ -21,3 +21,12 @@ Alternatives:
 - priority scheduler module instead of the pool sorting the raw data entries on its own
 - recovery from failure of dispatcher is fast in principle, but a spare has been implemented regardless since document generation is critical
 
+
+Second run:
+PDS:
+AV2: PDS failure (H)
+UC11
+UC12
+UC13
+UC14
+
