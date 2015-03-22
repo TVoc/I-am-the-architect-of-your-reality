@@ -230,7 +230,7 @@ The entry main entry point and accompanying storage components of the system are
 \begin{itemize}
 	\item SetActive
 	\begin{itemize}
-		\item \texttt{void activate} throws AlreadyActiveException
+		\item \texttt{void activate()} throws AlreadyActiveException
 		\begin{itemize}
 			\item Effect: 
 			\begin{itemize}
@@ -409,7 +409,7 @@ The entry main entry point and accompanying storage components of the system are
 			\item Exceptions: None
 		\end{itemize}
 		
-		\item \texttt{boolean getDocumentSubmissionReport(DocumentDataID data)}
+		\item \texttt{boolean isDocumentSubmitted(DocumentDataID data)}
 		\begin{itemize}
 			\item Effect: Indicates whether the generated document corresponding to the given DocumentDataID has already been delivered.
 			\item Exceptions: None
@@ -436,9 +436,37 @@ The entry main entry point and accompanying storage components of the system are
 \subsubsection{Data type definitions}
 Describe per complex data type used in the interfaces what it represents.
 
-\paragraph{returnType} This data element represents X.
+\paragraph{RawData} Contains the data from which a single document can be generated and the meta-data relevant to that document (e.g. recipient information and Customer Organization that submitted the data).
 
-\paragraph{ParamType} This data element represents Y.
+\paragraph{RawDataBatch} Contains several RawData instances
+
+\paragraph{RawDataEntryID} Allows unique identification of a single RawDataEntry instance.
+
+\paragraph{RawDataEntry} The combination of a RawData instance and its corresponding RawDataEntryID.
+
+\paragraph{DocumentData} Represents a generated document and the raw data from which it was generated.
+
+\paragraph{DocumentType} Represents a certain document type.
+
+\paragraph{Template} Provides a skeleton for a document of a certain document type. It has fields that can be filled out with raw data.
+
+\paragraph{DocumentDataID} Allows unique identification of a single DocumentData instance. 
+
+\paragraph{Echo} A message used as response to a ping request.
+
+\paragraph{ResourceGuidelineReport} Encapsulates directives from the \texttt{ResourceManager} or the \texttt{RawDataPool} regarding the amount of active \texttt{DocumentGeneratorProcess}es. Those guidelines are due to either imminent recurring batches, past resource usage patterns or high \texttt{RawDataPool} capacity usage.
+
+\paragraph{DocumentGeneratorProcessID} Allows look-up of the corresponding unique \texttt{DocumentGeneratorProcess}.
+
+\paragraph{ProcessStatusReport} Encapsulates information regarding a \texttt{DocumentGeneratorProcess} such as which, if any, RawDataEntry it is working on and whether it has finished generating the document or not.
+
+\paragraph{PoolDataReport} Reports which RawDataEntry entries in the \texttt{RawDataPool} have been marked as work in progress.
+
+\paragraph{StatisticsReport} Encapsulates information about resource usage (e.g. currently used \texttt{RawDataPool} capacity at a certain time)
+
+\paragraph{OrganisationID} Allows unique identification of a single Customer Organisation
+
+\paragraph{DispatcherID} Allows look-up of a single unique \texttt{DispatcherModule} instance 
 
 \subsubsection{Verify and refine}
 This section describes per component which (parts of) the remaining requirements it is responsible for. If requirements are split, a letter is added to its name (e.g. Av1a) to indicate that the component will only satisfy a part of the original requirement. If requirements are split, it will also be indicated what part of the original requirement each new requirement contains. If new derived requirements are introduced they will receive a new identifier and are marked as a new requirement.
