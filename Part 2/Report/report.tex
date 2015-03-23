@@ -647,12 +647,13 @@ The related functional drivers are:
 These drivers are the main drivers concerned with normal usage of the personal document store. No components regarding authentication or registering are considered. These drivers are also either High or Medium priority, making them a good choice.
 
 \subsubsection{Architectural design}
-\paragraph{Topic}
-Discussion of the solution selected for (a part of) one of the architectural
-drivers.
+\paragraph{Prevention and detection of document storage (\emph{Av2)}}
+\emph{Av2} specifies that the personal document storage should have a guaranteed minimal up-time. We propose a \texttt{DocumentDB}, which stores all generated documents, and the \texttt{PersonalDocumentDatabase}, which stores references to the documents addressed to each registered recipient (see paragraph ``Splitting up the document database and personal document database´´ for the rationale as to why these two are split up). Part of the solution to the prevention problem is to have passive replication of both the document database and the personal document database. We therefore propose a \texttt{ReplicationManager} that manages both the replicas of the \texttt{DocumentDB} and \texttt{PersonalDocumentDatabase}. Of course, there are also the \texttt{SecondaryDB} and \texttt{SecondaryPersonalDocumentDatabase}. As we have opted for passive replication, both databases shall implement an interface through which their respective primaries can synchronise with their secondaries. This synchronisation will happen every ten minutes. It is possible that the primary crashes before it has synchronised any new data. To solve this, we introduce the \texttt{DocumentSubmissionCache}, which stores 20 minutes worth of updates for both databases. When a secondary of either type is activated, the relevant updates in the \texttt{DocumentSubmissionCache} are flushed to the new primary. The fact that some of those updates may already have been present poses no problem as writes are idempotent.
 
 \subsubsection*{Alternatives considered}
 \paragraph{Alternatives for solution}
+\todo{split docDB and PDSDB}
+\todo{passive vs active rep}
 A discussion of the alternative solutions and why that were not selected.
 
 \subsubsection{Instantiation and allocation of functionality}
