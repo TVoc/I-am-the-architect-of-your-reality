@@ -61,7 +61,7 @@ As previously mentioned, there is a spare in place that knows which Raw Data Ent
 The \texttt{DispatcherModule} expects an acknowledgement each time it updates the state of the spare. In case there is no acknowledgement, the \texttt{DispatcherModule} pings the spare. If the spare does not echo in time, it is marked as failed. The \texttt{DispatcherModule} asks the \texttt{DispatcherSupervisor} for a new spare and shares its state with the new spare. When this is done, work is resumed.
 
 \paragraph{Notification of DispatcherModule or DocumentGeneratorProcess failure for \emph{Av1}}
-\emph{Av1} specifies that the eDocs administrators must be notified in case of failure. For this purpose, we introduce a new component, the \texttt{ErrorNotificationHandler}. There are two kinds of failures that must be reported: failure of a single \texttt{DocumentGeneratorProcess} and failure of the \texttt{DispatcherModule}. In the first case, the \texttt{DispatcherModule} notifies the \texttt{DispatcherSupervisor}, which notifies the \texttt{ErrorNotificationHandler} in turn. Conveniently, the \texttt{DispatcherModule} can also issue a notification in case generation of a document has failed due to incorrect raw data through this channel. In the second case, the heartbeat of the \texttt{DispatcherModule} has failed, which leads the \texttt{DispatcherSupervisor} to notify the \texttt{ErrorNotificationHandler}.
+\emph{Av1} specifies that the eDocs administrators must be notified in case of failure. For this purpose, we introduce a new component, the \texttt{AdminNotificationHandler}. There are two kinds of failures that must be reported: failure of a single \texttt{DocumentGeneratorProcess} and failure of the \texttt{DispatcherModule}. In the first case, the \texttt{DispatcherModule} notifies the \texttt{DispatcherSupervisor}, which notifies the \texttt{AdminNotificationHandler} in turn. Conveniently, the \texttt{DispatcherModule} can also issue a notification in case generation of a document has failed due to incorrect raw data through this channel. In the second case, the heartbeat of the \texttt{DispatcherModule} has failed, which leads the \texttt{DispatcherSupervisor} to notify the \texttt{AdminNotificationHandler}.
 
 \subsubsection*{Alternatives considered}
 \paragraph{DispatcherSupervisor also listening to DocumentGeneratorProcesses}
@@ -87,7 +87,7 @@ Responsible for storing Raw Data Entries that have not yet been processed. Also 
 Responsible for generating Documents out of Raw Data Entries. Queries the \texttt{DispatcherModule} for a new Entry when it has finished generating a document along with submitting the generated document back to the \texttt{DispatcherModule}. Requests the Template for use with its Raw Data (\texttt{OtherFunctionality1}), and when a PDF has been generated, hands this to the System for signing (\texttt{OtherFunctionality1}) when necessary (E.g. invoices), before submission.
 
 \subparagraph{DispatcherSupervisor}
-Responsible for listening to the heartbeat of the \texttt{DispatcherModule}. If the heartbeat fails, it should terminate the active \texttt{DispatcherModule} and activate the \texttt{SpareDispatcherModule}, and notify the \texttt{ErrorNotificationHandler}. Should the \texttt{DispatcherModule} request a new \texttt{Spare\-Dispatcher\-Module}, it terminates the current \texttt{Spare\-Dispatcher\-Module} and instantiates a new one and informs the \texttt{Dispatcher\-Module} about it. If the \texttt{Dispatcher\-Module} signals either \texttt{DocumentGeneratorProcess} failure or document generation failure due to incorrect raw data, it issues a notification through the \texttt{Error\-Notification\-Handler}.
+Responsible for listening to the heartbeat of the \texttt{DispatcherModule}. If the heartbeat fails, it should terminate the active \texttt{DispatcherModule} and activate the \texttt{SpareDispatcherModule}, and notify the \texttt{AdminNotificationHandler}. Should the \texttt{DispatcherModule} request a new \texttt{Spare\-Dispatcher\-Module}, it terminates the current \texttt{Spare\-Dispatcher\-Module} and instantiates a new one and informs the \texttt{Dispatcher\-Module} about it. If the \texttt{Dispatcher\-Module} signals either \texttt{DocumentGeneratorProcess} failure or document generation failure due to incorrect raw data, it issues a notification through the \texttt{Error\-Notification\-Handler}.
 
 \subparagraph{SpareDispatcherModule}
 Here, the internal data of the \texttt{DispatcherModule} is duplicated so that it can assume the responsibilities of the \texttt{DispatcherModule} upon failure. When its state is updated, it should send an acknowledgement to the \texttt{DispatcherModule}. It must also respond to pings from the \texttt{DispatcherModule}.
@@ -107,7 +107,7 @@ Responsible for allocating adequate space in the \texttt{RawDataPool} and giving
 \subparagraph{BillingManager}
 Responsible for managing billing information for each Customer Organization. It must be possible to bill Customer Organizations for both recurring batches and non-recurring batches. The \texttt{BillingManager} must supply billing information on Customer Organizations on demand.
 
-\subparagraph{ErrorNotificationHandler}
+\subparagraph{AdminNotificationHandler}
 Responsible for issuing notifications due to failure. The addressees can be either eDocs administrators (e.g. failure of hardware or software) or Customer Organization Administrators (e.g. document generation failure due to incorrect raw data).
 
 \subparagraph{OtherFunctionality1}
@@ -483,11 +483,20 @@ The main entry point and accompanying storage components of the system are gathe
 	        \item Effect: Signs the Document in the Document Data with the signing key of the Customer Organisation, which can be looked up with the ID found in the Document Data. Afterwards, returns the Document Data, with as only alteration the signing of the Document inside.
 	    \end{itemize}
 	\end{itemize}
+	
+	\item AdminNotificationDelivery
+	\begin{itemize}
+		\item \texttt{void deliverAdminNotification(AdminNotification notification)}
+		\begin{itemize}
+			\item Effect: Delivers the specified AdminNotification to the intended recipient
+			\item Exceptions: None
+		\end{itemize}
+	\end{itemize}
 \end{itemize}
 
-\subsubsection*{ErrorNotificationHandler}
+\subsubsection*{AdminNotificationHandler}
 \begin{itemize}
-	\item BillingManagement
+	\item AdminNotificationManagement
 	\begin{itemize}
 		\item \texttt{void signalDocumentGenerationFailure(GenerationErrorReport report)}
 		\begin{itemize}
@@ -553,6 +562,8 @@ This section provides an overview of all complex data types used in the interfac
 \paragraph{GeneratorProcessFailureReport} Contains the DocumentGeneratorProcessID of the \texttt{DocumentGeneratorProcess} that failed and any specifics known about the failure
 
 \paragraph{DispatcherModuleFailureReport} Contains the DispatcherID of the \texttt{DispatcherModule} that failed and any specifics known about the failure
+
+\paragraph{AdminNotification} Contains one of several possible report types that can be addressed to either eDocs Administrators or Customer Administrators (e.g. GenerationErrorReport, GeneratorProcessFailureReport, DispatcherModuleFailureReport)
 
 \subsubsection{Verify and refine}
 This section describes per component which (parts of) the remaining requirements it is responsible for. If requirements are split, a letter is added to its name (e.g. Av1a) to indicate that the component will only satisfy a part of the original requirement. If requirements are split, it will also be indicated what part of the original requirement each new requirement contains. If new derived requirements are introduced they will receive a new identifier and are marked as a new requirement.
