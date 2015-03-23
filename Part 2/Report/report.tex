@@ -75,7 +75,7 @@ In principle, instantiating a new \texttt{DispatcherModule} and bringing it up t
 
 \subsubsection{Instantiation and allocation of functionality}
 \paragraph{Decomposition}
-Figure \ref{fig:it1-cc_main} shows the components resulting from the decomposition in this run. Extra attention is required concerning the \texttt{DispatcherModule} and \texttt{SpareDispatcherModule}. These components are actually two instances of the same dispatching component. Therefore, they provide and require the same interfaces, but depending on their run-time role, i.e. primary or standby dispatcher (cf. the decisions concerning \emph{Av1} above), a specific set of these is activated. This is indicated by having both component instances provide and require the same interfaces, but differing the connections between components dependent on the role of the instance. Additional notes are added to the diagram where deemed necessary.
+Figure \ref{fig:it1-cc_main} shows the components resulting from the decomposition in this run. A subtle clarification has to be made concerning the \texttt{DispatcherModule} and \texttt{SpareDispatcherModule}. These components are both instantiations of the same type of component with different runtime responsibilities. This is noticable from the fact they have the same interfaces but different ones are being used on either. Additional notes are added to the diagram where deemed necessary.
 
 \subparagraph{DispatcherModule}
 Responsible for serving the \texttt{DocumentGeneratorProcesses} with new Raw Data Entries when asked. Also responsible for recording the leases on each served Entry, and monitoring these leases to ping \texttt{DocumentGeneratorProcesses} when leases expire. When a \texttt{Generator Process} has failed, it removes the failed \texttt{Process} and instantiates a new one. It also instantiates and destroys \texttt{GeneratorProcesses} when instructed to by the \texttt{ResourceManager}. Receives generated Documents form the \texttt{GeneratorProcesses} and submits these to the delivery system (\texttt{OtherFunctionality1}). Signals the BillingManager when a document from a non-recurring Raw Data batch has been processed so that the Customer Organization can be billed. Also responsible for sending a Heartbeat pulse to the \texttt{DispatcherSupervisor}, piggybacked on a document submission whenever possible. At every change to its internal data, the \texttt{DispatcherModule} should send this change to the \texttt{SpareDispatcherModule} to keep their states consistent. When the \texttt{SpareDispatcherModule} does not acknowledge the changes, it should be pinged by the \texttt{DispatcherModule}, and if it has failed, the latter should request a new \texttt{SpareDispatcherModule} from the \texttt{DispatcherSupervisor}. If a \texttt{Document\-Generator\-Process} has failed, it should notify the \texttt{DispatcherSupervisor} of this fact. The same applies when a \texttt{Document\-Generator\-Process} signals document generation failure due to incorrect raw data.
@@ -658,15 +658,43 @@ A discussion of the alternative solutions and why that were not selected.
 
 \subsubsection{Instantiation and allocation of functionality}
 \paragraph{Decomposition}
-Main aspects of the resulting decomposition.
+Figure \ref{fig:it2-cc_main} shows the components resulting from the decomposition in this run. The same clarification concerning the \texttt{DispatcherModule} and \texttt{SpareDispatcherModule} has to be made for both the \texttt{DocumentDB} and \texttt{SecondaryDocumentDB} and the \texttt{PersonalDocumentDatabase} and \texttt{SecondaryPersonalDocumentDatabase} respectively. These components are pairwise instantiations of the same type of component with different runtime responsibilities. This is noticable from the fact they have the same interfaces but different ones are being used on either. Additional notes are added to the diagram where deemed necessary.
 
-\subparagraph{ModuleB}
+\subparagraph{GeneratedDocumentHandler}
 Per introduced component a paragraph describing its responsibilities.
 
-\subparagraph{ModuleC}
+\subparagraph{ReplicationManager}
 Per introduced component a paragraph describing its responsibilities.
 
-\todo{figures}
+\subparagraph{DocumentSubmissionCache}
+Per introduced component a paragraph describing its responsibilities.
+
+\subparagraph{DocumentDB}
+Per introduced component a paragraph describing its responsibilities.
+
+\subparagraph{SecondaryDocumentDB}
+Per introduced component a paragraph describing its responsibilities.
+
+\subparagraph{PersonalDocumentDatabase}
+Per introduced component a paragraph describing its responsibilities.
+
+\subparagraph{SecondaryPersonalDocumentDatabase}
+Per introduced component a paragraph describing its responsibilities.
+
+\subparagraph{PersonalDocumentLookupModule}
+Per introduced component a paragraph describing its responsibilities.
+
+\subparagraph{DownloadDocumentLookupModule}
+Per introduced component a paragraph describing its responsibilities.
+
+\subparagraph{LookupLoadBalancer}
+Per introduced component a paragraph describing its responsibilities.
+
+\subparagraph{UserNotificationModule}
+Per introduced component a paragraph describing its responsibilities.
+
+\subparagraph{OtherFunctionality2}
+Per introduced component a paragraph describing its responsibilities.
 
 \begin{figure}[!htp]
     \centering
