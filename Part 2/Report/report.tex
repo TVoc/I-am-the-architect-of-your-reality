@@ -61,7 +61,7 @@ As previously mentioned, there is a spare in place that knows which Raw Data Ent
 The \texttt{DispatcherModule} expects an acknowledgement each time it updates the state of the spare. In case there is no acknowledgement, the \texttt{DispatcherModule} pings the spare. If the spare does not echo in time, it is marked as failed. The \texttt{DispatcherModule} asks the \texttt{DispatcherSupervisor} for a new spare and shares its state with the new spare. When this is done, work is resumed.
 
 \paragraph{Notification of DispatcherModule or DocumentGeneratorProcess failure for \emph{Av1}}
-\emph{Av1} specifies that the eDocs administrators must be notified in case of failure. For this purpose, we introduce a new component, the \texttt{ErrorNotificationHandler}. There are two kinds of failures that must be reported: failure of a single \texttt{DocumentGeneratorProcess} and failure of the \texttt{DispatcherModule}. In the first case, the \texttt{DispatcherModule} notifies the \texttt{DispatcherSupervisor}, which notifies the \texttt{ErrorNotificationHandler} in turn. Conveniently, the \texttt{DispatcherModule} can also issue a notification in case generation of a document has failed due to incorrect raw data through this channel. In the second case, the heartbeat of the \texttt{DispatcherModule} has failed, which leads the \texttt{DispatcherSupervisor to notify the \texttt{ErrorNotificationHandler}.
+\emph{Av1} specifies that the eDocs administrators must be notified in case of failure. For this purpose, we introduce a new component, the \texttt{ErrorNotificationHandler}. There are two kinds of failures that must be reported: failure of a single \texttt{DocumentGeneratorProcess} and failure of the \texttt{DispatcherModule}. In the first case, the \texttt{DispatcherModule} notifies the \texttt{DispatcherSupervisor}, which notifies the \texttt{ErrorNotificationHandler} in turn. Conveniently, the \texttt{DispatcherModule} can also issue a notification in case generation of a document has failed due to incorrect raw data through this channel. In the second case, the heartbeat of the \texttt{DispatcherModule} has failed, which leads the \texttt{DispatcherSupervisor} to notify the \texttt{ErrorNotificationHandler}.
 
 \subsubsection*{Alternatives considered}
 \paragraph{DispatcherSupervisor also listening to DocumentGeneratorProcesses}
@@ -78,7 +78,7 @@ In principle, instantiating a new \texttt{DispatcherModule} and bringing it up t
 Figure \ref{fig:it1-cc_main} shows the components resulting from the decomposition in this run. Extra attention is required concerning the \texttt{DispatcherModule} and \texttt{SpareDispatcherModule}. These components are actually two instances of the same dispatching component. Therefore, they provide and require the same interfaces, but depending on their run-time role, i.e. primary or standby dispatcher (cf. the decisions concerning \emph{Av1} above), a specific set of these is activated. This is indicated by having both component instances provide and require the same interfaces, but differing the connections between components dependent on the role of the instance. Additional notes are added to the diagram where deemed necessary.
 
 \subparagraph{DispatcherModule}
-Responsible for serving the \texttt{DocumentGeneratorProcesses} with new Raw Data Entries when asked. Also responsible for recording the leases on each served Entry, and monitoring these leases to ping \texttt{DocumentGeneratorProcesses} when leases expire. When a \texttt{Generator Process} has failed, it removes the failed \texttt{Process} and instantiates a new one. It also instantiates and destroys \texttt{GeneratorProcesses} when instructed to by the \texttt{ResourceManager}. Receives generated Documents form the \texttt{GeneratorProcesses} and submits these to the delivery system (\texttt{OtherFunctionality1}). Signals the BillingManager when a document from a non-recurring Raw Data batch has been processed so that the Customer Organization can be billed. Also responsible for sending a Heartbeat pulse to the \texttt{DispatcherSupervisor}, piggybacked on a document submission whenever possible. At every change to its internal data, the \texttt{DispatcherModule} should send this change to the \texttt{SpareDispatcherModule} to keep their states consistent. When the \texttt{SpareDispatcherModule} does not acknowledge the changes, it should be pinged by the \texttt{DispatcherModule}, and if it has failed, the latter should request a new \texttt{SpareDispatcherModule} from the \texttt{DispatcherSupervisor}. If a \texttt{DocumentGeneratorProcess} has failed, it should notify the \texttt{DispatcherSupervisor} of this fact. The same applies when a \texttt{DocumentGeneratorProcess} signals document generation failure due to incorrect raw data.
+Responsible for serving the \texttt{DocumentGeneratorProcesses} with new Raw Data Entries when asked. Also responsible for recording the leases on each served Entry, and monitoring these leases to ping \texttt{DocumentGeneratorProcesses} when leases expire. When a \texttt{Generator Process} has failed, it removes the failed \texttt{Process} and instantiates a new one. It also instantiates and destroys \texttt{GeneratorProcesses} when instructed to by the \texttt{ResourceManager}. Receives generated Documents form the \texttt{GeneratorProcesses} and submits these to the delivery system (\texttt{OtherFunctionality1}). Signals the BillingManager when a document from a non-recurring Raw Data batch has been processed so that the Customer Organization can be billed. Also responsible for sending a Heartbeat pulse to the \texttt{DispatcherSupervisor}, piggybacked on a document submission whenever possible. At every change to its internal data, the \texttt{DispatcherModule} should send this change to the \texttt{SpareDispatcherModule} to keep their states consistent. When the \texttt{SpareDispatcherModule} does not acknowledge the changes, it should be pinged by the \texttt{DispatcherModule}, and if it has failed, the latter should request a new \texttt{SpareDispatcherModule} from the \texttt{DispatcherSupervisor}. If a \texttt{Document\-Generator\-Process} has failed, it should notify the \texttt{DispatcherSupervisor} of this fact. The same applies when a \texttt{Document\-Generator\-Process} signals document generation failure due to incorrect raw data.
 
 \subparagraph{RawDataPool}
 Responsible for storing Raw Data Entries that have not yet been processed. Also responsible for sorting/scheduling these Entries according to deadline priorities, and recording which Entries are currently being processed. Submits statistics about its capacity usage to the \texttt{StatisticsModule}.
@@ -87,7 +87,7 @@ Responsible for storing Raw Data Entries that have not yet been processed. Also 
 Responsible for generating Documents out of Raw Data Entries. Queries the \texttt{DispatcherModule} for a new Entry when it has finished generating a document along with submitting the generated document back to the \texttt{DispatcherModule}. Requests the Template for use with its Raw Data (\texttt{OtherFunctionality1}), and when a PDF has been generated, hands this to the System for signing (\texttt{OtherFunctionality1}) when necessary (E.g. invoices), before submission.
 
 \subparagraph{DispatcherSupervisor}
-Responsible for listening to the heartbeat of the \texttt{DispatcherModule}. If the heartbeat fails, it should terminate the active \texttt{DispatcherModule} and activate the \texttt{SpareDispatcherModule}. Should the \texttt{DispatcherModule} request a new \texttt{SpareDispatcherModule}, it terminates the current \texttt{Spare\-Dispatcher\-Module} and instantiates a new one and informs the \texttt{DispatcherModule} about it. If the \texttt{DispatcherModule} signals either \texttt{DocumentGeneratorProcess} failure or document generation failure due to incorrect raw data, it issues a notification through the \texttt{ErrorNotificationHandler}.
+Responsible for listening to the heartbeat of the \texttt{DispatcherModule}. If the heartbeat fails, it should terminate the active \texttt{DispatcherModule} and activate the \texttt{SpareDispatcherModule}, and notify the \texttt{ErrorNotificationHandler}. Should the \texttt{DispatcherModule} request a new \texttt{Spare\-Dispatcher\-Module}, it terminates the current \texttt{Spare\-Dispatcher\-Module} and instantiates a new one and informs the \texttt{Dispatcher\-Module} about it. If the \texttt{Dispatcher\-Module} signals either \texttt{DocumentGeneratorProcess} failure or document generation failure due to incorrect raw data, it issues a notification through the \texttt{Error\-Notification\-Handler}.
 
 \subparagraph{SpareDispatcherModule}
 Here, the internal data of the \texttt{DispatcherModule} is duplicated so that it can assume the responsibilities of the \texttt{DispatcherModule} upon failure. When its state is updated, it should send an acknowledgement to the \texttt{DispatcherModule}. It must also respond to pings from the \texttt{DispatcherModule}.
@@ -108,7 +108,7 @@ Responsible for allocating adequate space in the \texttt{RawDataPool} and giving
 Responsible for managing billing information for each Customer Organization. It must be possible to bill Customer Organizations for both recurring batches and non-recurring batches. The \texttt{BillingManager} must supply billing information on Customer Organizations on demand.
 
 \subparagraph{ErrorNotificationHandler}
-Responsible for issuing notifications due to failure. The addressees can be both eDocs administrators (e.g. failure of hardware or software) and Customer Organization Administrators (e.g. document generation failure due to incorrect raw data).
+Responsible for issuing notifications due to failure. The addressees can be either eDocs administrators (e.g. failure of hardware or software) or Customer Organization Administrators (e.g. document generation failure due to incorrect raw data).
 
 \subparagraph{OtherFunctionality1}
 Encapsulates requirements not tackled in this run and which cannot be
@@ -364,19 +364,19 @@ The main entry point and accompanying storage components of the system are gathe
 			\item Effect: Initialises a new \texttt{SpareDispatcherModule} and generates an ID for it such that callee can find the new spare.
 			\item Exceptions: None
 		\end{itemize}
-	\end{itemize}
+		
+	    \item \texttt{void signalDocumentGenerationFailure(GenerationErrorReport report)}
+	    \begin{itemize}
+		    \item Effect: Passes on the given GenerationErrorReport through appropriate channels.
+		    \item Exceptions: None
+	    \end{itemize}
 	
-	\item \texttt{void signalDocumentGenerationFailure(GenerationErrorReport report)}
-	\begin{itemize}
-		\item Effect: Passes on the given GenerationErrorReport through appropriate channels.
-		\item Exceptions: None
-	\end{itemize}
-	
-	\item \texttt{void signalDocumentGeneratorProcessFailure(GeneratorProcessFailureReport report)}
-	\begin{itemize}
-		\item Effect: Passes on the given GeneratorProcessFailureReport through appropriate channels.
-		\item Exceptions: None
-	\end{itemize}
+	    \item \texttt{void signalDocumentGeneratorProcessFailure(GeneratorProcessFailureReport report)}
+	    \begin{itemize}
+		    \item Effect: Passes on the given GeneratorProcessFailureReport through appropriate channels.
+		    \item Exceptions: None
+	    \end{itemize}
+    \end{itemize}
 \end{itemize}
 
 \subsubsection*{StatisticsModule}
