@@ -661,31 +661,35 @@ A discussion of the alternative solutions and why that were not selected.
 Figure \ref{fig:it2-cc_main} shows the components resulting from the decomposition in this run. The same clarification concerning the \texttt{DispatcherModule} and \texttt{SpareDispatcherModule} has to be made for both the \texttt{DocumentDB} and \texttt{SecondaryDocumentDB} and the \texttt{PersonalDocumentDatabase} and \texttt{SecondaryPersonalDocumentDatabase} respectively. These components are pairwise instantiations of the same type of component with different runtime responsibilities. This is noticable from the fact they have the same interfaces but different ones are being used on either. Additional notes are added to the diagram where deemed necessary.
 
 \subparagraph{GeneratedDocumentHandler}
-Per introduced component a paragraph describing its responsibilities.
+This component is the entry point for the delivery subsystem from the generation subsystem. It accepts generated document and determines where and how these should be delivered. It submits these documents to the \texttt{ReplicationManager} to place it in the general \texttt{DocumentDB}, along with instructions whether or not it should also place these in the \texttt{PersonalDocumentDatabase}. It should bill Customer Organisations for the delivery of non-recurring batch documents, after determining this property for a received document. It signals the \texttt{GenDocHandlerListener} periodically to convey that it is still alive (This is a consideration made because of the fact that it is a Single Point of Failure in the system). Also responsible for composing a message to the user that a new document is available, when necessary, and delivering this to the \texttt{UserNotificationModule}. When necessary, instructs the \texttt{DownloadDocumentLookupModule} to record a deadline for a document download for a certain client and document.
+
+\subparagraph{GenDocHandlerListener}
+Listens to the heartbeat signal of the \texttt{GeneratedDocumentHandler} to ascertain it remaining functional. When the \texttt{GeneratedDocumentHandler} fails to signal the fact that it still functions, it is considered failed, and the \texttt{GenDocHandlerListener} notifies the eDocs Administrator of this fact through the \texttt{AdminNotificationHandler}.
 
 \subparagraph{ReplicationManager}
-Per introduced component a paragraph describing its responsibilities.
+Handles the passive replication for both the \texttt{DocumentDB} and the \texttt{PersonalDocumentDatabase}. It is responsible for both since they are tied together closely. When either fails and the \texttt{ReplicationManager} does not receive an answer for a while, the affected component is pinged, and when it does not answer the \texttt{ReplicationManager} notifies the eDocs Administrator of this fact through the \texttt{AdminNotificationHandler}. When a document is received from the \texttt{GeneratedDocumentHandler}, it submits this to the \texttt{DocumentDB}, and if so instructed also in the \texttt{PersonalDocumentDatabase}. It also places the document in the \texttt{DocumentSubmissionCache}, along with a marking of whether the document is also stored in the \texttt{PersonalDocumentDatabase}. It removes this document from the cache when it has received a confirmation that the document has been replicated onto all secondary databases it should belong to.
 
 \subparagraph{DocumentSubmissionCache}
-Per introduced component a paragraph describing its responsibilities.
+Accepts documents that should be temporarily stored before they are replicated in the databases. Allows for at least 3 hours of received document storage. Removes the documents from its storage when signaled to do so by the \texttt{ReplicationManager}.
 
 \subparagraph{DocumentDB}
-Per introduced component a paragraph describing its responsibilities.
+General database for all generated documents. Accepts documents from the \texttt{ReplicationManager} for storage. It should synchronize with the \texttt{SecondaryDocumentDB} periodically to keep their states consistent, and signals the \texttt{ReplicationManager} which documents have been succesfully replicated in both \texttt{DocumentDB}s. It should provide the \texttt{PersonalDocumentDatabase} with a requested document when so instructed by it. It should respond to pings by the \texttt{ReplicationManager}.
 
 \subparagraph{SecondaryDocumentDB}
-Per introduced component a paragraph describing its responsibilities.
+Accepts synchronisation requests from the \texttt{DocumentDB}, replicating any documents from the \texttt{DocumentDB} it does not yet contain, and then answer that it has succesfully done so.
 
 \subparagraph{PersonalDocumentDatabase}
-Per introduced component a paragraph describing its responsibilities.
+Specialised database for the personal document store service. Accepts documents from the \texttt{ReplicationManager} for storage. Keeps a set amount of documents in storage per Registered User. When a new document for a user arrives and the maximum amount of documents for this user in the \texttt{PersonalDocumentDatabase} is reached, the oldest document is replaced by a reference to it in the \texttt{DocumentDB}. It should synchronize with the \texttt{SecondaryPersonalDocumentDatabase} periodically to keep their states consistent, and signals the \texttt{ReplicationManager} which documents or references have been succesfully replicated in both \texttt{PersonalDocumentDatabase}s. It should provide the \texttt{PersonalDocumentLookupModule} with a requested document when so instructed by it, and if it only has a corresponding reference, queries the \texttt{DocumentDB} for it. It should respond to pings by the \texttt{ReplicationManager}.
 
 \subparagraph{SecondaryPersonalDocumentDatabase}
-Per introduced component a paragraph describing its responsibilities.
+Accepts synchronisation requests from the \texttt{PersonalDocumentDatabase}, replicating any documents or references from the \texttt{PersonalDocumentDatabase} it does not yet contain, and then answer that it has succesfully done so.
 
 \subparagraph{PersonalDocumentLookupModule}
-Per introduced component a paragraph describing its responsibilities.
+Accepts requests to serve documents out of the \texttt{PersonalDocumentDatabase}, querying the \texttt{PersonalDocumentDatabase} for them and returning them. When the \texttt{PersonalDocumentDatabase} does not answer, it is pinged, and when it fails to respond, the \texttt{PersonalDocumentLookupModule} returns the answer that the personal document stores are currently unavailable.
 
 \subparagraph{DownloadDocumentLookupModule}
-Per introduced component a paragraph describing its responsibilities.
+Accepts requests to serve documents out of the \texttt{DocumentDB}, querying the \texttt{DocumentDB} for them and returning them. When the \texttt{Document} does not answer in a timely fashion, the \texttt{DownloadDocumentLookupModule} returns the answer that the download service is currently unavailable. It has an internal information structure, recording 
+\todo{finish this sentence}
 
 \subparagraph{LookupLoadBalancer}
 Per introduced component a paragraph describing its responsibilities.
