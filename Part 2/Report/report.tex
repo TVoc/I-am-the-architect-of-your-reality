@@ -558,10 +558,11 @@ This section describes per component which (parts of) the remaining requirements
 In this run we decompose \texttt{OtherFunctionality1}. This component is an aggregate of leftover behaviour in the previous run.
 
 \subsubsection{Selected architectural drivers}
-The non-functional driver for this decomposition is:
+The non-functional drivers for this decomposition are:
 
 \begin{itemize}
     \item \emph{Av2}: Personal document storage failure
+    \item \emph{P2}: Document Lookups
 \end{itemize}
 
 The related functional drivers are:
@@ -574,7 +575,7 @@ The related functional drivers are:
 \end{itemize}
 
 \paragraph{Rationale}
-These drivers are the main drivers concerned with normal usage of the personal document store. No components regarding authentication or registering are considered.
+These drivers are the main drivers concerned with normal usage of the personal document store. No components regarding authentication or registering are considered. These drivers are also either High or Medium priority, making them a good choice.
 
 \subsubsection{Architectural design}
 \paragraph{Topic}
