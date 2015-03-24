@@ -650,7 +650,7 @@ These drivers are the main drivers concerned with normal usage of the personal d
 \subsubsection{Architectural design}
 
 \paragraph{Storage of generated documents}
-When the \texttt{DispatcherModule} (cf. decomposition 1) submits a document, it first arrives at the \texttt{GeneratedDocumentHandler}. It is here that it is decided what exactly to do with the document. It is offered to the \texttt{ReplicationManager} (see paragraph ``Prevention and detection of document storage (\emph{Av2})´´) regardless, but other actions may also be appropriate based on the raw data supplied along with the document, such as generating a download link.
+When the \texttt{DispatcherModule} (cf. decomposition 1) submits a document, it first arrives at the \texttt{GeneratedDocumentHandler}. It is here that it is decided what exactly to do with the document. It is offered to the \texttt{ReplicationManager} (see paragraph ``Prevention and detection of document storage (\emph{Av2})'') regardless, but other actions may also be appropriate based on the raw data supplied along with the document, such as generating a download link.
 
 \paragraph{Prevention and detection of document storage failure (\emph{Av2})}
 \emph{Av2} specifies that the personal document storage should have a guaranteed minimal up-time. We propose a \texttt{DocumentDB}, which stores all generated documents, and the \texttt{PersonalDocumentDatabase}, which stores references to the documents addressed together with an identifier of registered recipient to which those documents are addressed (see paragraph ``Splitting up the document database and personal document database'' for the rationale as to why these two are split up). Part of the solution to the prevention problem is to have passive replication of both the document database and the personal document database. We therefore propose a \texttt{ReplicationManager} that manages both the replicas of the \texttt{DocumentDB} and \texttt{PersonalDocumentDatabase}. The \texttt{ReplicationManager} manages both kinds of databases since the contents of both are tied closely together, therefore having separate replication managers for both would entail unnecessary overhead. Of course, there are also the \texttt{SecondaryDB} and \texttt{SecondaryPersonalDocumentDatabase}. When a generated document arrives at the \texttt{ReplicationManager}, it stores the document in the \texttt{DocumentDB} and also stores a reference to the document together with an identifier of the recipient in the \texttt{PersonalDocumentDatabase}, if appropriate. As we have opted for passive replication, both databases shall implement an interface through which their respective primaries can synchronise with their secondaries. This synchronisation will happen every ten minutes. It is possible that the primary crashes before it has synchronised any new data. To solve this, we introduce the \texttt{DocumentSubmissionCache}, which stores 20 minutes worth of updates for both databases. When a secondary of either type is activated, the relevant updates in the \texttt{DocumentSubmissionCache} are flushed to the new primary. The fact that some of those updates may already have been present poses no problem as writes are idempotent. In order to detect failure of the current primary, both databases also implement a ping interface so that the \texttt{ReplicationManager} can detect failure in a timely manner and send out a notification to the eDocs administrators.
@@ -763,56 +763,56 @@ Figure \ref{fig:it2-depl_main} shows the mapping of architectural components on 
             \item Exceptions: None
          \end{itemize}
     \end{itemize}
-    
+
     \item DocumentLookup
     	\begin{itemize}
     		\item \texttt{DocumentData retrieveDocumentData(DocumentDataID id)} throws NoSuchDocumentException
     		\begin{itemize}
     			\item Effect: Retrieves the full document data matching the specified id.
-    			\item Exceptions: 
+    			\item Exceptions:
     			\begin{itemize}
     				\item NoSuchDocumentException: no document matching the specified id is present
     			\end{itemize}
     		\end{itemize}
-    		
+
     		\item \texttt{Document retrieveDocument(DocumentDataID id)} throws NoSuchDocumentException
     		\begin{itemize}
     			\item Effect: Retrieves the generated document without its raw data.
-    			\item Exceptions: 
+    			\item Exceptions:
     			\begin{itemize}
     				\item NoSuchDocumentException: no document matching the specified id is present
     			\end{itemize}
     		\end{itemize}
-    		
+
     		\item \texttt{RawDataEntry retrieveRawDataFromDocument(DocumentDataID id)} throws NoSuchDocumentException
     		\begin{itemize}
     			\item Effect: Retrieves the raw data of the specified document.
-    			\item Exceptions: 
+    			\item Exceptions:
     			\begin{itemize}
     				\item NoSuchDocumentException: no document matching the specified id is present
     			\end{itemize}
     		\end{itemize}
-    		
+
     		\item \texttt{List<DocumentData> queryDocumentData(DocumentQuery query)}
     		\begin{itemize}
     			\item Effect: Retrieves the full document data of all documents that satisfy the specified DocumentQuery.
     			\item Exceptions: None
     		\end{itemize}
-    		
+
     		\item \texttt{List<Document> queryDocuments(DocumentQuery query)}
     		\begin{itemize}
     			\item Effect: Retrieves all generated documents that satisfy the specified DocumentQuery, without their raw data.
     			\item Exceptions: None
     		\end{itemize}
-    		
+
     		\item \texttt{List<RawDataEntry> queryRawDataFromDocuments(DocumentQuery query)}
     		\begin{itemize}
     			\item Effect: Retrieves the raw data of the all documents that satisfy the specified DocumentQuery.
     			\item Exceptions: None
     		\end{itemize}
     	\end{itemize}
-    
-    
+
+
     \item Synchronise
     	\begin{itemize}
     		\item \texttt{void synchroniseState(List<DocumentDataUpdate> updates)}
@@ -821,7 +821,7 @@ Figure \ref{fig:it2-depl_main} shows the mapping of architectural components on 
     			\item Exceptions: None
     		\end{itemize}
     	\end{itemize}
-    
+
     \item Ping
     \begin{itemize}
     	\item \texttt{Echo ping()}
@@ -841,19 +841,19 @@ Figure \ref{fig:it2-depl_main} shows the mapping of architectural components on 
 			\item Effect: Submits the association of the specified document with the specified Registered Recipient.
 			\item Exceptions: None
 		\end{itemize}
-		
+
 		\item \texttt{void removePersonalDocument(DocumentDataID docID)}
 		\begin{itemize}
 			\item Effect: Removes the specified document identifier from the database. No effect if no such document exists.
 			\item Exceptions: None
 		\end{itemize}
-		
+
 		\item \texttt{void removePersonalDocumentAssociation(DocumentDataID docID)}
 		\begin{itemize}
 			\item Effect: Removes the association between the specified document with its recipient identifier. No effect if no such document exists.
 			\item Exceptions: None
 		\end{itemize}
-		
+
 		\item \texttt{DocumentData retrievePersonalDocumentData(DocumentDataID docID, RegisteredRecipientID id)} throws NoSuchDocumentException, RetrievalNotAllowedException
 		\begin{itemize}
 			\item Effect: Retrieves the full document data specified by the given document identifier.
@@ -863,7 +863,7 @@ Figure \ref{fig:it2-depl_main} shows the mapping of architectural components on 
 				\item RetrievalNotAllowedException: The specified document does not belong to the personal document store of the specified recipient.
 			\end{itemize}
 		\end{itemize}
-		
+
 		\item \texttt{Document retrievePersonalDocument(DocumentDataID docID, RegisteredRecipientID id)} throws NoSuchDocumentException, RetrievalNotAllowedException
 		\begin{itemize}
 			\item Effect: Retrieves the document specified by the given document identifier without its raw data.
@@ -873,7 +873,7 @@ Figure \ref{fig:it2-depl_main} shows the mapping of architectural components on 
 				\item RetrievalNotAllowedException: The specified document does not belong to the personal document store of the specified recipient.
 			\end{itemize}
 		\end{itemize}
-		
+
 		\item \texttt{RawDataEntry retrievePersonalDocumentRawData(DocumentDataID docID, RegisteredRecipientID id)} throws NoSuchDocumentException, RetrievalNotAllowedException
 		\begin{itemize}
 			\item Effect: Retrieves the raw data belonging to the document specified by the given document identifier.
@@ -883,7 +883,7 @@ Figure \ref{fig:it2-depl_main} shows the mapping of architectural components on 
 				\item RetrievalNotAllowedException: The specified document does not belong to the personal document store of the specified recipient.
 			\end{itemize}
 		\end{itemize}
-		
+
 		\item \texttt{List<DocumentData> queryPersonalDocumentData(DocumentQuery query)} throws RecipientIDNotIncludedException
 		\begin{itemize}
 			\item Effect: Retrieves the full document data of all documents matching the specified DocumentQuery.
@@ -892,7 +892,7 @@ Figure \ref{fig:it2-depl_main} shows the mapping of architectural components on 
 				\item RecipientIDNotIncludedException: The DocumentQuery does not include the identifier of the recipient
 			\end{itemize}
 		\end{itemize}
-		
+
 		\item \texttt{List<Document> queryPersonalDocuments(DocumentQuery query)} throws RecipientIDNotIncludedException
 		\begin{itemize}
 			\item Effect: Retrieves all documents matching the specified DocumentQuery without their raw data.
@@ -901,7 +901,7 @@ Figure \ref{fig:it2-depl_main} shows the mapping of architectural components on 
 				\item RecipientIDNotIncludedException: The DocumentQuery does not include the identifier of the recipient
 			\end{itemize}
 		\end{itemize}
-		
+
 		\item \texttt{List<RawDataEntry> queryPersonalDocumentRawData(DocumentQuery query)} throws RecipientIDNotIncludedException
 		\begin{itemize}
 			\item Effect: Retrieves the raw data of all documents matching the specified DocumentQuery.
@@ -911,7 +911,7 @@ Figure \ref{fig:it2-depl_main} shows the mapping of architectural components on 
 			\end{itemize}
 		\end{itemize}
 	\end{itemize}
-	
+
 	\item Synchronise
 	\begin{itemize}
 		\item \texttt{void synchroniseState(List<PersonalDocumentDataUpdate> updates)}
@@ -920,7 +920,7 @@ Figure \ref{fig:it2-depl_main} shows the mapping of architectural components on 
 			\item Exceptions: None
 		\end{itemize}
 	\end{itemize}
-	
+
 	\item Ping
 	\begin{itemize}
 		\item \texttt{Echo ping()}
@@ -940,31 +940,31 @@ Figure \ref{fig:it2-depl_main} shows the mapping of architectural components on 
 			\item Effect: Records the specified update in the cache.
 			\item Exceptions: None
 		\end{itemize}
-		
+
 		\item \texttt{void submitPersonalDocumentUpdate(PersonalDocumentDataUpdate update)}
 		\begin{itemize}
 			\item Effect: Records the specified update in the cache.
 			\item Exceptions: None
 		\end{itemize}
-		
+
 		\item \texttt{List<DocumentDataUpdate> flushDocumentDataUpdates()}
 		\begin{itemize}
 			\item Effect: Retrieves all stored document data updates and removes these.
 			\item Exceptions: None
 		\end{itemize}
-		
+
 		\item \texttt{List<PersonalDocumentDataUpdate> flusPersonalDocumentData()}
 		\begin{itemize}
 			\item Effect: Retrieves all stored personal document data updates and removes these.
 			\item Exceptions: None
 		\end{itemize}
-		
+
 		\item \texttt{void removeDocumentUpdates(DocumentDataID id)}
 		\begin{itemize}
 			\item Effect: Removes all updates pertaining to the specified document from the cache.
 			\item Exceptions: None
 		\end{itemize}
-		
+
 		\item \texttt{void removePersonalDocumentUpdate(DocumentDataID docID)}
 		\begin{itemize}
 			\item Effect: Removes all personal document database updates pertaining to the specified document from the cache.
@@ -982,20 +982,20 @@ Figure \ref{fig:it2-depl_main} shows the mapping of architectural components on 
 			\item Effect: Writes the specified generated document into the document database. If addToPersonalDB is true, then the document's identifier together with the recipient's identifier is written to the personal document database
 			\item Exceptions: None
 		\end{itemize}
-		
+
 		\item \texttt{void addDocumentsToPersonalDocumentStore(RegisteredRecipientID id)}
 		\begin{itemize}
 			\item Effect: Looks up all document identifiers belonging to the specified recipient and writes those pairs to the personal document database
 			\item Exceptions: None
 		\end{itemize}
-		
+
 		\item \texttt{void removeDocumentsFromPersonalDocumentStore(RegisteredRecipientID id)}
 		\begin{itemize}
 			\item Effect: Looks up all associations between document identifiers and the specified recipient in the personal document database and removes them
 			\item Exceptions: None
 		\end{itemize}
 	\end{itemize}
-	
+
 	\item ReplicationConfirmation
 	\begin{itemize}
 		\item \texttt{void confirmDocumentUpdateSuccess(DocumentDataID id)}
@@ -1003,13 +1003,197 @@ Figure \ref{fig:it2-depl_main} shows the mapping of architectural components on 
 			\item Effect: Confirms that all updates concerning the specified documents in the document database were successful.
 			\item Exceptions: None
 		\end{itemize}
-		
+
 		\item \texttt{void confirmPersonalDocumentUpdateSuccess(DocumentDataID id)}
 		\begin{itemize}
 			\item Effect: Confirms that all updates concerning the specified documents in the personal document database were successful.
 			\item Exceptions: None
 		\end{itemize}
 	\end{itemize}
+\end{itemize}
+
+\subsubsection*{GeneratedDocumentHandler}
+\begin{itemize}
+    \item SubmitDocument
+    This is the same interface as presented by \texttt{OtherFunctionality1} after the first run.
+\end{itemize}
+
+\subsubsection*{GenDocHandlerListener}
+\begin{itemize}
+    \item Heartbeat
+    \begin{itemize}
+        \item \texttt{void supplyHeartbeat()}
+        \begin{itemize}
+            \item Effect: Records a heartbeat from the supervised component.
+            \item Exceptions: None
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsubsection*{PersonalDocumentLookupModule}
+\begin{itemize}
+    \item PersonalDocumentLookup
+    \begin{itemize}
+        \item \texttt{Document retrievePersonalDocument(DocumentDataID docID, RegisteredRecipientID id)} throws NoSuchDocumentException, RetrievalNotAllowedException
+        \begin{itemize}
+            \item Effect: Retrieves the document specified by the given document identifier without its raw data.
+            \item Exceptions:
+            \begin{itemize}
+                \item NoSuchDocumentException: The specified DocumentDataID is not present.
+                \item RetrievalNotAllowedException: The specified document does not belong to the personal document store of the specified recipient.
+            \end{itemize}
+        \end{itemize}
+
+        \item \texttt{List<Document> queryPersonalDocuments(DocumentQuery query)} throws RecipientIDNotIncludedException
+        \begin{itemize}
+            \item Effect: Retrieves all documents matching the specified DocumentQuery without their raw data.
+            \item Exceptions:
+            \begin{itemize}
+                \item RecipientIDNotIncludedException: The DocumentQuery does not include the identifier of the recipient
+            \end{itemize}
+        \end{itemize}
+
+        \item \texttt{List<Document> retrieveAllPersonalDocuments(RegisteredRecipientID id)} throws NoSuchRegisteredRecipientException
+        \begin{itemize}
+            \item Effect: Retrieves all documents of specified Registered Recipient's personal document store.
+            \item Exceptions:
+            \begin{itemize}
+                \item NoSuchRegisteredRecipientException: The specified RegisteredRecipientID is not present in the system.
+            \end{itemize}
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsubsection*{DownloadDocumentLookupModule}
+\begin{itemize}
+    \item DocumentDownloadMgmt
+    \begin{itemize}
+        \item \texttt{void RecordDocumentDownloadDeadline(UnregisteredRecipientInfo recipientInfo, DocumentDataID docID, Time deadline)}
+        \begin{itemize}
+            \item Effect: Records the deadline for given Unregistered Recipient to download given document.
+            \item Exceptions: None
+        \end{itemize}
+    \end{itemize}
+
+    \item DownloadDocumentLookup
+    \begin{itemize}
+        \item \texttt{Document downloadDocument(DocumentDownloadToken token)} throws NoSuchDocumentException, RetrievalNotAllowedException
+        \begin{itemize}
+            \item Effect: Retrieves the document specified by the given token. Also records the fact that the document has been downloaded at least once.
+            \item Exceptions:
+            \begin{itemize}
+                \item NoSuchDocumentException: The document specified in the token is not present.
+                \item RetrievalNotAllowedException: The information in the token is not consistent with the download records in the module.
+            \end{itemize}
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsubsection*{LookupLoadBalancer}
+\begin{itemize}
+    \item LookupLoadMgmt
+    \begin{itemize}
+        \item \texttt{boolean requestLookupPermission(LookupSpecification specs)}
+        \begin{itemize}
+            \item Effect: Requests permission to perform the lookup as detailed by the Specification. This method returns a simple boolean whether or not the requesting module has permission to perform the actual lookup.
+            \item Exceptions: None
+        \end{itemize}
+
+        \item \texttt{void submitLookupDelay(LookupSpecification specs, Time delay)}
+        \begin{itemize}
+            \item Effect: Records internally the source of the lookup, the amount of looked up documents and the encountered delay while looking up documents. These are recorded to calculate the current load of the databases, and to prepare answers for future lookup requests.
+        \end{itemize}
+    \end{itemize}
+
+    \item LoadInfoMgmt
+    \begin{itemize}
+        \item \texttt{void submitCurrentDatabasesSpecs(List<DatabaseSpecification> specs)} throws InconsistentDatabaseSetupException
+        \begin{itemize}
+            \item Effect: The \texttt{Loadbalancer} assumes the received list details the (new) full set of databases available to the system, and sets these as a reference for lookup load calculation.
+            \item Exceptions:
+            \begin{itemize}
+                \item InconsistentDatabaseSetupException: When the supplied list of \texttt{Databases} is not consistent with the amount or type of \texttt{Databases} expected by the \texttt{LoadBalancer}.
+            \end{itemize}
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsubsection*{UserNotificationModule}
+\begin{itemize}
+    \item NotificationSubmission
+    \begin{itemize}
+        \item \texttt{void notifyUnregisteredRecipient(UnregisteredRecipientInfo info, NotificationContents contents)}
+        \begin{itemize}
+            \item Effect: Composes an e-mail to given recipient with given contents, and submits it for delivery.
+            \item Exceptions: None
+        \end{itemize}
+
+        \item \texttt{void notifyRegisteredRecipient(RegisteredRecipientID id, NotificationContents contents)} throws NoSuchRegisteredRecipientException
+        \begin{itemize}
+            \item Effect: Composes an e-mail to given recipient with given contents, and submits it for delivery.
+            \item Exceptions:
+            \begin{itemize}
+                \item NoSuchRegisteredRecipientException: The specified RegisteredRecipientID is not present in the system.
+            \end{itemize}
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsubsection*{OtherFunctionality2}
+\begin{itemize}
+    \item EmailDelivery
+    \begin{itemize}
+        \item \texttt{void submitEmailWithDestination(String emailAddress, HTMLDocument mail)}
+        \begin{itemize}
+            \item Effect: Submit an email document for delivery to supplied e-mail address.
+            \item Exceptions: None
+        \end{itemize}
+
+        \item \texttt{void submitEmailWithRegisteredRecipientID(RegisteredRecipientID id, HTMLDocument mail)} throws NoSuchRegisteredRecipientException
+        \begin{itemize}
+            \item Effect: Submit an email document for delivery to Registered Recipient with given id.
+            \item Exceptions:
+            \begin{itemize}
+                \item NoSuchRegisteredRecipientException: The specified RegisteredRecipientID is not present in the system.
+            \end{itemize}
+        \end{itemize}
+    \end{itemize}
+
+    \item UserMgmt
+    \begin{itemize}
+        \item \texttt{boolean isRegisteredRecipient(String emailAddress)}
+        \begin{itemize}
+            \item Effect: Check whether or not the recipient with given e-mail address is a Registered Recipient.
+            \item Exceptions: None
+        \end{itemize}
+
+        \item \texttt{RegisteredRecipientID lookupRegisterRecipientID(String emailAddress)} throws NoSuchRegisteredRecipientException
+        \begin{itemize}
+            \item Effect: Lookup the ID of the Registered Recipient with given e-mail address.
+            \item Exceptions:
+            \begin{itemize}
+                \item NoSuchRegisteredRecipientException: When the given e-mail address does not belong to a Registered Recipient.
+            \end{itemize}
+        \end{itemize}
+    \end{itemize}
+
+    \item CustomerOrganisationInfoManagement
+    This is the same interface as presented by \texttt{OtherFunctionality1} after the first run, along with following additions:
+    \begin{itemize}
+        \item \texttt{void requestOrganisationBilling(BillingRequest request)} throws IncorrectlySignedException
+        \begin{itemize}
+            \item Effect: Submits a request for billing a Customer Organisation for planned and unplanned expenses in the system.
+            \item Exceptions:
+            \begin{itemize}
+                \item IncorrectlySignedException: When the request was not signed by a trusted billing component.
+            \end{itemize}
+        \end{itemize}
+
+        \item \texttt{RecurringBatchDetails getOrganisationRecurringBatchDetails(OrganisationID id)}
+        \begin{itemize}
+            \item Effect: Request the RecurringBatchDetails for Customer Organisation with given ID.
+        \end{itemize}
+    \end{itemize}
 \end{itemize}
 
 \subsubsection{Data type definitions}
@@ -1022,6 +1206,20 @@ Describe per complex data type used in the interfaces what it represents.
 \paragraph{PersonalDocumentDataUpdate} Contains an association between a DocumentDataID and a RegisteredRecipientID and an indication whether this is a write or a removal
 
 \paragraph{RegisteredRecipientID} Corresponds with a single registered recipient. Currently, this identifier is envisioned as the recipient's e-mail address.
+
+\paragraph{UnregisteredRecipientInfo} Information to identify and if necessary contact an Unregistered Recipient.
+
+\paragraph{DocumentDownloadToken} A token generated for the Unregistered recipient, containing their UnregisteredRecipientInfo and DocumentDataID. This token can be used with the system to download a document, as long as the deadline for the download is not reached.
+
+\paragraph{LookupSpecification} A specification of a certain lookup action, detailing the target database for lookup, the source lookup module and the amount and estimated size of all documents in the lookup.
+
+\paragraph{DatabaseSpecification} A specification of a database in the system, containing an identifier and the resources it has for lookup and storage.
+
+\paragraph{NotificationContents} Contents for a message to deliver to a message recipient.
+
+\paragraph{BillingRequest} Details of billing to a given Customer Organisation, containing among other information at least the amount the Organisation should be billed for, and details of how the amount was calculated. This request should be signed by a trusted billing component, here the \texttt{BillingManager}.
+
+\paragraph{RecurringBatchDetails} Details for a Customer Organisation about the recurring batches as agreed with the eDocs company in their SLA.
 
 \subsubsection{Verify and refine}
 This section describes per component which (parts of) the remaining requirements it is responsible for. If requirements are split, a letter is added to its name (e.g. Av1a) to indicate that the component will only satisfy a part of the original requirement. If requirements are split, it will also be indicated what part of the original requirement each new requirement contains. If new derived requirements are introduced they will receive a new identifier and are marked as a new requirement.
