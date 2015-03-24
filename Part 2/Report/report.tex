@@ -53,10 +53,10 @@ Apart from recurring batches, the system should provide enough resources (\textt
 In principle, the \texttt{RawDataPool} subcontracts the generation of Documents to several \texttt{DocumentGeneratorProcesses}. In order to manage the complexity and scalability of this, we propose a \texttt{DispatcherModule}. This module is responsible for knowing which \texttt{Document\-Generator\-Processes} are active/instantiated and which Raw Data Entries have been assigned to which \texttt{Processes}. It also records at which time it assigned a specific Entry to which \texttt{Process}. The Raw Data Entry flow is as follows: a \texttt{DocumentGeneratorProcess} has finished generating a Document according to its assigned Raw Data Entry. The \texttt{DispatcherModule} temporarily stores the generated Document. The \texttt{Process} simultaneously submits the finished Document to the \texttt{DispatcherModule}, makes the \texttt{BillingManager} bill the Customer Organization if the Raw Data Entry was from a non-recurring batch, and requests a new Raw Data Entry. The \texttt{DispatcherModule} submits the finished document to the Document Delivery Subsystem and, when acknowledged, signals the \texttt{RawDataPool} that the corresponding Raw Data Entry has been successfully processed and requests the next Raw Data Entry that must be processed. It also deletes the temporarily stored generated Document upon acknowledgement. Upon receipt of the next Raw Data Entry, the \texttt{DispatcherModule} gives the Entry to the \texttt{DocumentGeneratorProcess} that initiated the flow after recording the following: the time at which the Entry was assigned, the responsible \texttt{Process} and a reference to the assigned Raw Data Entry. There is also a spare \texttt{DispatcherModule}, officially called the \texttt{SpareDispatcherModule}. This is necessary in case the \texttt{DispatcherModule} fails (see paragraph ``DispatcherModule Failure Detection and Resolution for \emph{Av1}''). Whenever the active \texttt{DispatcherModule} records a new Raw Data assignment, it also signals the spare \texttt{DispatcherModule} to record that assignment as well. The spare \texttt{DispatcherModule} is aware of the \texttt{RawDataPool} and kept up to date on all currently active/instantiated \texttt{DocumentGeneratorProcesses}. This is done in order to enable the spare \texttt{DispatcherModule} to assume the responsibilities of the active \texttt{DispatcherModule} as seamlessly as possible.
 
 \paragraph{DocumentGeneratorProcess Failure Detection and Resolution for \emph{Av1}}
-An individual \texttt{Document\-Generator\-Process} may fail. There are two situations in which this may happen: the first (and rather trivial) is when a \texttt{Process} has finished generating a Document and has requested a new Raw Data Entry. When the \texttt{DispatcherModule} offers a new Raw Data Entry, it is able to detect failure when the \texttt{Process} does not respond. The \texttt{Process} should then be terminated and a new \texttt{Process} instantiated that subsequently starts work on the previously offered Raw Data Entry. The second (and more interesting) case is when a \texttt{Process} fails while generating a Document. In order to counteract Raw Data loss, there is a leasing system in place. The \texttt{DispatcherModule} knows which Raw Data Entries have been assigned to which \texttt{DocumentGeneratorProcesses}, and each \texttt{Process} has a set lease time during which it should submit the generated Document or renew its lease. A \texttt{Process} may only renew its lease a set amount of times to prevent it from holding on to a Raw Data Entry indefinitely. When a lease has expired, the \texttt{DispatcherModule} pings the offending \texttt{Process}. If it does not respond with an echo, the \texttt{Process} is marked as failed. If it does respond, the lease is implicitly renewed except if the \texttt{Process} has already reached the maximum amount of lease renewals, in which case it is also marked as failed. As in the first case, when a \texttt{Process} is terminated, a new \texttt{Process} is instantiated and the Raw Data Entry that was previously assigned to the failed \texttt{Process} is then offered to the new \texttt{Process}. 
+An individual \texttt{Document\-Generator\-Process} may fail. There are two situations in which this may happen: the first (and rather trivial) is when a \texttt{Process} has finished generating a Document and has requested a new Raw Data Entry. When the \texttt{DispatcherModule} offers a new Raw Data Entry, it is able to detect failure when the \texttt{Process} does not respond. The \texttt{Process} should then be terminated and a new \texttt{Process} instantiated that subsequently starts work on the previously offered Raw Data Entry. The second (and more interesting) case is when a \texttt{Process} fails while generating a Document. In order to counteract Raw Data loss, there is a leasing system in place. The \texttt{DispatcherModule} knows which Raw Data Entries have been assigned to which \texttt{DocumentGeneratorProcesses}, and each \texttt{Process} has a set lease time during which it should submit the generated Document or renew its lease. A \texttt{Process} may only renew its lease a set amount of times to prevent it from holding on to a Raw Data Entry indefinitely. When a lease has expired, the \texttt{DispatcherModule} pings the offending \texttt{Process}. If it does not respond with an echo, the \texttt{Process} is marked as failed. If it does respond, the lease is implicitly renewed except if the \texttt{Process} has already reached the maximum amount of lease renewals, in which case it is also marked as failed. As in the first case, when a \texttt{Process} is terminated, a new \texttt{Process} is instantiated and the Raw Data Entry that was previously assigned to the failed \texttt{Process} is then offered to the new \texttt{Process}.
 
 \paragraph{DispatcherModule Failure Detection and Resolution for \emph{Av1}}
-The \texttt{DispatcherModule} may fail. As it is a single point of failure, this issue deserves due consideration. In order to detect failure, there is a \texttt{DispatcherSupervisor}. This module supervises the \texttt{DispatcherModule} by means of a heartbeat. Each time the \texttt{DispatcherModule} submits a Document to the Document Delivery Subsystem, it also notifies the \texttt{Supervisor}. If there are no Raw Data Entries currently being monitored by the \texttt{DispatcherModule}, it sends out a notification to the \texttt{Supervisor} at regular intervals that it is still alive, regardless. If the \texttt{Supervisor} has not received a notification from the \texttt{DispatcherModule} for a set amount of time, it marks the \texttt{DispatcherModule} as failed. 
+The \texttt{DispatcherModule} may fail. As it is a single point of failure, this issue deserves due consideration. In order to detect failure, there is a \texttt{DispatcherSupervisor}. This module supervises the \texttt{DispatcherModule} by means of a heartbeat. Each time the \texttt{DispatcherModule} submits a Document to the Document Delivery Subsystem, it also notifies the \texttt{Supervisor}. If there are no Raw Data Entries currently being monitored by the \texttt{DispatcherModule}, it sends out a notification to the \texttt{Supervisor} at regular intervals that it is still alive, regardless. If the \texttt{Supervisor} has not received a notification from the \texttt{DispatcherModule} for a set amount of time, it marks the \texttt{DispatcherModule} as failed.
 As previously mentioned, there is a spare in place that knows which Raw Data Entries have been assigned to which \texttt{DocumentGeneratorProcesses}. It knows about the \texttt{RawDataPool}, the currently active \texttt{DocumentGeneratorProcesses} and the \texttt{DispatcherSupervisor}. Also, it temporarily stores generated Documents that have yet to be submitted to the Delivery Subsystem and removes those Documents when the currently active \texttt{DispatcherModule} confirms it has been submitted. When the \texttt{Supervisor} has determined that the currently active \texttt{DispatcherModule} has failed and has ascertained that the failed \texttt{DispatcherModule} has terminated, it notifies the spare that it is to assume the responsibilies of newly active \texttt{DispatcherModule}. The newly active \texttt{DispatcherModule} then checks the validity of its internal data by contacting the \texttt{RawDataPool} and all \texttt{Processes}, in order to ascertain that no events have taken place for the duration of its activation. Also, the newly active \texttt{DispatcherModule} queries the Delivery Subsystem whether it has already delivered the generated Documents in temporary storage in order to prevent duplicate submissions of generated Documents, removing those that have indeed already been submitted (it is assumed that each Document has a unique identifier). After activation of the now active spare has been completed, the \texttt{DispatcherSupervisor} instantiates a new spare \texttt{DispatcherModule} and connects it to the currently active \texttt{DispatcherModule}. The currently active \texttt{DispatcherModule} then connects the spare to the \texttt{RawDataPool} and all currently active \texttt{DocumentGeneratorProcesses}. Work can then be resumed.
 The \texttt{DispatcherModule} expects an acknowledgement each time it updates the state of the spare. In case there is no acknowledgement, the \texttt{DispatcherModule} pings the spare. If the spare does not echo in time, it is marked as failed. The \texttt{DispatcherModule} asks the \texttt{DispatcherSupervisor} for a new spare and shares its state with the new spare. When this is done, work is resumed.
 
@@ -68,7 +68,7 @@ The \texttt{DispatcherModule} expects an acknowledgement each time it updates th
 It is reasonable to reuse the \texttt{Supervisor} to also listen for the heartbeat of the \texttt{DocumentGeneratorProcesses}, since this is already its responsibility with regards to the \texttt{DispatcherModule}. However, this solution would scale poorly and, in addition, the \texttt{DispatcherModule} has information such that it can more adequately judge whether a certain \texttt{DocumentGeneratorProcess} has failed.
 
 \paragraph{Dedicated priority scheduling module}
-Instead of handing the responsibility of priority scheduling to the \texttt{RawDataPool}, it is possible to have another module do this instead. However, it is faster and easier to do this in the \texttt{RawDataPool}. Additionally, we do not judge this to lessen the \texttt{RawDataPool}'s cohesion and understandability since there are many data structures that also impose an order on the items they store. 
+Instead of handing the responsibility of priority scheduling to the \texttt{RawDataPool}, it is possible to have another module do this instead. However, it is faster and easier to do this in the \texttt{RawDataPool}. Additionally, we do not judge this to lessen the \texttt{RawDataPool}'s cohesion and understandability since there are many data structures that also impose an order on the items they store.
 
 \paragraph{Whether or not to have a \texttt{SpareDispatcherModule}}
 In principle, instantiating a new \texttt{DispatcherModule} and bringing it up to speed can happen quickly by aggregating information from the \texttt{RawDataPool}, the currently active \texttt{DocumentGeneratorProcesses} and the Delivery Subsystem. However, we decided to have a spare as generating documents is one of the core aspects of the system. For this reason, recovering from failure in a timely manner is crucial.
@@ -152,7 +152,7 @@ The main entry point and accompanying storage components of the system are gathe
             \item Effect: Supply a new Raw Data Entry. May be an empty entry if no Raw Data Entry is available.
             \item Exceptions: None
         \end{itemize}
-        
+
         \item \texttt{void submitGeneratedDocument(DocumentData generated)} throws InvalidDocumentDataException
         \begin{itemize}
             \item Effect: Accept a generated document so that it may be delivered and the Customer Organization billed if appropriate.
@@ -161,17 +161,17 @@ The main entry point and accompanying storage components of the system are gathe
             	\item InvalidDocumentDataException: The DocumentData argument is badly structured
             \end{itemize}
         \end{itemize}
-        
+
         \item \texttt{void signalDocumentGenerationFailure(GenerationErrorReport report)}
         \begin{itemize}
         	\item Effect: Passes the given GenerationErrorReport on through appropriate channels
         	\item Exceptions: None
         \end{itemize}
-        
+
         \item \texttt{void renewLease(RawDataEntryID id)} throws LeaseExpiredException
         \begin{itemize}
             \item Effect: Renew the lease on the Raw Data Entry with given ID.
-            \item Exceptions: 
+            \item Exceptions:
             \begin{itemize}
                 \item LeaseExpiredException: Thrown when the lease has already expired, or the \texttt{Document\-Generation\-Process} has reached the maximum amount of lease renewals.
             \end{itemize}
@@ -181,7 +181,7 @@ The main entry point and accompanying storage components of the system are gathe
 	\begin{itemize}
 		\item \texttt{Echo ping()}
 		\begin{itemize}
-			\item Effect: Returns an Echo to reassure the caller that the callee is still available. 
+			\item Effect: Returns an Echo to reassure the caller that the callee is still available.
 			\item Exceptions: None
 		\end{itemize}
 	\end{itemize}
@@ -207,31 +207,31 @@ The main entry point and accompanying storage components of the system are gathe
 			\item Effect: Records the identifier of a new \texttt{DocumentGeneratorProcess}. No effect if the identifier has been supplied previously.
 			\item Exceptions: None
 		\end{itemize}
-		
+
 		\item \texttt{void recordDocumentGeneratorProcessRemoval(DocumentGeneratorProcessID id)}
 		\begin{itemize}
 			\item Effect: Records that the \texttt{DocumentGeneratorProcess} with the specified identifier has been removed from the system. No effect if the identifier was not supplied earlier through \texttt{record\-New\-Document\-Generator\-Process(Document\-Generator\-ProcessID)}.
 			\item Exceptions: None
 		\end{itemize}
-		
+
 		\item \texttt{void recordRawDataAssignment(RawDataEntry entry, DocumentGeneratorProcessID id,Time t)}
 		\begin{itemize}
 			\item Effect: Records that the specified Raw Data Entry has been assigned to the specified \texttt{Document\-Generator\-Process} on timepoint \texttt{t}. If that pair of Raw Data Entry and \texttt{Document\-Generator\-Process} has already been recorded with a certain time \texttt{t2}, the new time overwrites the old.
 			\item Exceptions: None
 		\end{itemize}
-		
+
 		\item \texttt{void removeRawDataAssignment(DocumentData generated, DocumentGeneratorProcessID id)}
 		\begin{itemize}
 			\item Effect: Removes the assignment of the Raw Data Entry in the specified DocumentData to the specified \texttt{DocumentGeneratorProcess}. No effect if that pair is not recorded.
 			\item Exceptions: None
 		\end{itemize}
-		
+
 		\item \texttt{void recordGeneratedDocument(DocumentData generated, DocumentGeneratorProcessID id)}
 		\begin{itemize}
 			\item Effect: Stores the supplied generated document in secondary storage, along with an ID for the \texttt{GeneratorProcess}, to be able to deliver an acknowledgement.
 			\item Exceptions: None
 		\end{itemize}
-		
+
 		\item \texttt{void removeGeneratedDocument(DocumentDataID id)} throws DocumentNotFoundException
 		\begin{itemize}
 			\item Effect: Deletes the corresponding DocumentData from secondary storage.
@@ -240,7 +240,7 @@ The main entry point and accompanying storage components of the system are gathe
 				\item DocumentNotFoundException: No corresponding DocumentData exists in storage.
 			\end{itemize}
 		\end{itemize}
-		
+
 		\item \texttt{void recordDocumentGeneratorProcessInactivation(DocumentGeneratorProcessID id)}
 		\begin{itemize}
 			\item Effect: Marks the corresponding \texttt{GeneratorProcess} as inactive due to no new Raw Data being available.
@@ -254,7 +254,7 @@ The main entry point and accompanying storage components of the system are gathe
 	\begin{itemize}
 		\item \texttt{void activate()} throws AlreadyActiveException
 		\begin{itemize}
-			\item Effect: 
+			\item Effect:
 			\begin{itemize}
 				\item Looks up and assumes control of all \texttt{DocumentGeneratorProcess}es it has an identifier of.
 				\item Verifies the correctness of its internal state by contacting the \texttt{RawDataPool} (to verify which Raw Data Entries have been marked as work in progress), \texttt{DocumentGeneratorProcess}es (to verify assignments of Raw Data Entries to \texttt{Processes}) and \texttt{OtherFunctionality1} (to verify which generated documents it has in storage have already been delivered.
@@ -262,7 +262,7 @@ The main entry point and accompanying storage components of the system are gathe
 				\item Copies its state to the new spare
 				\item Returns and resumes normal operation
 			\end{itemize}
-			\item Exceptions: 
+			\item Exceptions:
 			\begin{itemize}
 				\item AlreadyActiveException: This \texttt{DispatcherModule} is the active \texttt{DispatcherModule}
 			\end{itemize}
@@ -279,26 +279,26 @@ The main entry point and accompanying storage components of the system are gathe
 			\item Effect: Indicates through the returned object whether it is working on the specified Raw Data Entry and if it has finished or not
 			\item Exceptions: None
 		\end{itemize}
-		
+
 		\item \texttt{Echo ping()}
 		\begin{itemize}
 			\item Effect: Returns an Echo to reassure the caller that the callee is still available.
 			\item Exceptions: None
 		\end{itemize}
-		
+
 		\item \texttt{void assignRawData(RawDataEntry entry)} throws NotIdleException
 		\begin{itemize}
 			\item Effect: Assigns the specified RawDataEntry to this \texttt{DocumentGeneratorProcess}
-			\item Exceptions: 
+			\item Exceptions:
 			\begin{itemize}
 				\item NotIdleException: This \texttt{DocumentGeneratorProcess} is already working on another RawDataEntry.
 			\end{itemize}
 		\end{itemize}
-		
+
 		\item \texttt{DocumentData getGeneratedDocument()} throws NoDocumentDataAvailableException
 		\begin{itemize}
 			\item Effect: Supplies the document generated from its assigned Raw Data Entry
-			\item Exceptions: 
+			\item Exceptions:
 			\begin{itemize}
 				\item NoDocumentDataAvailableException: Document generation has not yet been finished or no RawDataEntry has been assigned.
 			\end{itemize}
@@ -315,17 +315,17 @@ The main entry point and accompanying storage components of the system are gathe
 			\item Effect: Supplies the next RawDataEntry that should be processed. If no Entry is available, an empty Entry is returned.
 			\item Exceptions: None
 		\end{itemize}
-		
+
 		\item \texttt{PoolDataReport getDataReport()}
 		\begin{itemize}
 			\item Effect: Supplies information about which RawDataEntry entries have been marked as work in progress.
 			\item Exceptions: None
 		\end{itemize}
-		
+
 		\item \texttt{void removeData(RawDataEntryID id)} throws NoSuchRawDataEntryException
 		\begin{itemize}
 			\item Effect: Removes the corresponding RawDataEntry from the pool.
-			\item Exceptions: 
+			\item Exceptions:
 			\begin{itemize}
 				\item NoSuchRawDataEntryException: There is no corresponding RawDataEntry.
 			\end{itemize}
@@ -364,13 +364,13 @@ The main entry point and accompanying storage components of the system are gathe
 			\item Effect: Initialises a new \texttt{SpareDispatcherModule} and generates an ID for it such that callee can find the new spare.
 			\item Exceptions: None
 		\end{itemize}
-		
+
 	    \item \texttt{void signalDocumentGenerationFailure(GenerationErrorReport report)}
 	    \begin{itemize}
 		    \item Effect: Passes on the given GenerationErrorReport through appropriate channels.
 		    \item Exceptions: None
 	    \end{itemize}
-	
+
 	    \item \texttt{void signalDocumentGeneratorProcessFailure(GeneratorProcessFailureReport report)}
 	    \begin{itemize}
 		    \item Effect: Passes on the given GeneratorProcessFailureReport through appropriate channels.
@@ -400,7 +400,7 @@ The main entry point and accompanying storage components of the system are gathe
 			\item Effect: Records that a batch with the specified maximal amount is expected at the specified date.
 			\item Exceptions: None
 		\end{itemize}
-		
+
 		\item \texttt{void deleteRecurringBatch(Date date, int maxAmount)}
 		\begin{itemize}
 			\item Effect: Records that a batch on the specified date with the specified maximal amount will no longer occur.
@@ -460,7 +460,7 @@ The main entry point and accompanying storage components of the system are gathe
 			\item Effect: Initiates the submission process for the specified generated document
 			\item Exceptions: None
 		\end{itemize}
-		
+
 		\item \texttt{boolean isDocumentSubmitted(DocumentDataID data)}
 		\begin{itemize}
 			\item Effect: Indicates whether the generated document corresponding to the given DocumentDataID has already been delivered.
@@ -483,7 +483,7 @@ The main entry point and accompanying storage components of the system are gathe
 	        \item Effect: Signs the Document in the Document Data with the signing key of the Customer Organisation, which can be looked up with the ID found in the Document Data. Afterwards, returns the Document Data, with as only alteration the signing of the Document inside.
 	    \end{itemize}
 	\end{itemize}
-	
+
 	\item AdminNotificationDelivery
 	\begin{itemize}
 		\item \texttt{void deliverAdminNotification(AdminNotification notification)}
@@ -504,7 +504,7 @@ The main entry point and accompanying storage components of the system are gathe
 			\item Exceptions: None
 		\end{itemize}
 	\end{itemize}
-	
+
 	\begin{itemize}
 		\item \texttt{void signalDocumentGeneratorProcessFailure(GeneratorProcessFailureReport report)}
 		\begin{itemize}
@@ -512,7 +512,7 @@ The main entry point and accompanying storage components of the system are gathe
 			\item Exceptions: None
 		\end{itemize}
 	\end{itemize}
-	
+
 	\begin{itemize}
 		\item \texttt{void signalDispatcherModuleFailure(DispatcherModuleFailureReport report)}
 		\begin{itemize}
@@ -539,7 +539,7 @@ This section provides an overview of all complex data types used in the interfac
 
 \paragraph{Template} Provides a skeleton for a document of a certain document type. It has fields that can be filled out with raw data.
 
-\paragraph{DocumentDataID} Allows unique identification of a single DocumentData instance. 
+\paragraph{DocumentDataID} Allows unique identification of a single DocumentData instance.
 
 \paragraph{Echo} A message used as response to a ping request.
 
@@ -555,7 +555,7 @@ This section provides an overview of all complex data types used in the interfac
 
 \paragraph{OrganisationID} Allows unique identification of a single Customer Organisation
 
-\paragraph{DispatcherID} Allows look-up of a single unique \texttt{DispatcherModule} instance 
+\paragraph{DispatcherID} Allows look-up of a single unique \texttt{DispatcherModule} instance
 
 \paragraph{GenerationErrorReport} Contains the RawDataEntryID for which generation failed and information as to why it failed
 
@@ -589,8 +589,9 @@ This section describes per component which (parts of) the remaining requirements
     \item \emph{UC20}: Update document template
     \item \emph{UC21a}: Consult status of all document processing jobs\\
     Handling the (visual) interfacing with the user. Determining the finished jobs.
-    \item \emph{UC22}: Notify customer administrator
-    \item \emph{Av2}: Personal document storage failure 
+    \item \emph{UC22a}: Notify customer administrator
+    Notifying the customer administrator of delivery failure
+    \item \emph{Av2}: Personal document storage failure
     \item \emph{Av3}: Zoomit failure
     \item \emph{P2}: Document lookups
     \item \emph{P3a}: Status overview for customer administrators\\
@@ -647,14 +648,40 @@ The related functional drivers are:
 These drivers are the main drivers concerned with normal usage of the personal document store. No components regarding authentication or registering are considered. These drivers are also either High or Medium priority, making them a good choice.
 
 \subsubsection{Architectural design}
-\paragraph{Prevention and detection of document storage (\emph{Av2)}}
-\emph{Av2} specifies that the personal document storage should have a guaranteed minimal up-time. We propose a \texttt{DocumentDB}, which stores all generated documents, and the \texttt{PersonalDocumentDatabase}, which stores references to the documents addressed to each registered recipient (see paragraph ``Splitting up the document database and personal document database´´ for the rationale as to why these two are split up). Part of the solution to the prevention problem is to have passive replication of both the document database and the personal document database. We therefore propose a \texttt{ReplicationManager} that manages both the replicas of the \texttt{DocumentDB} and \texttt{PersonalDocumentDatabase}. Of course, there are also the \texttt{SecondaryDB} and \texttt{SecondaryPersonalDocumentDatabase}. As we have opted for passive replication, both databases shall implement an interface through which their respective primaries can synchronise with their secondaries. This synchronisation will happen every ten minutes. It is possible that the primary crashes before it has synchronised any new data. To solve this, we introduce the \texttt{DocumentSubmissionCache}, which stores 20 minutes worth of updates for both databases. When a secondary of either type is activated, the relevant updates in the \texttt{DocumentSubmissionCache} are flushed to the new primary. The fact that some of those updates may already have been present poses no problem as writes are idempotent.
+
+\paragraph{Storage of generated documents}
+When the \texttt{DispatcherModule} (cf. decomposition 1) submits a document, it first arrives at the \texttt{GeneratedDocumentHandler}. It is here that it is decided what exactly to do with the document. It is offered to the \texttt{ReplicationManager} (see paragraph ``Prevention and detection of document storage (\emph{Av2})´´) regardless, but other actions may also be appropriate based on the raw data supplied along with the document, such as generating a download link.
+
+\paragraph{Prevention and detection of document storage failure (\emph{Av2})}
+\emph{Av2} specifies that the personal document storage should have a guaranteed minimal up-time. We propose a \texttt{DocumentDB}, which stores all generated documents, and the \texttt{PersonalDocumentDatabase}, which stores references to the documents addressed together with an identifier of registered recipient to which those documents are addressed (see paragraph ``Splitting up the document database and personal document database'' for the rationale as to why these two are split up). Part of the solution to the prevention problem is to have passive replication of both the document database and the personal document database. We therefore propose a \texttt{ReplicationManager} that manages both the replicas of the \texttt{DocumentDB} and \texttt{PersonalDocumentDatabase}. The \texttt{ReplicationManager} manages both kinds of databases since the contents of both are tied closely together, therefore having separate replication managers for both would entail unnecessary overhead. Of course, there are also the \texttt{SecondaryDB} and \texttt{SecondaryPersonalDocumentDatabase}. When a generated document arrives at the \texttt{ReplicationManager}, it stores the document in the \texttt{DocumentDB} and also stores a reference to the document together with an identifier of the recipient in the \texttt{PersonalDocumentDatabase}, if appropriate. As we have opted for passive replication, both databases shall implement an interface through which their respective primaries can synchronise with their secondaries. This synchronisation will happen every ten minutes. It is possible that the primary crashes before it has synchronised any new data. To solve this, we introduce the \texttt{DocumentSubmissionCache}, which stores 20 minutes worth of updates for both databases. When a secondary of either type is activated, the relevant updates in the \texttt{DocumentSubmissionCache} are flushed to the new primary. The fact that some of those updates may already have been present poses no problem as writes are idempotent. In order to detect failure of the current primary, both databases also implement a ping interface so that the \texttt{ReplicationManager} can detect failure in a timely manner and send out a notification to the eDocs administrators.
+
+\paragraph{Handling failure of the personal document storage (\emph{Av2})}
+\emph{Av2} specifies that documents to be delivered via the personal document store must be temporarily stored elsewhere if the personal document storage fails. In our set-up, the \texttt{DocumentSubmissionCache} is also responsible for caching whichever type of records a database stores if it fails. When normal operation is resumed, the \texttt{ReplicationManager} must then write all records of the correct type stored in the \texttt{DocumentSubmissionCache} into the database. At least three hours of corresponding entries must be stored until the failure is resolved. Therefore, when the \texttt{PersonalDocumentDatabase} and all replicas fail, all personal document records that arrive in the meantime are written to the \texttt{DocumentSubmissionCache}, which are then written to the \texttt{PersonalDocumentDatabase} when it resumes operation.
+
+\paragraph{Degraded mode upon failure of personal document store (\emph{Av2})}
+\emph{Av2} requires that a maximally functional interface is presented to the user when they attempt to access the personal document store after it has failed. In order to realise this, we add a module that queries the \texttt{PersonalDocumentDatabase} on the user's behalf, the \texttt{PersonalDocumentLookupModule}. When a request of the \texttt{PersonalDocumentLookupModule} times out, it pings the \texttt{PersonalDocumentDatabase}. If no response is received within five seconds, it is determined that the \texttt{PersonalDocumentDatabase} has failed. The request fails and this is indicated to the user. The \texttt{PersonalDocumentLookupModule} keeps pinging the \texttt{PersonalDocumentDatabase} every ten seconds. Upon receipt of an echo, normal operation is resumed. While the \texttt{PersonalDocumentLookupModule} is still pinging the \texttt{PersonalDocumentDatabase}, any further requests result in an indication that the personal document storage is currently unavailable.
+
+\paragraph{Detecting failure of the \texttt{GeneratedDocumentHandler}}
+The \texttt{GeneratedDocumentHandler} is a rather sensitive point in the system, as all generated documents must pass through here. Therefore, we introduce the \texttt{GenDocHandlerListener} that monitors the heartbeat of the \texttt{GeneratedDocumentHandler} and notifies an eDocs administrator through the \texttt{AdminNotificationHandler} upon determination of failure.
+
+\paragraph{Maintaining download links for documents}
+Any document sent to an unregistered recipient is associated with a download link if receipt tracking has been activated. In order to manage this, we propose the \texttt{DownloadDocumentLookupModule}. When the \texttt{GeneratedDocumentHandler} submits a document to the \texttt{DownloadDocumentLookupModule}, it generates a unique link. This link is then stored together with the time at which it was generated. When download of a document is initiated, the link is submitted to the \texttt{DownloadDocumentLookupModule}, which then queries the \texttt{DownloadDocumentLookupModule}. If the link has expired in the meantime, this is indicated to the user. The \texttt{DownloadDocumentLookupModule} periodically checks if any of its links has expired. If it detects expired links, the appropriate Customer Administrator is notified.
+
+\paragraph{Lookup of documents in the personal document storage}
+Support must be provided for consulting a user's personal document store as a whole, consulting a specific document or searching through the personal document store. We therefore make the \texttt{PersonalDocumentLookupModule} capable of issuing diverse types of queries. It can request summaries of all of a user's documents, request a full document matching a certain document reference, or issue a query ((partial) name of the sender, type of document, date range, etc.) the documents of interest must match, which also produces summaries of all matching documents. In all of these requests, the user's identifier is implicitly included as a parameter.
+
+\paragraph{Load balancing ()\emph{P2})}
+\emph{P2} specifies that requests for documents in the personal document store or requests for downloads must be throttled under certain circumstances. In order to realise this, we propose the \texttt{LookupLoadBalancer}. Both the \texttt{DownloadDocumentLookupModule} and the \texttt{PersonalDocumentLookupModule} must receive permission from the \texttt{LookupLoadBalancer} before issuing an individual query. Also, when either module has finished executing a query, they must report to the \texttt{LookupLoadBalancer} which kind of query it was and how long they took executing it. This way, the \texttt{LookupLoadBalancer} can determine when there is a high load on the system and delay giving permission for execution of queries where appropriate. Other components in the system can also keep the \texttt{LookupLoadBalancer} aware of currently existing processing capacity so that it can keep this information in mind when making decisions.
 
 \subsubsection*{Alternatives considered}
-\paragraph{Alternatives for solution}
-\todo{split docDB and PDSDB}
-\todo{passive vs active rep}
-A discussion of the alternative solutions and why that were not selected.
+\paragraph{Splitting up the document database and personal document database}
+Several options exist as to how to implement the personal document store. One of these is to simply keep all documents in document storage. If this is done, then there is a virtual personal document store for each user. This is deemed undesirable, as the personal document store of a certain user must then be computed every time a request comes in. The overhead introduced by this can be substantial when a lot of documents have been stored and the personal document store of a user is large. All other options consist of somehow redundantly storing all documents that belong to a personal document store. The obvious solution would be to store all those documents in the document storage and also in a dedicated personal document storage. This proposal was also rejected, as the document storage already has passive replication in place and this solution would introduce an unacceptable level of redundancy. The solution currently in place (i.e. storing references to documents instead of the full documents) was deemed to be sufficiently low-impact in terms of storage while still offering acceptable performance for the personal document store.
+
+\paragraph{Passive replication vs active replication for document storage}
+\emph{Av2} specifies that documents must temporarily be stored elsewhere upon failure. The affected documents are then processed when normal operation is resumed. Passive replication is a natural fit for this requirement since it involves synchronisation, both during normal operation and after failure of the primary. Using active replication for this purpose would still require some sort of cache in order to meet this requirement, which does not agree with the principle of active replication.
+
+\paragraph{Ping/echo versus heartbeat for document storage}
+The \texttt{ReplicationManager} must detect when the primary fails. Acknowledgements are implicit each time the primary indicates it has successfully executed a write, therefore using a heartbeat would be of limited use. It is only when the primary fails to acknowledge a write that the \texttt{ReplicationManager} must explicitly ascertain whether the primary is still alive, and using ping/echo is perfect for this purpose.
 
 \subsubsection{Instantiation and allocation of functionality}
 \paragraph{Decomposition}
@@ -685,20 +712,20 @@ Specialised database for the personal document store service. Accepts documents 
 Accepts synchronisation requests from the \texttt{PersonalDocumentDatabase}, replicating any documents or references from the \texttt{PersonalDocumentDatabase} it does not yet contain, and then answer that it has succesfully done so.
 
 \subparagraph{PersonalDocumentLookupModule}
-Accepts requests to serve documents out of the \texttt{PersonalDocumentDatabase}, querying the \texttt{PersonalDocumentDatabase} for them and returning them. When the \texttt{PersonalDocumentDatabase} does not answer, it is pinged, and when it fails to respond, the \texttt{PersonalDocumentLookupModule} returns the answer that the personal document stores are currently unavailable.
+Accepts requests to serve documents out of the \texttt{PersonalDocumentDatabase}, querying the \texttt{PersonalDocumentDatabase} for them and returning them. When the \texttt{PersonalDocumentDatabase} does not answer, it is pinged, and when it fails to respond, the \texttt{PersonalDocumentLookupModule} returns the answer that the personal document stores are currently unavailable. Before looking up a document, it should ask the \texttt{LookupLoadBalancer} first if it is allowed to do so. After having looked up a document, it should also notify the \texttt{LookupLoadBalancer} of this, along with the effective delay it encountered.
 
 \subparagraph{DownloadDocumentLookupModule}
-Accepts requests to serve documents out of the \texttt{DocumentDB}, querying the \texttt{DocumentDB} for them and returning them. When the \texttt{Document} does not answer in a timely fashion, the \texttt{DownloadDocumentLookupModule} returns the answer that the download service is currently unavailable. It has an internal information structure, recording 
-\todo{finish this sentence}
+Accepts requests to serve documents out of the \texttt{DocumentDB}, querying the \texttt{DocumentDB} for them and returning them. When the \texttt{DocumentDB} does not answer in a timely fashion, the \texttt{DownloadDocumentLookupModule} returns the answer that the download service is currently unavailable. It has an internal information structure, recording deadlines as to how long a certain document can be downloaded by a certain client, and whether or not the document has been downloaded at least once. Only documents in this internal structure can effectively be downloaded, and only by given client in the record. It accepts instruction to make these records from the \texttt{GeneratedDocumentHandler}. It serves actual download requests from \texttt{OtherFunctionality2}. When the deadline for a document download is reached, it deletes the record. If the document was not downloaded at least once, both the client and the Customer Administrator are notified of this, via the \texttt{UserNotificationModule} and \texttt{AdminNotificationHandler} respectively. Before looking up a document, it should ask the \texttt{LookupLoadBalancer} first if it is allowed to do so. After having looked up a document, it should also notify the \texttt{LookupLoadBalancer} of this, along with the effective delay it encountered.
 
 \subparagraph{LookupLoadBalancer}
-Per introduced component a paragraph describing its responsibilities.
+Receives information from \texttt{OtherFunctionality2} about the system resources available for the \texttt{DocumentDB} and the \texttt{PersonalDocumentDatabase}. Also receives notifications from both \texttt{LookupModule}s when they retreive a document and how much delay they encountered while doing so. This \texttt{LoadBalancer} calculates the maximum request throughput and regulates the lookup of both \texttt{LookupModules} by requiring them to first get permission to look up a document. It can thus guarantee a priority of one \texttt{LookupModule} over the other when necessary, or to avert overloading one or both \texttt{Databases}.
 
 \subparagraph{UserNotificationModule}
-Per introduced component a paragraph describing its responsibilities.
+\todo{Change this to ClientNotificationModule}
+Accepts submissions for notifications addressed to clients, composes an E-mail with the contents of the submission and hands it to the e-mail delivery system of \texttt{OtherFunctionality2}.
 
 \subparagraph{OtherFunctionality2}
-Per introduced component a paragraph describing its responsibilities.
+Encapsulates requirements not tackled in this run and which cannot be assigned to other introduced components. Some functionality assigned to it this run is: Serving the \texttt{LookupLoadBalancer} with information regarding system resources, requesting document lookups from both \texttt{LookupModule}s, accepting regular billing information updates (remnant of last run), so the companies are periodically billed for use of the system, delivery of notifications via e-mail, and serving the system with information about clients. \todo{UserMgmt to ClientMgmt}
 
 \begin{figure}[!htp]
     \centering
@@ -727,7 +754,7 @@ Rationale of the allocation of components to physical nodes.
         \item \texttt{returnType operation1(ParamType param1)} throws TypeOfException
         \begin{itemize}
             \item Effect: Describe the effect of calling this operation.
-            \item Exceptions: 
+            \item Exceptions:
             \begin{itemize}
                 \item TypeOfException: Describe when this exception is thrown.
             \end{itemize}
@@ -749,19 +776,55 @@ Describe per complex data type used in the interfaces what it represents.
 \paragraph{ParamType} This data element represents Y.
 
 \subsubsection{Verify and refine}
-This section describes per component which (parts of) the remaining
-requirements it is responsible for.
+This section describes per component which (parts of) the remaining requirements it is responsible for. If requirements are split, a letter is added to its name (e.g. Av1a) to indicate that the component will only satisfy a part of the original requirement. If requirements are split, it will also be indicated what part of the original requirement each new requirement contains. If new derived requirements are introduced they will receive a new identifier and are marked as a new requirement.
 
-\paragraph{ModuleB}
+\paragraph{OtherFunctionality2}
 \begin{itemize}
-    \item \emph{Z1}: name
-    \item \emph{UCd}: name
+    \item \emph{UC1}: Log in
+    \item \emph{UC2}: Log out
+    \item \emph{UC6}: Deliver document via e-mail
+    \item \emph{UC8}: Deliver document via postal mail
+    \item \emph{UC9}: Deliver document via Zoomit
+    \item \emph{UC10}: Confirm document delivery (Zoomit)
+    \item \emph{UC15a}: Download document via document link
+    Issuing the request for download of the specified document
+    \item \emph{UC16}: Register to personal document store
+    \item \emph{UC17}: Unregister from personal document store
+    \item \emph{UC18}: Register customer organization
+    \item \emph{UC19}: Unregister customer organization
+    \item \emph{UC20}: Update document template
+    \item \emph{UC21a}: Consult status of all document processing jobs
+    Handling the (visual) interfacing with the user. Determining the finished jobs.
+    \item \emph{UC22a}: Notify customer administrator
+    Notifying the customer administrator of delivery failure
+    \item \emph{Av3}: Zoomit failure
+    \item \emph{P3b}: Status overview for customer administrators
+    Handling the (visual) interfacing with the user
+    \item \emph{M1a}: New type of document: bank statements
+    The delivery and template handling for the new document
+    \item \emph{M2}: Multiple print \& postal services
+    \item \emph{M3}: Dynamic selection of the cheapest of print \& postal services
 \end{itemize}
 
-\paragraph{ModuleC}
+\paragraph{SubmissionSubsystem}
 \begin{itemize}
-    \item \emph{UCba}: name\\Description which part of the original use case is
-        the responsibility of this component.
+	\item \emph{UC3}: Initiate document processing
+	\item \emph{M1b}: New type of document: bank statements\\
+	Being able to receive and verify the integrity of Raw Data for the new type of document.
+\end{itemize}
+
+\paragraph{RawDataPool}
+\begin{itemize}
+	\item \emph{UC21b}: Consult status of all document processing jobs\\
+	Determining the unfinished and currently processing jobs.
+	\item \emph{P3b}: Status overview for customer administrators\\
+	Calculating and delivering information about all unfinished and currently processing jobs for a certain \texttt{Customer Organisation} in a timely fashion.
+\end{itemize}
+
+\paragraph{DocumentGenerationProcess}
+\begin{itemize}
+	\item \emph{M1c}: New type of document: bank statements\\
+	Being able to generate documents of the new type with the accompanying new template.
 \end{itemize}
 
 \subsection{Decomposition 3: Module (drivers)}
