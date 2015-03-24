@@ -348,7 +348,7 @@ The main entry point and accompanying storage components of the system are gathe
 \begin{itemize}
 	\item Heartbeat
 	\begin{itemize}
-		\item \texttt{void supplyHeartbeat()} throws TypeOfException
+		\item \texttt{void supplyHeartbeat()}
 		\begin{itemize}
 			\item Effect: Records a heartbeat from the supervised component.
 			\item Exceptions: None
@@ -670,7 +670,7 @@ Any document sent to an unregistered recipient is associated with a download lin
 \paragraph{Lookup of documents in the personal document storage}
 Support must be provided for consulting a user's personal document store as a whole, consulting a specific document or searching through the personal document store. We therefore make the \texttt{PersonalDocumentLookupModule} capable of issuing diverse types of queries. It can request summaries of all of a user's documents, request a full document matching a certain document reference, or issue a query ((partial) name of the sender, type of document, date range, etc.) the documents of interest must match, which also produces summaries of all matching documents. In all of these requests, the user's identifier is implicitly included as a parameter.
 
-\paragraph{Load balancing ()\emph{P2})}
+\paragraph{Load balancing (\emph{P2})}
 \emph{P2} specifies that requests for documents in the personal document store or requests for downloads must be throttled under certain circumstances. In order to realise this, we propose the \texttt{LookupLoadBalancer}. Both the \texttt{DownloadDocumentLookupModule} and the \texttt{PersonalDocumentLookupModule} must receive permission from the \texttt{LookupLoadBalancer} before issuing an individual query. Also, when either module has finished executing a query, they must report to the \texttt{LookupLoadBalancer} which kind of query it was and how long they took executing it. This way, the \texttt{LookupLoadBalancer} can determine when there is a high load on the system and delay giving permission for execution of queries where appropriate. Other components in the system can also keep the \texttt{LookupLoadBalancer} aware of currently existing processing capacity so that it can keep this information in mind when making decisions.
 
 \subsubsection*{Alternatives considered}
@@ -747,33 +747,281 @@ Figure \ref{fig:it2-depl_main} shows the mapping of architectural components on 
 \end{figure}
 
 \subsubsection{Interfaces for child modules}
-\subsubsection*{ModuleB}
+\subsubsection*{DocumentDB}
 \begin{itemize}
-    \item InterfaceA
+    \item DocumentSubmission
     \begin{itemize}
-        \item \texttt{returnType operation1(ParamType param1)} throws TypeOfException
+        \item \texttt{void submitDocument(DocumentData doc)}
         \begin{itemize}
-            \item Effect: Describe the effect of calling this operation.
-            \item Exceptions:
-            \begin{itemize}
-                \item TypeOfException: Describe when this exception is thrown.
-            \end{itemize}
+            \item Effect: Writes the specified generated document into the database.
+            \item Exceptions: None
         \end{itemize}
 
-        \item \texttt{returnType operation2()}
+        \item \texttt{void removeDocument(DocumentDataID id)}
         \begin{itemize}
-            \item Effect: Describe the effect of calling this operation.
+            \item Effect: Removes the document specified by id from the database. No effect if no such document exists.
             \item Exceptions: None
          \end{itemize}
     \end{itemize}
+    
+    \item DocumentLookup
+    	\begin{itemize}
+    		\item \texttt{DocumentData retrieveDocumentData(DocumentDataID id)} throws NoSuchDocumentException
+    		\begin{itemize}
+    			\item Effect: Retrieves the full document data matching the specified id.
+    			\item Exceptions: 
+    			\begin{itemize}
+    				\item NoSuchDocumentException: no document matching the specified id is present
+    			\end{itemize}
+    		\end{itemize}
+    		
+    		\item \texttt{Document retrieveDocument(DocumentDataID id)} throws NoSuchDocumentException
+    		\begin{itemize}
+    			\item Effect: Retrieves the generated document without its raw data.
+    			\item Exceptions: 
+    			\begin{itemize}
+    				\item NoSuchDocumentException: no document matching the specified id is present
+    			\end{itemize}
+    		\end{itemize}
+    		
+    		\item \texttt{RawDataEntry retrieveRawDataFromDocument(DocumentDataID id)} throws NoSuchDocumentException
+    		\begin{itemize}
+    			\item Effect: Retrieves the raw data of the specified document.
+    			\item Exceptions: 
+    			\begin{itemize}
+    				\item NoSuchDocumentException: no document matching the specified id is present
+    			\end{itemize}
+    		\end{itemize}
+    		
+    		\item \texttt{List<DocumentData> queryDocumentData(DocumentQuery query)}
+    		\begin{itemize}
+    			\item Effect: Retrieves the full document data of all documents that satisfy the specified DocumentQuery.
+    			\item Exceptions: None
+    		\end{itemize}
+    		
+    		\item \texttt{List<Document> queryDocuments(DocumentQuery query)}
+    		\begin{itemize}
+    			\item Effect: Retrieves all generated documents that satisfy the specified DocumentQuery, without their raw data.
+    			\item Exceptions: None
+    		\end{itemize}
+    		
+    		\item \texttt{List<RawDataEntry> queryRawDataFromDocuments(DocumentQuery query)}
+    		\begin{itemize}
+    			\item Effect: Retrieves the raw data of the all documents that satisfy the specified DocumentQuery.
+    			\item Exceptions: None
+    		\end{itemize}
+    	\end{itemize}
+    
+    
+    \item Synchronise
+    	\begin{itemize}
+    		\item \texttt{void synchroniseState(List<DocumentDataUpdate> updates)}
+    		\begin{itemize}
+    			\item Effect: Carries out all updates contained within the specified list.
+    			\item Exceptions: None
+    		\end{itemize}
+    	\end{itemize}
+    
+    \item Ping
+    \begin{itemize}
+    	\item \texttt{Echo ping()}
+    	\begin{itemize}
+    		\item Effect: Returns an Echo to reassure the caller that the callee is still available.
+    		\item Exceptions: None
+    	\end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsubsection*{PersonalDocumentDatabase}
+\begin{itemize}
+	\item PersonalDocumentManagement
+	\begin{itemize}
+		\item \texttt{void submitPersonalDocument(DocumentDataID docID, RegisteredRecipientID id)}
+		\begin{itemize}
+			\item Effect: Submits the association of the specified document with the specified Registered Recipient.
+			\item Exceptions: None
+		\end{itemize}
+		
+		\item \texttt{void removePersonalDocument(DocumentDataID docID)}
+		\begin{itemize}
+			\item Effect: Removes the specified document identifier from the database. No effect if no such document exists.
+			\item Exceptions: None
+		\end{itemize}
+		
+		\item \texttt{void removePersonalDocumentAssociation(DocumentDataID docID)}
+		\begin{itemize}
+			\item Effect: Removes the association between the specified document with its recipient identifier. No effect if no such document exists.
+			\item Exceptions: None
+		\end{itemize}
+		
+		\item \texttt{DocumentData retrievePersonalDocumentData(DocumentDataID docID, RegisteredRecipientID id)} throws NoSuchDocumentException, RetrievalNotAllowedException
+		\begin{itemize}
+			\item Effect: Retrieves the full document data specified by the given document identifier.
+			\item Exceptions:
+			\begin{itemize}
+				\item NoSuchDocumentException: The specified DocumentDataID is not present.
+				\item RetrievalNotAllowedException: The specified document does not belong to the personal document store of the specified recipient.
+			\end{itemize}
+		\end{itemize}
+		
+		\item \texttt{Document retrievePersonalDocument(DocumentDataID docID, RegisteredRecipientID id)} throws NoSuchDocumentException, RetrievalNotAllowedException
+		\begin{itemize}
+			\item Effect: Retrieves the document specified by the given document identifier without its raw data.
+			\item Exceptions:
+			\begin{itemize}
+				\item NoSuchDocumentException: The specified DocumentDataID is not present.
+				\item RetrievalNotAllowedException: The specified document does not belong to the personal document store of the specified recipient.
+			\end{itemize}
+		\end{itemize}
+		
+		\item \texttt{RawDataEntry retrievePersonalDocumentRawData(DocumentDataID docID, RegisteredRecipientID id)} throws NoSuchDocumentException, RetrievalNotAllowedException
+		\begin{itemize}
+			\item Effect: Retrieves the raw data belonging to the document specified by the given document identifier.
+			\item Exceptions:
+			\begin{itemize}
+				\item NoSuchDocumentException: The specified DocumentDataID is not present.
+				\item RetrievalNotAllowedException: The specified document does not belong to the personal document store of the specified recipient.
+			\end{itemize}
+		\end{itemize}
+		
+		\item \texttt{List<DocumentData> queryPersonalDocumentData(DocumentQuery query)} throws RecipientIDNotIncludedException
+		\begin{itemize}
+			\item Effect: Retrieves the full document data of all documents matching the specified DocumentQuery.
+			\item Exceptions:
+			\begin{itemize}
+				\item RecipientIDNotIncludedException: The DocumentQuery does not include the identifier of the recipient
+			\end{itemize}
+		\end{itemize}
+		
+		\item \texttt{List<Document> queryPersonalDocuments(DocumentQuery query)} throws RecipientIDNotIncludedException
+		\begin{itemize}
+			\item Effect: Retrieves all documents matching the specified DocumentQuery without their raw data.
+			\item Exceptions:
+			\begin{itemize}
+				\item RecipientIDNotIncludedException: The DocumentQuery does not include the identifier of the recipient
+			\end{itemize}
+		\end{itemize}
+		
+		\item \texttt{List<RawDataEntry> queryPersonalDocumentRawData(DocumentQuery query)} throws RecipientIDNotIncludedException
+		\begin{itemize}
+			\item Effect: Retrieves the raw data of all documents matching the specified DocumentQuery.
+			\item Exceptions:
+			\begin{itemize}
+				\item RecipientIDNotIncludedException: The DocumentQuery does not include the identifier of the recipient
+			\end{itemize}
+		\end{itemize}
+	\end{itemize}
+	
+	\item Synchronise
+	\begin{itemize}
+		\item \texttt{void synchroniseState(List<PersonalDocumentDataUpdate> updates)}
+		\begin{itemize}
+			\item Effect: Carries out all updates contained within the specified list.
+			\item Exceptions: None
+		\end{itemize}
+	\end{itemize}
+	
+	\item Ping
+	\begin{itemize}
+		\item \texttt{Echo ping()}
+		\begin{itemize}
+			\item Effect: Returns an Echo to reassure the caller that the callee is still available.
+			\item Exceptions: None
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+
+\subsubsection*{DocumentSubmissionCache}
+\begin{itemize}
+	\item CacheManagement
+	\begin{itemize}
+		\item \texttt{void submitDocumentUpdate(DocumentDataUpdate update)}
+		\begin{itemize}
+			\item Effect: Records the specified update in the cache.
+			\item Exceptions: None
+		\end{itemize}
+		
+		\item \texttt{void submitPersonalDocumentUpdate(PersonalDocumentDataUpdate update)}
+		\begin{itemize}
+			\item Effect: Records the specified update in the cache.
+			\item Exceptions: None
+		\end{itemize}
+		
+		\item \texttt{List<DocumentDataUpdate> flushDocumentDataUpdates()}
+		\begin{itemize}
+			\item Effect: Retrieves all stored document data updates and removes these.
+			\item Exceptions: None
+		\end{itemize}
+		
+		\item \texttt{List<PersonalDocumentDataUpdate> flusPersonalDocumentData()}
+		\begin{itemize}
+			\item Effect: Retrieves all stored personal document data updates and removes these.
+			\item Exceptions: None
+		\end{itemize}
+		
+		\item \texttt{void removeDocumentUpdates(DocumentDataID id)}
+		\begin{itemize}
+			\item Effect: Removes all updates pertaining to the specified document from the cache.
+			\item Exceptions: None
+		\end{itemize}
+		
+		\item \texttt{void removePersonalDocumentUpdate(DocumentDataID docID)}
+		\begin{itemize}
+			\item Effect: Removes all personal document database updates pertaining to the specified document from the cache.
+			\item Exceptions: None
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+
+\subsubsection*{ReplicationManager}
+\begin{itemize}
+	\item DocumentSubmissionManagement
+	\begin{itemize}
+		\item \texttt{void submitDocument(DocumentData doc, boolean addToPersonalDB)}
+		\begin{itemize}
+			\item Effect: Writes the specified generated document into the document database. If addToPersonalDB is true, then the document's identifier together with the recipient's identifier is written to the personal document database
+			\item Exceptions: None
+		\end{itemize}
+		
+		\item \texttt{void addDocumentsToPersonalDocumentStore(RegisteredRecipientID id)}
+		\begin{itemize}
+			\item Effect: Looks up all document identifiers belonging to the specified recipient and writes those pairs to the personal document database
+			\item Exceptions: None
+		\end{itemize}
+		
+		\item \texttt{void removeDocumentsFromPersonalDocumentStore(RegisteredRecipientID id)}
+		\begin{itemize}
+			\item Effect: Looks up all associations between document identifiers and the specified recipient in the personal document database and removes them
+			\item Exceptions: None
+		\end{itemize}
+	\end{itemize}
+	
+	\item ReplicationConfirmation
+	\begin{itemize}
+		\item \texttt{void confirmDocumentUpdateSuccess(DocumentDataID id)}
+		\begin{itemize}
+			\item Effect: Confirms that all updates concerning the specified documents in the document database were successful.
+			\item Exceptions: None
+		\end{itemize}
+		
+		\item \texttt{void confirmPersonalDocumentUpdateSuccess(DocumentDataID id)}
+		\begin{itemize}
+			\item Effect: Confirms that all updates concerning the specified documents in the personal document database were successful.
+			\item Exceptions: None
+		\end{itemize}
+	\end{itemize}
 \end{itemize}
 
 \subsubsection{Data type definitions}
 Describe per complex data type used in the interfaces what it represents.
 
-\paragraph{returnType} This data element represents X.
+\paragraph{DocumentQuery} Represents an executable query on both the document database and the personal document database. A non-exhaustive list of elements are the name of the sender, a date range, document type or identifier of a registered recipient
 
-\paragraph{ParamType} This data element represents Y.
+\paragraph{DocumentDataUpdate} Contains a DocumentData instance and an indication whether this is a write or a removal.
+
+\paragraph{PersonalDocumentDataUpdate} Contains an association between a DocumentDataID and a RegisteredRecipientID and an indication whether this is a write or a removal
+
+\paragraph{RegisteredRecipientID} Corresponds with a single registered recipient. Currently, this identifier is envisioned as the recipient's e-mail address.
 
 \subsubsection{Verify and refine}
 This section describes per component which (parts of) the remaining requirements it is responsible for. If requirements are split, a letter is added to its name (e.g. Av1a) to indicate that the component will only satisfy a part of the original requirement. If requirements are split, it will also be indicated what part of the original requirement each new requirement contains. If new derived requirements are introduced they will receive a new identifier and are marked as a new requirement.
