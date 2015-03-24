@@ -132,7 +132,7 @@ Figure \ref{fig:it1-seq_aspect1} illustrates the standard flow of document gener
 \end{figure}
 
 \paragraph{Deployment}
-Figure \ref{fig:it1-depl_main} show the mapping of architectural components on physical nodes.
+Figure \ref{fig:it1-depl_main} shows the mapping of architectural components on physical nodes.
 The main entry point and accompanying storage components of the system are gathered on the \texttt{RawDataHandlingNode}, since these work together closely and depend on eachother. Also, they are a cohesive part of the system regarding behaviour. The \texttt{DispatcherSupervisor} and both \texttt{DispatcherModule}s are key components in the system, being the central focus of generation behaviour. They each have their own node, being essential parts, so simultaneous failure is less likely. The \texttt{DocumentGeneratorProcesses} are mapped to their own dedicated nodes because they are work processes and specialised powerful nodes can be provided to them. They can be distributed along multiple of these nodes so that when a lot of work is done, failure of one work node doesn't bring the system to a halt. The remaining functionality of the system, most of which is used later than the behaviour specified by the selected drivers, is mapped to an OtherFunctionalityNode, which is to be decomposed later.
 
 \begin{figure}[!htp]
@@ -736,12 +736,12 @@ Encapsulates requirements not tackled in this run and which cannot be assigned t
 \end{figure}
 
 \paragraph{Deployment}
-Rationale of the allocation of components to physical nodes.
+Figure \ref{fig:it2-depl_main} shows the mapping of architectural components on physical nodes. Only the components introduced in this run and previously connected to the decomposed component \texttt{OtherFunctionality1} are shown as per the component-and-connector diagram. The \texttt{RawDataHandlingNode} and \texttt{PrimaryDispatcher} are the same nodes as in the first run. The \texttt{DocumentHandlerNode} contains the entry point for the delivery and storage system for documents, along with its heartbeat listener. The \texttt{DatabaseReplicationNode}, \texttt{DocumentDB}, \texttt{SecondaryDocumentDB}, \texttt{PersonalDocumentDatabase} and \texttt{SecondaryPersonalDocumentDatabase} are the database nodes along with their passive replication nodes. They are all seperate nodes so failure of one does not cause document loss. The \texttt{LookupNode} contains all components regarding document lookup. The \texttt{OtherFunctionalityNode} contains all other components not directly impacted by this run.
 
 \begin{figure}[!htp]
     \centering
-    %\includegraphics[width=0.8\textwidth]{}
-    \missingfigure[figwidth=0.8\textwidth]{Deployment diagram}
+    \includegraphics[width=0.8\textwidth]{depl_diag_2.png}
+    %\missingfigure[figwidth=0.8\textwidth]{Deployment diagram}
     \caption{Deployment diagram of this decomposition.
         }\label{fig:it2-depl_main}
 \end{figure}
