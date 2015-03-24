@@ -589,7 +589,8 @@ This section describes per component which (parts of) the remaining requirements
     \item \emph{UC20}: Update document template
     \item \emph{UC21a}: Consult status of all document processing jobs\\
     Handling the (visual) interfacing with the user. Determining the finished jobs.
-    \item \emph{UC22}: Notify customer administrator
+    \item \emph{UC22a}: Notify customer administrator
+    Notifying the customer administrator of delivery failure
     \item \emph{Av2}: Personal document storage failure
     \item \emph{Av3}: Zoomit failure
     \item \emph{P2}: Document lookups
@@ -647,14 +648,37 @@ The related functional drivers are:
 These drivers are the main drivers concerned with normal usage of the personal document store. No components regarding authentication or registering are considered. These drivers are also either High or Medium priority, making them a good choice.
 
 \subsubsection{Architectural design}
-\paragraph{Prevention and detection of document storage (\emph{Av2)}}
-\emph{Av2} specifies that the personal document storage should have a guaranteed minimal up-time. We propose a \texttt{DocumentDB}, which stores all generated documents, and the \texttt{PersonalDocumentDatabase}, which stores references to the documents addressed to each registered recipient (see paragraph ``Splitting up the document database and personal document database'' for the rationale as to why these two are split up). Part of the solution to the prevention problem is to have passive replication of both the document database and the personal document database. We therefore propose a \texttt{ReplicationManager} that manages both the replicas of the \texttt{DocumentDB} and \texttt{PersonalDocumentDatabase}. Of course, there are also the \texttt{SecondaryDB} and \texttt{SecondaryPersonalDocumentDatabase}. As we have opted for passive replication, both databases shall implement an interface through which their respective primaries can synchronise with their secondaries. This synchronisation will happen every ten minutes. It is possible that the primary crashes before it has synchronised any new data. To solve this, we introduce the \texttt{DocumentSubmissionCache}, which stores 20 minutes worth of updates for both databases. When a secondary of either type is activated, the relevant updates in the \texttt{DocumentSubmissionCache} are flushed to the new primary. The fact that some of those updates may already have been present poses no problem as writes are idempotent.
+
+\paragraph{Storage of generated documents}
+When the \texttt{DispatcherModule} (cf. decomposition 1) submits a document, it first arrives at the \texttt{GeneratedDocumentHandler}. It is here that it is decided what exactly to do with the document. It is offered to the \texttt{ReplicationManager} (see paragraph ``Prevention and detection of document storage (\emph{Av2})´´) regardless, but other actions may also be appropriate based on the raw data supplied along with the document, such as generating a download link.
+
+\paragraph{Prevention and detection of document storage failure (\emph{Av2})}
+\emph{Av2} specifies that the personal document storage should have a guaranteed minimal up-time. We propose a \texttt{DocumentDB}, which stores all generated documents, and the \texttt{PersonalDocumentDatabase}, which stores references to the documents addressed together with an identifier of registered recipient to which those documents are addressed (see paragraph ``Splitting up the document database and personal document database'' for the rationale as to why these two are split up). Part of the solution to the prevention problem is to have passive replication of both the document database and the personal document database. We therefore propose a \texttt{ReplicationManager} that manages both the replicas of the \texttt{DocumentDB} and \texttt{PersonalDocumentDatabase}. Of course, there are also the \texttt{SecondaryDB} and \texttt{SecondaryPersonalDocumentDatabase}. When a generated document arrives at the \texttt{ReplicationManager}, it stores the document in the \texttt{DocumentDB} and also stores a reference to the document together with an identifier of the recipient in the \texttt{PersonalDocumentDatabase}, if appropriate. As we have opted for passive replication, both databases shall implement an interface through which their respective primaries can synchronise with their secondaries. This synchronisation will happen every ten minutes. It is possible that the primary crashes before it has synchronised any new data. To solve this, we introduce the \texttt{DocumentSubmissionCache}, which stores 20 minutes worth of updates for both databases. When a secondary of either type is activated, the relevant updates in the \texttt{DocumentSubmissionCache} are flushed to the new primary. The fact that some of those updates may already have been present poses no problem as writes are idempotent. In order to detect failure of the current primary, both databases also implement a ping interface so that the \texttt{ReplicationManager} can detect failure in a timely manner and send out a notification to the eDocs administrators.
+
+\paragraph{Handling failure of the personal document storage (\emph{Av2})}
+\emph{Av2} specifies that documents to be delivered via the personal document store must be temporarily stored elsewhere if the personal document storage fails. In our set-up, the \texttt{DocumentSubmissionCache} is also responsible for caching whichever type of records a database stores if it fails. When normal operation is resumed, the \texttt{ReplicationManager} must then write all records of the correct type stored in the \texttt{DocumentSubmissionCache} into the database. At least three hours of corresponding entries must be stored until the failure is resolved. Therefore, when the \texttt{PersonalDocumentDatabase} and all replicas fail, all personal document records that arrive in the meantime are written to the \texttt{DocumentSubmissionCache}, which are then written to the \texttt{PersonalDocumentDatabase} when it resumes operation.
+
+\paragraph{Degraded mode upon failure of personal document store (\emph{Av2})}
+\emph{Av2} requires that a maximally functional interface is presented to the user when they attempt to access the personal document store after it has failed. In order to realise this, we add a module that queries the \texttt{PersonalDocumentDatabase} on the user's behalf, the \texttt{PersonalDocumentLookupModule}. When a request of the \texttt{PersonalDocumentLookupModule} times out, it pings the \texttt{PersonalDocumentDatabase}. If no response is received within five seconds, it is determined that the \texttt{PersonalDocumentDatabase} has failed. The request fails and this is indicated to the user. The \texttt{PersonalDocumentLookupModule} keeps pinging the \texttt{PersonalDocumentDatabase} every ten seconds. Upon receipt of an echo, normal operation is resumed. While the \texttt{PersonalDocumentLookupModule} is still pinging the \texttt{PersonalDocumentDatabase}, any further requests result in an indication that the personal document storage is currently unavailable.
+
+\paragraph{Maintaining download links for documents}
+Any document sent to an unregistered recipient is associated with a download link if receipt tracking has been activated. In order to manage this, we propose the \texttt{DownloadDocumentLookupModule}. When the \texttt{GeneratedDocumentHandler} submits a document to the \texttt{DownloadDocumentLookupModule}, it generates a unique link. This link is then stored together with the time at which it was generated. When download of a document is initiated, the link is submitted to the \texttt{DownloadDocumentLookupModule}, which then queries the \texttt{DownloadDocumentLookupModule}. If the link has expired in the meantime, this is indicated to the user. The \texttt{DownloadDocumentLookupModule} periodically checks if any of its links has expired. If it detects expired links, the appropriate Customer Administrator is notified.
+
+\paragraph{Lookup of documents in the personal document storage}
+Support must be provided for consulting a user's personal document store as a whole, consulting a specific document or searching through the personal document store. We therefore make the \texttt{PersonalDocumentLookupModule} capable of issuing diverse types of queries. It can request summaries of all of a user's documents, request a full document matching a certain document reference, or issue a query ((partial) name of the sender, type of document, date range, etc.) the document of interest must match, which also produces summaries of all matching documents. In all of these requests, the user's identifier is implicitly included as a parameter.
+
+\paragraph{Load balancing ()\emph{P2})}
+\emph{P2} specifies that requests for documents in the personal document store or requests for downloads must be throttled under certain circumstances. In order to realise this, we propose the \texttt{LookupLoadBalancer}. Both the \texttt{DownloadDocumentLookupModule} and the \texttt{PersonalDocumentLookupModule} must receive permission from the \texttt{LookupLoadBalancer} before issuing an individual query. Also, when either module has finished executing a query, they must report to the \texttt{LookupLoadBalancer} which kind of query it was and how long they took executing it. This way, the \texttt{LookupLoadBalancer} can determine when there is a high load on the system and delay giving permission for execution of queries where appropriate. Other components in the system can also keep the \texttt{LookupLoadBalancer} aware of currently existing processing capacity so that it can keep this information in mind when making decisions.
 
 \subsubsection*{Alternatives considered}
-\paragraph{Alternatives for solution}
-\todo{split docDB and PDSDB}
-\todo{passive vs active rep}
-A discussion of the alternative solutions and why that were not selected.
+\paragraph{Splitting up the document database and personal document database}
+Several options exist as to how to implement the personal document store. One of these is to simply keep all documents in document storage. If this is done, then there is a virtual personal document store for each user. This is deemed undesirable, as the personal document store of a certain user must then be computed every time a request comes in. The overhead introduced by this can be substantial when a lot of documents have been stored and the personal document store of a user is large. All other options consist of somehow redundantly storing all documents that belong to a personal document store. The obvious solution would be to store all those documents in the document storage and also in a dedicated personal document storage. This proposal was also rejected, as the document storage already has passive replication in place and this solution would introduce an unacceptable level of redundancy. The solution currently in place (i.e. storing references to documents instead of the full documents) was deemed to be sufficiently low-impact in terms of storage while still offering acceptable performance for the personal document store.
+
+\paragraph{Passive replication vs active replication for document storage}
+\emph{Av2} specifies that documents must temporarily be stored elsewhere upon failure. The affected documents are then processed when normal operation is resumed. Passive replication is a natural fit for this requirement since it involves synchronisation, both during normal operation and after failure of the primary. Using active replication for this purpose would still require some sort of cache in order to meet this requirement, which does not agree with the principle of active replication.
+
+\paragraph{Ping/echo versus heartbeat for document storage}
+The \texttt{ReplicationManager} must detect when the primary fails. Acknowledgements are implicit each time the primary indicates it has successfully executed a write, therefore using a heartbeat would be of limited use. It is only when the primary fails to acknowledge a write that the \texttt{ReplicationManager} must explicitly ascertain whether the primary is still alive, and using ping/echo is perfect for this purpose.
 
 \subsubsection{Instantiation and allocation of functionality}
 \paragraph{Decomposition}
@@ -749,19 +773,55 @@ Describe per complex data type used in the interfaces what it represents.
 \paragraph{ParamType} This data element represents Y.
 
 \subsubsection{Verify and refine}
-This section describes per component which (parts of) the remaining
-requirements it is responsible for.
+This section describes per component which (parts of) the remaining requirements it is responsible for. If requirements are split, a letter is added to its name (e.g. Av1a) to indicate that the component will only satisfy a part of the original requirement. If requirements are split, it will also be indicated what part of the original requirement each new requirement contains. If new derived requirements are introduced they will receive a new identifier and are marked as a new requirement.
 
-\paragraph{ModuleB}
+\paragraph{OtherFunctionality2}
 \begin{itemize}
-    \item \emph{Z1}: name
-    \item \emph{UCd}: name
+    \item \emph{UC1}: Log in
+    \item \emph{UC2}: Log out
+    \item \emph{UC6}: Deliver document via e-mail
+    \item \emph{UC8}: Deliver document via postal mail
+    \item \emph{UC9}: Deliver document via Zoomit
+    \item \emph{UC10}: Confirm document delivery (Zoomit)
+    \item \emph{UC15a}: Download document via document link
+    Issuing the request for download of the specified document
+    \item \emph{UC16}: Register to personal document store
+    \item \emph{UC17}: Unregister from personal document store
+    \item \emph{UC18}: Register customer organization
+    \item \emph{UC19}: Unregister customer organization
+    \item \emph{UC20}: Update document template
+    \item \emph{UC21a}: Consult status of all document processing jobs
+    Handling the (visual) interfacing with the user. Determining the finished jobs.
+    \item \emph{UC22a}: Notify customer administrator
+    Notifying the customer administrator of delivery failure
+    \item \emph{Av3}: Zoomit failure
+    \item \emph{P3b}: Status overview for customer administrators
+    Handling the (visual) interfacing with the user
+    \item \emph{M1a}: New type of document: bank statements
+    The delivery and template handling for the new document
+    \item \emph{M2}: Multiple print \& postal services
+    \item \emph{M3}: Dynamic selection of the cheapest of print \& postal services
 \end{itemize}
 
-\paragraph{ModuleC}
+\paragraph{SubmissionSubsystem}
 \begin{itemize}
-    \item \emph{UCba}: name\\Description which part of the original use case is
-        the responsibility of this component.
+	\item \emph{UC3}: Initiate document processing
+	\item \emph{M1b}: New type of document: bank statements\\
+	Being able to receive and verify the integrity of Raw Data for the new type of document.
+\end{itemize}
+
+\paragraph{RawDataPool}
+\begin{itemize}
+	\item \emph{UC21b}: Consult status of all document processing jobs\\
+	Determining the unfinished and currently processing jobs.
+	\item \emph{P3b}: Status overview for customer administrators\\
+	Calculating and delivering information about all unfinished and currently processing jobs for a certain \texttt{Customer Organisation} in a timely fashion.
+\end{itemize}
+
+\paragraph{DocumentGenerationProcess}
+\begin{itemize}
+	\item \emph{M1c}: New type of document: bank statements\\
+	Being able to generate documents of the new type with the accompanying new template.
 \end{itemize}
 
 \subsection{Decomposition 3: Module (drivers)}
