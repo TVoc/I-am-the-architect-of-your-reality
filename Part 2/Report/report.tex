@@ -1304,22 +1304,32 @@ A discussion of the alternative solutions and why that were not selected.
 
 \subsubsection{Instantiation and allocation of functionality}
 \paragraph{Decomposition}
-Main aspects of the resulting decomposition.
+Figure \ref{fig:it3-cc_main} shows the components resulting from the decomposition in this run. The most important of these are the \texttt{RegistrationManager}, \texttt{RecipientDB} and \texttt{CustomerOrganisationDB} since these are the components most involved with registering Customer Organizations and Registered Recipients and logging users into the system.
 
-\subparagraph{ModuleB}
-Per introduced component a paragraph describing its responsibilities.
+\subparagraph{RegistrationManager}
+Responsible for registering new Customer Organizations, the corresponding Customer Administrators, and Registered Recipients. Unregistering those same users is also done here. Also provides login and logout functionality through login tokens. As long as a user's login token is determined to be valid, that user is considered to be logged into the system.
 
-\subparagraph{ModuleC}
-Per introduced component a paragraph describing its responsibilities.
+\subparagraph{RecipientDB}
+Responsible for storing details about all Registered Recipients. Among those details are the RegisteredRecipientID and password (which is of course stored in an appropriately secure manner) so that an attempted login can be verified.
+
+\subparagraph{CustomerOrganisationDB}
+Responsible for storing details about all Customer Organizations and their Customer Administrators. Among those details are the CustomerOrganizationID, password (stored in an appropriately secure manner) and any terms of the Service Level Agreement that are relevant to the system.
+
+\subparagraph{UICommunicationFacade}
+When the user indicates through the user interface that he wants to perform an action within the system, it is the \texttt{UICommunicationFacade} that issues all the calls needed to the proper parts of the system to perform that action. For now, the only concern is registering a new user and logging in a user.
+
+\subparagraph{OtherFunctionality3}
+A component to be decomposed in a future run. Contains functionality not handled by \texttt{OtherFunctionality2}, i.e. delivering e-mail to recipients and to eDocs administrators and Customer Administrators.
 
 \begin{figure}[!htp]
     \centering
-    %\includegraphics[width=0.8\textwidth]{}
-    \missingfigure[figwidth=0.8\textwidth]{Component-and-connector diagram}
+    \includegraphics[width=0.8\textwidth]{comp_diag_3.png}
+    %\missingfigure[figwidth=0.8\textwidth]{Component-and-connector diagram}
     \caption{Component-and-connector diagram of this decomposition.
-        }\label{fig:it1-cc_main}
+        }\label{fig:it3-cc_main}
 \end{figure}
 
+\begin{comment}
 \paragraph{Behaviour}
 If needed and explanation of the behaviour of certain aspects of the design so
 far.
@@ -1331,6 +1341,7 @@ far.
     \caption{Sequence diagram illustrating a key behavioural aspect.
         }\label{fig:it1-seq_aspect1}
 \end{figure}
+\end{comment}
 
 \paragraph{Deployment}
 Rationale of the allocation of components to physical nodes.
@@ -1344,33 +1355,35 @@ Rationale of the allocation of components to physical nodes.
 \end{figure}
 
 \subsubsection{Interfaces for child modules}
-\subsubsection*{ModuleB}
+\subsubsection*{RegistrationManager}
 \begin{itemize}
-    \item InterfaceA
-    \begin{itemize}
-        \item \texttt{returnType operation1(ParamType param1)} throws TypeOfException
-        \begin{itemize}
-            \item Effect: Describe the effect of calling this operation.
-            \item Exceptions: 
-            \begin{itemize}
-                \item TypeOfException: Describe when this exception is thrown.
-            \end{itemize}
-        \end{itemize}
-
-        \item \texttt{returnType operation2()}
-        \begin{itemize}
-            \item Effect: Describe the effect of calling this operation.
-            \item Exceptions: None
-         \end{itemize}
-    \end{itemize}
+    \item RegistrationManagement:
+    Provides methods to register new recipients and new Customer Organizations (and their Customer Administrators). Upon successful registration, a login token is generated so that the user is immediately logged in.
+    
+    \item LoginManagement:
+    Provides the possibility for both Registered Recipients and Customer Administrators to supply login credentials so that they may receive a login token in return. If the credentials are invalid, an exception is raised. If an external system wishes to interact with the system (e.g. submitting raw data), that system must also first be authorized through this interface. 
 \end{itemize}
 
+\subsubsection*{CustomerOrganisationDB}
+\begin{itemize}
+	\item CustomerOrganisationInformationManagement
+	Provides methods to store information about Customer Organizations and their Customer Administrators. This information can later be retrieved, queried or deleted. Also able to verify login credentials supplied by a user.
+\end{itemize}
+
+\subsubsection*{RecipientDB}
+\begin{itemize}
+	\item RecipientDB
+	Provides methods to store information about Registered Recipients. This information can later be retrieved, queried or deleted. Also able to verify login credentials supplied by a user.
+\end{itemize}
+
+\begin{comment}
 \subsubsection{Data type definitions}
 Describe per complex data type used in the interfaces what it represents.
 
 \paragraph{returnType} This data element represents X.
 
 \paragraph{ParamType} This data element represents Y.
+\end{comment}
 
 \subsubsection{Verify and refine}
 This section describes per component which (parts of) the remaining
