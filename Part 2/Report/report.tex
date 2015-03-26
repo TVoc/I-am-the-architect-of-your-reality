@@ -8,6 +8,7 @@
 \geometry{tmargin=3cm, bmargin=2.2cm, lmargin=2.2cm, rmargin=2cm}
 \usepackage{todonotes} %Used for the figure placeholders
 \usepackage[htt]{hyphenat}
+\usepackage{verbatim}
 
 \begin{document}
 \input{titlepage}
@@ -1291,16 +1292,25 @@ The related functional drivers are:
 \end{itemize}
 
 \paragraph{Rationale}
-This set of use-cases is very coherent and complete as a group. Most are high-priority or medium-priority use-cases. N quality requirement matches any of the use-cases so none were selected. This is also supported by the fact that all but one remaining quality requirements are low-priority, the other one being medium-priority.
+This set of use-cases is very coherent and complete as a group. Most are high-priority or medium-priority use-cases. No quality requirement matches any of the use-cases so none were selected. This is also supported by the fact that all but one remaining quality requirements are low-priority, the other one being medium-priority.
 
 \subsubsection{Architectural design}
-\paragraph{Topic}
-Discussion of the solution selected for (a part of) one of the architectural
-drivers.
+
+\paragraph{Registering to the system}
+When a Customer Organisation or Recipient has to be registered in the system, this is done via a user interface. The interface connects to the system via the \texttt{UICommunicationFacade}, a component which relays user interface calls to the system. The component introduced to regulate registration (and log in, see later), is the \texttt{RegistrationManager}, which will be contacted by said \texttt{UICommunicationFacade}. The \texttt{RegistrationManager} accepts registration requests when being supplied with valid registration information for either type of registration respectively. For registering a Customer Organisation or a Recipient, a \texttt{CustomerOrganisationDB} and \texttt{RecipientDB} have been introduced respectively. The \texttt{RegistrationManager} checks whether an entry for given registration information already exists, and if so, reports this to the \texttt{UICommunicationFacade}. If not, the \texttt{RegistrationManager} records the registration in the correct database and returns a positive answer to the \texttt{UICommunicationFacade}, along with a login token for the new registration (see ``Logging in to and out of the system'').\todo{Fill pds?}
+
+\paragraph{Logging in to and out of the system}
+For authentication, a \texttt{LoginTokenRegistrar} is introduced, governing login tokens, representing a logged in session. When a Customer Organisation or Registered Recipient (hereafter called the ``user''), wants to log in to the system, he indicates this by supplying his login information via the \texttt{UICommunicationFacade} to the \texttt{RegistrationManager}. The login information is checked against the user's entry in the corresponding database, and, if correct, the \texttt{RegistrationManager} requests a login token from the \texttt{LoginTokenRegistrar}, supplying the user's ID. The \texttt{LoginTokenRegistrar} generates a token, with the supplied ID embedded, and internally records it as an active token. When a request is made to the system that concerns a specific user session, e.g. retreiving an overview of a certain Registered Recipients personal document store, the request should be accompanied by a login token for the user session. This token can be supplied the \texttt{LoginTokenRegistrar}, to check whether or not it is a valid login token. When a user logs in, their personal session records and guards the login token, which can be used to execute requests on behalf of the user. When the user indicates he wants to log out, the \texttt{UICommunicationFacade} will relay this to the \texttt{RegistrationManager}, along with the token. The \texttt{RegistrationManager} hands the token to the \texttt{LoginTokenRegistrar}, who removes it from its internal records, making it impossible to be used again.
+
+\paragraph{Unregistering from the system}
+When a user has to be unregistered from the system, this can be indicated via the \texttt{UICommunicationFacade}, with a login token of an entity who is authorised to unregister said user (e.g. the Registered Recipient themselves or the eDocs Administrator). The \texttt{UICommunicationFacade} passes the request to the \texttt{RegistrationManager}, who checks the supplied login token with the \texttt{LoginTokenRegistrar}. If the token is valid, the requested registration is removed from the respective database. Immediately after this, the \texttt{LoginTokenRegistrar} is instructed to remove all active login tokens based on the unregistered information from its internal records, effectively logging out the newly unregistered user.
 
 \subsubsection*{Alternatives considered}
-\paragraph{Alternatives for solution}
-A discussion of the alternative solutions and why that were not selected.
+\paragraph{Redundancy for the Registration Databases}
+There has been clearly opted for no redundancy in the registration databases. It would be prudent to provide at least some redundancy in the form of secure backups. This is not extensively included in our solution because it is not requested in a Quality Requirement, but could be added when further decomposing said databases.
+
+\paragraph{A frontend for the Registration Databases}
+In the same line as previous Alternative, the databases are accessed in a very direct way. It is possible to decompose the databases further and add a database manager to both, serving requested (specialised) information.
 
 \subsubsection{Instantiation and allocation of functionality}
 \paragraph{Decomposition}
@@ -1344,14 +1354,14 @@ far.
 \end{comment}
 
 \paragraph{Deployment}
-Rationale of the allocation of components to physical nodes.
+Figure \ref{fig:it2-depl_main} shows the mapping of architectural components on physical nodes. Only the components introduced in this run and previously connected to the decomposed component \texttt{OtherFunctionality1} are shown as per the component-and-connector diagram. The components are mainly deployed as expected, with the databases getting their own dedicated node. Most nodes have access tot the \texttt{RegistrationManagementNode} since authorisation of user actions in the system has to go through here.
 
 \begin{figure}[!htp]
     \centering
-    %\includegraphics[width=0.8\textwidth]{}
-    \missingfigure[figwidth=0.8\textwidth]{Deployment diagram}
+    \includegraphics[width=0.8\textwidth]{depl_diag_3.png}
+    %\missingfigure[figwidth=0.8\textwidth]{Deployment diagram}
     \caption{Deployment diagram of this decomposition.
-        }\label{fig:it1-depl_main}
+        }\label{fig:it3-depl_main}
 \end{figure}
 
 \subsubsection{Interfaces for child modules}
@@ -1359,9 +1369,9 @@ Rationale of the allocation of components to physical nodes.
 \begin{itemize}
     \item RegistrationManagement:
     Provides methods to register new recipients and new Customer Organizations (and their Customer Administrators). Upon successful registration, a login token is generated so that the user is immediately logged in.
-    
+
     \item LoginManagement:
-    Provides the possibility for both Registered Recipients and Customer Administrators to supply login credentials so that they may receive a login token in return. If the credentials are invalid, an exception is raised. If an external system wishes to interact with the system (e.g. submitting raw data), that system must also first be authorized through this interface. 
+    Provides the possibility for both Registered Recipients and Customer Administrators to supply login credentials so that they may receive a login token in return. If the credentials are invalid, an exception is raised. If an external system wishes to interact with the system (e.g. submitting raw data), that system must also first be authorized through this interface.
 \end{itemize}
 
 \subsubsection*{CustomerOrganisationDB}
