@@ -1323,7 +1323,7 @@ Responsible for registering new Customer Organizations, the corresponding Custom
 Responsible for storing details about all Registered Recipients. Among those details are the RegisteredRecipientID and password (which is of course stored in an appropriately secure manner) so that an attempted login can be verified.
 
 \subparagraph{CustomerOrganisationDB}
-Responsible for storing details about all Customer Organizations and their Customer Administrators. Among those details are the CustomerOrganizationID, password (stored in an appropriately secure manner) and any terms of the Service Level Agreement that are relevant to the system.
+Responsible for storing details about all Customer Organizations and their Customer Administrators. Among those details are the CustomerOrganizationID, password (stored in an appropriately secure manner) and any terms of the Service Level Agreement that are relevant to the system. If a new Customer Organization is registered or if a Customer Organization's recurring batch configuration is modified, the \texttt{CustomerOrganisationDB} writes that recurring batch configuration to the \texttt{SchedulerModule}.
 
 \subparagraph{LoginTokenRegistrar}
 Responsible for generating and storing login tokens. Accepts RegisteredRecipientIDs and CustomerOrganisationIDs to generate login tokens for the corresponding users. Internally records which tokens it makes, to verify whether a token was made by it or not. When a login token has to be rescinded, e.g. the user logs out, the token is removed from the internal data structure. The \texttt{Registrar} offers the functionality to be contacted by parts of the system to authenticate system actions with login tokens.
