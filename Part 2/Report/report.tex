@@ -1407,13 +1407,53 @@ Describe per complex data type used in the interfaces what it represents.
 \end{comment}
 
 \subsubsection{Verify and refine}
-This section describes per component which (parts of) the remaining
-requirements it is responsible for.
+This section describes per component which (parts of) the remaining requirements it is responsible for. If requirements are split, a letter is added to its name (e.g. Av1a) to indicate that the component will only satisfy a part of the original requirement. If requirements are split, it will also be indicated what part of the original requirement each new requirement contains. If new derived requirements are introduced they will receive a new identifier and are marked as a new requirement.
 
-\paragraph{ModuleB}
+\paragraph{OtherFunctionality3}
 \begin{itemize}
-    \item \emph{Z1}: name
-    \item \emph{UCd}: name
+    \item \emph{UC6}: Deliver document via e-mail
+    \item \emph{UC8}: Deliver document via postal mail
+    \item \emph{UC9}: Deliver document via Zoomit
+    \item \emph{UC10}: Confirm document delivery (Zoomit)
+    \item \emph{UC20a}: Update document template\\
+    Internal update of the template.
+    \item \emph{UC21a}: Consult status of all document processing jobs\\
+    Determining the finished jobs.
+    \item \emph{UC22a}: Notify customer administrator\\
+    Notifying the customer administrator of delivery failure
+    \item \emph{Av3}: Zoomit failure
+    \item \emph{M1a}: New type of document: bank statements\\
+    The delivery and template handling for the new document
+    \item \emph{M2}: Multiple print \& postal services
+    \item \emph{M3}: Dynamic selection of the cheapest of print \& postal services
+\end{itemize}
+
+
+\paragraph{UICommunicationFacade}
+\begin{itemize}
+    \item \emph{UC15a}: Download document via document link\\
+    Issuing the request for download of the specified document
+    \item \emph{UC20b}: Update document template\\
+    Handling the (visual) interfacing with the user.
+    \item \emph{UC21c}: Consult status of all document processing jobs\\
+    Handling the (visual) interfacing with the user. 
+    \item \emph{P3b}: Status overview for customer administrators\\
+    Handling the (visual) interfacing with the user
+\end{itemize}
+
+\paragraph{SubmissionSubsystem}
+\begin{itemize}
+	\item \emph{UC3}: Initiate document processing
+	\item \emph{M1b}: New type of document: bank statements\\
+	Being able to receive and verify the integrity of Raw Data for the new type of document.
+\end{itemize}
+
+\paragraph{RawDataPool}
+\begin{itemize}
+	\item \emph{UC21b}: Consult status of all document processing jobs\\
+	Determining the unfinished and currently processing jobs.
+	\item \emph{P3b}: Status overview for customer administrators\\
+	Calculating and delivering information about all unfinished and currently processing jobs for a certain \texttt{Customer Organisation} in a timely fashion.
 \end{itemize}
 
 \paragraph{ModuleC}
