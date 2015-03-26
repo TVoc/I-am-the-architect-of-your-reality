@@ -1460,10 +1460,10 @@ This section describes per component which (parts of) the remaining requirements
 \end{itemize}
 
 \section{Resulting partial architecture}\label{sec:architecture}
-This section provides an over of the architecture constructed through ADD\@.
+This section gives an overview of the result of the three performed runs. This is not a complete ADD decomposition, thus there is still the notion of \texttt{OtherFunctionality} included. The structure is shown as a context diagram, and a set of component-connector diagrams.
 
 \subsection{Context diagram}
-This subsection discusses the context diagram.
+Figure \ref{fig:cc_context} gives an overview of the external parties and their interaction with the system.
 
 \begin{figure}[!htp]
     \centering
@@ -1474,8 +1474,7 @@ This subsection discusses the context diagram.
 \end{figure}
 
 \subsection{Component-and-connector view}
-A short discussion of the component-and-connector view with the key
-decompositions if any.
+Figure \ref{fig:cc_main} shows a very high level overview of the resulting system after three decomposition runs. Figures \ref{fig:decomp_decomp1}, \ref{fig:decomp_decomp2} and \ref{fig:decomp_decomp3} give a more detailed structure of the actual decomposed subsystems, the actual results from our decomposition. A remark on figure \ref{fig:decomp_decomp3}: the \texttt{UserInformationMgmt} interface on the overview (figure \ref{fig:cc_main}) is embodied by the \texttt{RecipientInfoMgmt} and \texttt{CustomerOrganisationInformationManagement} interfaces.
 
 \begin{figure}[!htp]
     \centering
@@ -1489,7 +1488,7 @@ decompositions if any.
     \centering
     \includegraphics[width=0.8\textwidth]{comp_diag_final1.png}
     %\missingfigure[figwidth=0.8\textwidth]{Key decomposition}
-    \caption{Decomposition of a component shown in Figure~\ref{fig:cc_main}
+    \caption{Decomposition of the \texttt{GenerationSubsystem} component as mentioned in Figure~\ref{fig:cc_main}
         }\label{fig:decomp_decomp1}
 \end{figure}
 
@@ -1497,7 +1496,7 @@ decompositions if any.
     \centering
     \includegraphics[width=0.8\textwidth]{comp_diag_final2.png}
     %\missingfigure[figwidth=0.8\textwidth]{Key decomposition}
-    \caption{Decomposition of a component shown in Figure~\ref{fig:cc_main}
+    \caption{Decomposition of the \texttt{StorageSubsystem} component as mentioned in Figure~\ref{fig:cc_main}
         }\label{fig:decomp_decomp2}
 \end{figure}
 
@@ -1505,7 +1504,7 @@ decompositions if any.
     \centering
     \includegraphics[width=0.8\textwidth]{comp_diag_final3.png}
     %\missingfigure[figwidth=0.8\textwidth]{Key decomposition}
-    \caption{Decomposition of a component shown in Figure~\ref{fig:cc_main}
+    \caption{Decomposition of the \texttt{UserRegistrationSubsystem} component as mentioned in Figure~\ref{fig:cc_main}
         }\label{fig:decomp_decomp3}
 \end{figure}
 
