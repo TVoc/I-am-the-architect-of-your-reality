@@ -1371,7 +1371,7 @@ Figure \ref{fig:it2-depl_main} shows the mapping of architectural components on 
 \subsubsection*{RegistrationManager}
 \begin{itemize}
     \item RegistrationManagement:
-    Provides methods to register new recipients and new Customer Organizations (and their Customer Administrators). Upon successful registration, a login token is generated so that the user is immediately logged in.
+    Provides methods to register new recipients and new Customer Organizations (and their Customer Administrators). Upon successful registration, a login token is generated so that the user is immediately logged in. If an account with the supplied registration information (company name for Customer Organizations, e-mail address for recipient) already exists, the registration process is terminated and an exception is raised. If a new recipient is registered, it is indicated to the \texttt{ReplicationManager} that all documents addressed to that recipient must now be stored in the personal document storage.
 
     \item LoginManagement:
     Provides the possibility for both Registered Recipients and Customer Administrators to supply login credentials so that they may receive a login token in return. If the credentials are invalid, an exception is raised. If an external system wishes to interact with the system (e.g. submitting raw data), that system must also first be authorized through this interface.
@@ -1387,6 +1387,17 @@ Figure \ref{fig:it2-depl_main} shows the mapping of architectural components on 
 \begin{itemize}
 	\item RecipientDB
 	Provides methods to store information about Registered Recipients. This information can later be retrieved, queried or deleted. Also able to verify login credentials supplied by a user.
+\end{itemize}
+
+\subsubsection*{LoginTokenRegistrar}
+\begin{itemize}
+	\item TokenManagement \\
+	Provides methods to:
+	\begin{itemize}
+		\item generate (and subsequently store, then return) new login tokens for a certain user
+		\item remove login tokens from internal storage
+		\item validate login tokens (i.e. check whether it is present among the currently active login tokens)
+	\end{itemize} 
 \end{itemize}
 
 \begin{comment}
