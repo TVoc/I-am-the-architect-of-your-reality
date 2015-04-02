@@ -1,0 +1,61 @@
+Subsystems:
+
+-Submission:
+    +Receipt of raw data (add timestamp of receipt)
+    -> UserManagement: Information about CO and templates(?)
+    -> JobStorage: Store Received Data
+    -> Generation: InsertJobs
+    -> Communication: Error propagation
+    => Postal Code Information Broker
+    -AuthTokenManager: Generates and stores Auth tokens for raw data submission
+-JobStorage
+    +Job status follow-up + ID generation
+    +Receipt tracking
+-Generation:
+    +Document Generation
+    -> JobStorage: GetBatchData + marking job status
+    -> GeneratedDocumentHandler: submit generated document for storage and delivery
+    -> UserMgmt: Key+Template retrieval
+    -> Billing: non-recurring/priority billing
+    -> Communication: report error on document generation
+-GeneratedDocumentHandler:
+    +Receiving generated documents
+    +Distributing generated documents where necessary, e.g. storage, delivery channel
+    -> UserMgmt: Query for Recipient status
+-Storage:
+    -GeneralDB
+    -PDSDB
+-Delivery (e.g. EmailDeliveryChannel, PDSDeliveryChannel...):
+    +general interface for document submission, offered by every "Delivery channel acceptor"
+    +consists of several of these acceptors, which are maintained by the generatedDocumentHandler
+    +Have their own method of packaging and delivering pdf's, most via Communication
+    -> Communication: send message to actor for delivery (can be recipient or third party), possibly including the generated pdf.
+    -> UserMgmt: Query for Receipt Tracking
+    -> JobStorage: Signal either "Delivered" or "Pending delivery confirmation"
+    -> Billing: Billing the CO for non-recurring delivery
+    -EmailDeliveryChannel:
+        +Generate email with pdf or download link
+        -> Communication: Submit generated email.
+        -> Lookup: add download entry
+    -Postal Delivery
+-Communication
+    +Notifying the eDocs and Customer administrators
+    +Relaying emails or other digital deliveries to third parties or recipients
+    +Recieving errors for email delivery
+    -> UserMgmt: Customer Organistion Administrator lookup
+    -> JobStorage: Mark (e-mail) delivery as failed
+-Billing
+-UserManagement:
+    +Log in and log out
+    -Recipients
+    -CO:
+        +Priority handling
+        +Template management
+        +Key management
+    -> Submission: generation and notification for new auth token
+-UI facade
+    +session management
+    -> UserManagement: authentication
+    -> Submission: generation and notification for new auth token
+-Lookup
+
