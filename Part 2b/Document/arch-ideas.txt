@@ -1,7 +1,14 @@
+-(sub)component
+-> association with internal interface of other component
+=> association with external party
++Responsibility of component
+
 Subsystems:
 
 -Submission:
-    +Receipt of raw data (add timestamp of receipt)
+    +Receipt of raw data (add timestamp of receipt and Customer Organisation ID if not present)
+    +Validate raw data format
+    +Validate raw data contents e.g. consistent information, complete information, document type is compatible with given distribution channel
     -> UserManagement: Information about CO and templates(?)
     -> JobStorage: Store Received Data
     -> Generation: InsertJobs
@@ -22,9 +29,15 @@ Subsystems:
     +Receiving generated documents
     +Distributing generated documents where necessary, e.g. storage, delivery channel
     -> UserMgmt: Query for Recipient status
+    -> Storage: Submit document to relevant database(s)
 -Storage:
+    +Manage the addition or deletion of a Registered Recipient to the PDSDB
+    +Respond to lookups to designated Session Response Channel
     -GeneralDB
+        +Store all documents
     -PDSDB
+        +Store personal documents
+        +answer lookup queries for personal documents
 -Delivery (e.g. EmailDeliveryChannel, PDSDeliveryChannel...):
     +general interface for document submission, offered by every "Delivery channel acceptor"
     +consists of several of these acceptors, which are maintained by the generatedDocumentHandler
@@ -37,25 +50,80 @@ Subsystems:
         +Generate email with pdf or download link
         -> Communication: Submit generated email.
         -> Lookup: add download entry
-    -Postal Delivery
+    -PostalDeliveryChannel:
+        -> UserMgmt: query for SLA details (print parameters etc.)
+        => P&P: Submit documents for delivery via snail mail
+    -ZoomitDeliveryChannel:
+        -> UserMgmt: Lookup name of CO from ID, or CO itself for notificiation
+        => zoomit: hand over document for delivery, if necessary, provide details for receipt confirmation
+        -> Communication: Notify CO admin when zoomit delivery failed
+    -PDSDeliveryChannel:
+        +compose mail with document information and generated link (general link prefix, followed by encoded ID)
+        -> communication: Submit email for delivery
+        -> lookup: encoding of PersonalDocumentID for link
 -Communication
     +Notifying the eDocs and Customer administrators
+    +Lookup email address when handed a RecipientID or AdministratorID
     +Relaying emails or other digital deliveries to third parties or recipients
     +Recieving errors for email delivery
     -> UserMgmt: Customer Organistion Administrator lookup
     -> JobStorage: Mark (e-mail) delivery as failed
+    => Email provider: submit emails for delivery
+    -DeliveryConfirmation:
+        +Accept connection to signal delivery confirmation of document with receipt tracking enabled (in case of e.g. zoomit)
+        -> JobStorage: Signal Delivery Confirmation
 -Billing
 -UserManagement:
     +Log in and log out
+    +Verify Details for registration, i.e. completeness of the details, no registration exists for these details (email address) etc.
+    -LoginTokenRegistrar
+        +Generate and maintain login tokens
+        +Invalidate tokens when users are unregistered
     -Recipients
+        +Register new Registered Recipients
+        +Unregister Recipients
+        -> Storage: Signal the addition or deletion of a Registered User to the PDSDB
     -CO:
+        +Maintain registrations for CO details, AND CO admin details
+        +Register new CO and admin(s)
+        +Unregister CO and admin(s)
         +Priority handling
         +Template management
         +Key management
+        -> Communication: notify CO admin of registration
+        -> Submission: signal removal of auth tokens when unregistering CO
     -> Submission: generation and notification for new auth token
 -UI facade
-    +session management
-    -> UserManagement: authentication
+    +session management: initialize a session per user
+    -Session:
+        (+session mode: user/CO admin/edocs admin)
+        +maintain login token
+        +provide response channel for document lookups
+        +Interpret lookup responses
+        +Accept the users search query
+        +Accept login and logout request
+        +U: Accept request to register and unregister Recipient
+        +eDocs: Accept request to register and unregister CO
+        +CO: accept template update request
+    -> UserManagement\LoginTokenRegistrar: authentication (login token)
+    -> UserManagement: registration management e.g. accepting details for verification, acknowledging actual registration (for both Recipients and CO)
+    -> UserManagement: Query template details, submit new template, check which document types allowed for templates
     -> Submission: generation and notification for new auth token
+    -> Lookup: consult PDS (overview of all documents), search PDS, consult document in PDS, submit PDS link
+    -> Lookup: submit Unregistered download link
+    -> Lookup: Consult status of all jobs for certain CO
 -Lookup
+    +encode PersonalDocumentID (longer ascii string with redundancy, so no "links" can be forged)
+    +generate random download link for Unregistered recipients, store this link for 30 days
+    +lookup documents when requested to
+    +accept document links and serve the request
+    +accept request for job overview: queries the Jobstorage and Documentdb and merges the result, while removing duplicates which are not yet delivered
+    ->PDSDB: Lookup personal document/(search result/general) overview (IDs, type, generation date), 
+    ->DocumentDB: Lookup document for download, request overview of generated jobs for certain CO
+    ->JobStorage: Signal Delivery Confirmation, request report of certain CO
+    ->communication: signal unregisterd recipient and CO admin when unregistered download link expires
+
+External parties:
+-P&P:
+    +Accepts documents with a delivery address and print parameters, for final delivery.
 
