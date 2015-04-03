@@ -2,6 +2,7 @@
 -> association with internal interface of other component
 => association with external party
 +Responsibility of component
+*Non-functional attribute
 
 Subsystems:
 
@@ -16,6 +17,7 @@ Subsystems:
     => Postal Code Information Broker
     -AuthTokenManager: Generates and stores Auth tokens for raw data submission
 -JobStorage
+    *active replication for performance in lookup
     +Job status follow-up + ID generation
     +Receipt tracking
 -Generation:
@@ -36,6 +38,8 @@ Subsystems:
     -GeneralDB
         +Store all documents
     -PDSDB
+        *Active replication
+        *Cache for documents and temporary storage
         +Store personal documents
         +answer lookup queries for personal documents
 -Delivery (e.g. EmailDeliveryChannel, PDSDeliveryChannel...):
@@ -54,9 +58,11 @@ Subsystems:
         -> UserMgmt: query for SLA details (print parameters etc.)
         => P&P: Submit documents for delivery via snail mail
     -ZoomitDeliveryChannel:
+        *Delivery queue/cache for unavailability (av3) and heavy load (2 days)
         -> UserMgmt: Lookup name of CO from ID, or CO itself for notificiation
         => zoomit: hand over document for delivery, if necessary, provide details for receipt confirmation
         -> Communication: Notify CO admin when zoomit delivery failed
+        *-> Communication: Notify eDocs admin when zoomit is unreachable
     -PDSDeliveryChannel:
         +compose mail with document information and generated link (general link prefix, followed by encoded ID)
         -> communication: Submit email for delivery
@@ -113,6 +119,7 @@ Subsystems:
     -> Lookup: submit Unregistered download link
     -> Lookup: Consult status of all jobs for certain CO
 -Lookup
+    *LoadBalancer for throttling and stuff
     +encode PersonalDocumentID (longer ascii string with redundancy, so no "links" can be forged)
     +generate random download link for Unregistered recipients, store this link for 30 days
     +lookup documents when requested to
