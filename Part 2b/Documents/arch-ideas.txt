@@ -19,19 +19,20 @@ Subsystems:
 -JobStorage
     *active replication for performance in lookup
     +Job status follow-up + ID generation
+    +Keeps all job entries FOREVER, but keeps raw data until generation is complete.
     +Receipt tracking
 -Generation:
     +Document Generation
     -> JobStorage: GetBatchData + marking job status
     -> GeneratedDocumentHandler: submit generated document for storage and delivery
     -> UserMgmt: Key+Template retrieval
-    -> Billing: non-recurring/priority billing
     -> Communication: report error on document generation
 -GeneratedDocumentHandler:
     +Receiving generated documents
     +Distributing generated documents where necessary, e.g. storage, delivery channel
     -> UserMgmt: Query for Recipient status
     -> Storage: Submit document to relevant database(s)
+    -> Billing: non-recurring/priority billing for generation
 -Storage:
     +Manage the addition or deletion of a Registered Recipient to the PDSDB
     +Respond to lookups to designated Session Response Channel
