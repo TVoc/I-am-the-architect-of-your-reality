@@ -31,8 +31,10 @@ Subsystems:
     +Receiving generated documents
     +Distributing generated documents where necessary, e.g. storage, delivery channel
     -> UserMgmt: Query for Recipient status
+    -> UserMgmt: Query for receipt tracking
     -> Storage: Submit document to relevant database(s)
     -> Billing: non-recurring/priority billing for generation
+    -> DeliverySubsystem: document delivery
 -Storage:
     +Manage the addition or deletion of a Registered Recipient to the PDSDB
     +Respond to lookups to designated Session Response Channel
@@ -48,7 +50,6 @@ Subsystems:
     +consists of several of these acceptors, which are maintained by the generatedDocumentHandler
     +Have their own method of packaging and delivering pdf's, most via Communication
     -> Communication: send message to actor for delivery (can be recipient or third party), possibly including the generated pdf.
-    -> UserMgmt: Query for Receipt Tracking
     -> JobStorage: Signal either "Delivered" or "Pending delivery confirmation"
     -> Billing: Billing the CO for non-recurring delivery
     -EmailDeliveryChannel:
@@ -115,7 +116,7 @@ Subsystems:
     -> UserManagement\LoginTokenRegistrar: authentication (login token)
     -> UserManagement: registration management e.g. accepting details for verification, acknowledging actual registration (for both Recipients and CO)
     -> UserManagement: Query template details, submit new template, check which document types allowed for templates
-    -> Submission: generation and notification for new auth token
+    -> UserManagement: generation and notification for new auth token
     -> Lookup: consult PDS (overview of all documents), search PDS, consult document in PDS, submit PDS link
     -> Lookup: submit Unregistered download link
     -> Lookup: Consult status of all jobs for certain CO
