@@ -36,6 +36,7 @@ Subsystems:
     -> Billing: non-recurring/priority billing for generation
     -> DeliverySubsystem: document delivery
     -> Communication: Signal generation error (MessageMgmt)
+    -> JobStorage: Lookup Delivery details
 -Storage:
     +Manage the addition or deletion of a Registered Recipient to the PDSDB
     +Respond to lookups to designated Session Response Channel
