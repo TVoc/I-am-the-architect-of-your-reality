@@ -26,7 +26,7 @@ Subsystems:
     -> JobStorage: GetBatchData + marking job status
     -> GeneratedDocumentHandler: submit generated document for storage and delivery
     -> UserMgmt: Key+Template retrieval
-    -> Communication: report error on document generation
+    -> Communication: report error on document generation processes (errorSignaling)
 -GeneratedDocumentHandler:
     +Receiving generated documents
     +Distributing generated documents where necessary, e.g. storage, delivery channel
@@ -35,6 +35,7 @@ Subsystems:
     -> Storage: Submit document to relevant database(s)
     -> Billing: non-recurring/priority billing for generation
     -> DeliverySubsystem: document delivery
+    -> Communication: Signal generation error (MessageMgmt)
 -Storage:
     +Manage the addition or deletion of a Registered Recipient to the PDSDB
     +Respond to lookups to designated Session Response Channel
