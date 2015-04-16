@@ -102,6 +102,7 @@ Subsystems:
         -> Submission: signal removal of auth tokens when unregistering CO
     -> Submission: generation and notification for new auth token
 -UI facade
+    +PDS download link (which contains the document ID): enforce log-in
     +session management: initialize a session per user
     -Session:
         (+session mode: user/CO admin/edocs admin)
