@@ -1,0 +1,8 @@
+Alternatives:
+
+-PDSCache flushes directly
+
+Remarks:
+
+-DocumentDB stores delivery info (for pds filling)
+-NotificationEmailHandler offers raw email submission or email template submission, where it looks up the COAdmin address for you
