@@ -198,9 +198,14 @@ List and describe all data types defined in your interface specifications. List
 them alphabetically for ease of navigation.
 
 \begin{itemize}
-    \item \texttt{Paramtype1}: Description of data type.
-    \item \texttt{Paramtype2}: Description of data type.
-    \item \texttt{returnType1}: Description of data type.
+	\item \texttt{BatchDetails}: Encapsulates details about the batch a Customer Organization intends to upload (e.g. type of documents contained in the batch).
+	\item \texttt{Job}: Encapsulates a RawDataEntry, together with its JobID and BatchID.
+	\item \texttt{JobStatusEntry}: Encapsulates document state concerning whether it has been generated, delivered, etc. and relevant time stamps.
+    \item \texttt{LoginCredentials}: Used when the user wants to log in. Contains the username, password, function the user wants to log in as and general info about the user attempting the login (e.g. IP address).
+    \item \texttt{LoginToken}: Depending on the type of user, authorises the user to perform certain actions within the system.
+    \item \texttt{RawDataBatch}: Contains several RawDataEntries and an indication whether it concerns a recurring batch. 
+    \item \texttt{RawDataEntry}: Contains all raw data and meta data necessary such that a document can be generated.
+    \item \texttt{UserSession}: Container for login token; keeps state for logged-in user.
 \end{itemize}
 
 \end{document}
