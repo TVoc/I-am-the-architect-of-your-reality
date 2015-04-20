@@ -24,19 +24,13 @@ The goal of this project was to design an architecture for a Document Processing
 \section{Overview}\label{sec:overview}
 \subsection{Architectural decisions}
 
-\paragraph{Av1a\@: notification of the eDocs Administrator} Provide a brief discussion of the
-decisions related to \emph{ReqX}.\\
-\emph{Employed tactics and patterns: List all patterns and tactics used to
-    achieve ReqX, if any.}
+\paragraph{Av1a and Av2a\@: notification of the eDocs Administrator}
+\emph{Av1a} and \emph{Av2a} expect a system for notifying the eDocs Administrator of errors within 1 minute. For this purpose, there is a \texttt{Communication Subsystem}, capable of swiftly relaying Error Notifications to the eDocs Administrator. The \texttt{Subsystem} is also responsible for relaying normal message (non-internal errors, standard email deliveries etc.), but this responsibility can be inhibited if system errors are reported, so they take precedence.\\
+\emph{Employed tactics and patterns: None}
     
-\paragraph{Av1b\@: storing the status of an individual job} Provide a brief discussion of the
-decisions related to \emph{ReqX}.\\
-\emph{Employed tactics and patterns: List all patterns and tactics used to
-    achieve ReqX, if any.}
-    
-\paragraph{Av2a\@: notifying the appropriate operator within 1 minute} Provide a brief discussion of the decisions related to \emph{ReqX}.\\
-\emph{Employed tactics and patterns: List all patterns and tactics used to
-    achieve ReqX, if any.}
+\paragraph{Av1b\@: storing the status of an individual job}
+A general \texttt{Job Storage Subsystem} is introduced to the system, to store among others the status of all jobs. For \emph{Av1b}, the \texttt{GeneratorManager} has access to this \texttt{Subsystem}, to change the status of a failed job to ``Temporarily failed''.\\
+\emph{Employed tactics and patterns: None}
     
 \paragraph{Av2b\@: temporary storage of Personal Document Store documents} Provide a brief discussion of the decisions related to \emph{ReqX}.\\
 \emph{Employed tactics and patterns: List all patterns and tactics used to
@@ -47,10 +41,9 @@ decisions related to \emph{ReqX}.\\
 \emph{Employed tactics and patterns: List all patterns and tactics used to
     achieve ReqX, if any.}
     
-\paragraph{P2\@: document lookups} Provide a brief discussion of the
-decisions related to \emph{ReqX}.\\
-\emph{Employed tactics and patterns: List all patterns and tactics used to
-    achieve ReqX, if any.}
+\paragraph{P2\@: document lookups}
+For handling Document Lookups in a timely fashion, a \texttt{Lookup Subsystem} has been introduced to the system. This \texttt{Subsystem} handles both PDS and Download lookups, monitoring the amount of requests for both sides. When one side is in danger performance-wise because of the other, the \texttt{Subsystem} will throttle the overactive side, so the system keeps performing as expected for both Download and PDS lookups. Enough redundancy in the form of \emph{active replication} is provided in the \texttt{Storage Subsystem} such that lookups and storage of generated documents can be executed simultaneously without having a large impact upon one another.\\
+\emph{Employed tactics and patterns: Active replication, Manage event rate}
     
 \paragraph{P3\@: status overview for Customer Administrators} Provide a brief discussion of the
 decisions related to \emph{ReqX}.\\
@@ -62,14 +55,13 @@ decisions related to \emph{ReqX}.\\
 \emph{Employed tactics and patterns: List all patterns and tactics used to
     achieve ReqX, if any.}
     
-\paragraph{M2\@: Multiple print \& postal services} Provide a brief discussion of the
-decisions related to \emph{ReqX}.\\
-\emph{Employed tactics and patterns: List all patterns and tactics used to
-    achieve ReqX, if any.}
+\paragraph{M2\@: Multiple print \& postal services} 
+In the \texttt{Delivery Subsystem}, the different delivery channels are viewed as black boxes for delivery. They manage their own delivery, billing and job status management where necessary. The delivery channel for postal delivery is the only part of the system to be modified for this requirement. The delivery channel could have a set of possible PPS companies of which to select the desired one. The selection of the desired company could be an extra field in the delivery metadata, while no extra information warrants the default PPS company.\\
+\emph{Employed tactics and patterns: Maintain existing interface, Abstract common services}
     
-\paragraph{M3\@: Dynamic selection of the cheapest of print \& postal services} Provide a brief discussion of the decisions related to \emph{ReqX}.\\
-\emph{Employed tactics and patterns: List all patterns and tactics used to
-    achieve ReqX, if any.}
+\paragraph{M3\@: Dynamic selection of the cheapest of print \& postal services}
+Cfr. \emph{M2}, the postal delivery channel can be modified without changing the rest of the system. This delivery channel can then internally analyse the cost for the delivery of a document, based on the delivery address and set of PPS companies available.\\
+\emph{Employed tactics and patterns: Abstract common services}
 
 \subsection{Discussion}
 Use this section to discuss your architecture in retrospect.
