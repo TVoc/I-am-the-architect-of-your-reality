@@ -1,0 +1,25 @@
+\section{Defined data types}\label{app:datatypes}
+List and describe all data types defined in your interface specifications. List
+them alphabetically for ease of navigation.
+
+\begin{itemize}
+	\item \texttt{DeliveryMetaData}: Contains the delivery channel, recipient address and other required delivery information (e.g. Customer Organization name, whether receipt tracking applies and whether it is from a recurring batch) for an individual document.
+	\item \texttt{BatchDetails}: Encapsulates details about the batch a Customer Organization intends to upload (e.g. type of documents contained in the batch).
+	\item \texttt{BatchMetaData}: Contains information such as the CustomerID, the document type of the batch and when it was received.
+	\item \texttt{CustomerOrganizationID}: Corresponds to a certain Customer Organization.
+	\item \texttt{Document}: Represents a generated document
+	\item \texttt{DownloadLink}: Encoded link which decodes to a JobID.
+	\item \texttt{GenerationErrorReport}: Contains information about the document for which generation failed (e.g. CustomerOrganizationID) and the reason for the error.
+	\item \texttt{Job}: Encapsulates a RawDataEntry, together with its JobID and BatchID.
+	\item \texttt{JobID}: Corresponds to a Job and later the Document generated from it.
+	\item \texttt{JobStatusEntry}: Encapsulates document state concerning whether it has been generated, delivered, etc. and relevant time stamps.
+    \item \texttt{LoginCredentials}: Used when the user wants to log in. Contains the username, password, function the user wants to log in as and general info about the user attempting the login (e.g. IP address).
+    \item \texttt{LoginToken}: Depending on the type of user, authorises the user to perform certain actions within the system.
+    \item \texttt{PDSLookupLink}: Encoded link which decodes to a JobID and RecipientID.
+    \item \texttt{RawDataBatch}: Contains several RawDataEntries and an indication whether it concerns a recurring batch. 
+    \item \texttt{RawDataEntry}: Contains all raw data and meta data necessary such that a document can be generated.
+    \item \texttt{RawDataMetaData}: Contains information such as the identifier of the raw data unique within the Customer Organization, the selected delivery channel, the name of the addressee and the address of the addressee (the form of which depends on the selected delivery channel).
+    \item \texttt{RegistrationDetails}: Contains details that can be used to register a Recipient such as first name, last name, e-mail address and postal address.
+    \item \texttt{Template}: Contains fields that can be filled out and an indication which fields are mandatory.
+    \item \texttt{UserSession}: Container for login token; keeps state for logged-in user.
+\end{itemize}
