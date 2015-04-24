@@ -1,11 +1,11 @@
 \section{Client-server view (UML Component diagram)}\label{sec:client-server}
 In Figure \ref{fig:cc-context}, we present a context diagram of the client-server view, detailing the external communication to and from the system. The entry points to the system are the (mostly automated) external version of raw data submission. The Customer Organisation and/or Social Secretary can submit Raw Data Batches via the specified protocols supported by the eDocs system.
-The other entry point being the \texttt{UIfacade}, which is contacted by User Software for User Interface Actions, e.g. a management dashboard for the Customer Administrator (one or more per Organisation) to query for job statuses, or a log-in system for recipients to log in to the PDS.
-The exit points of the system are more versatile. There is one closely related to the UI Actions, where parts of the system respond to queries by directly supplying information to the user sessions, which in turn are individual (dedicated) intermediaries for instances of the client software. This bypasses the \texttt{UIFacade} as a bottleneck.
-The \texttt{SubmissionSubsystem} queries an \texttt{External Information Broker} when verifying the meta-data of Raw Data Batches and Entries as specified in \emph{UC3}.
-The \texttt{BillingSubsystem} contacts the \texttt{Billing System} (external of the actual eDocs system) used by the eDocs Company periodically to bill users of eDocs.
-The \texttt{CommunicationSubsystem} submits composed e-mails to an \texttt{External Email Provider} for delivery. This functionality is used for reporting errors in the system to the eDocs admin, various notifications to CO admins, delivery of documents etc.
-There are two other external communication mechanisms for document delivery, namely the \texttt{Zoomit} service's \texttt{Document Delivery} interface and the \texttt{Print \& Postal Service}'s one. These are both directly used by the delivery subsystem, in contrast to document delivery by e-mail, which passes through the \texttt{CommunicationSubsystem}, as explained earlier.
+The other entry point being the \ttt{UIfacade}, which is contacted by User Software for User Interface Actions, e.g. a management dashboard for the Customer Administrator (one or more per Organisation) to query for job statuses, or a log-in system for recipients to log in to the PDS.
+The exit points of the system are more versatile. There is one closely related to the UI Actions, where parts of the system respond to queries by directly supplying information to the user sessions, which in turn are individual (dedicated) intermediaries for instances of the client software. This bypasses the \ttt{UIFacade} as a bottleneck.
+The \ttt{SubmissionSubsystem} queries an \ttt{External Information Broker} when verifying the meta-data of Raw Data Batches and Entries as specified in \emph{UC3}.
+The \ttt{BillingSubsystem} contacts the \ttt{Billing System} (external of the actual eDocs system) used by the eDocs Company periodically to bill users of eDocs.
+The \ttt{CommunicationSubsystem} submits composed e-mails to an \ttt{External Email Provider} for delivery. This functionality is used for reporting errors in the system to the eDocs admin, various notifications to CO admins, delivery of documents etc.
+There are two other external communication mechanisms for document delivery, namely the \ttt{Zoomit} service's \ttt{Document Delivery} interface and the \ttt{Print \& Postal Service}'s one. These are both directly used by the delivery subsystem, in contrast to document delivery by e-mail, which passes through the \ttt{CommunicationSubsystem}, as explained earlier.
 
 \begin{figure}[!htp]
     \centering
@@ -14,7 +14,18 @@ There are two other external communication mechanisms for document delivery, nam
     \caption{Context diagram for the client-server view.}\label{fig:cc-context}
 \end{figure}
 
-The primary diagram and accompanying explanation.
+Figure \ref{fig:cs-primary} shows the primary component-and-connector diagram of the system. The presented overview divides the eDocs system into several subsystems, each with their dedicated functionalitie(s). The division are straightforward, and make for a less coupled system.\\
+The \ttt{SubmissionSubsystem} accepts \ttt{Raw data batches} from an external user or via the \ttt{UIFacade}. It verifies these \ttt{Batches} and then registers them for generation in the \ttt{JobStorageSubsystem} and the \ttt{DocumentGenerationSubsystem}.\\
+The \ttt{JobStorageSubsystem} \\
+The \ttt{DocumentGenerationSubsystem} \\
+The \ttt{GeneratedDocumentHandler} \\
+The \ttt{DocumentStorageSubsystem} \\
+The \ttt{DeliverySubsystem} \\
+The \ttt{CommunicationSubsystem} \\
+The \ttt{UserManagementSubsystem} \\
+The \ttt{BillingSubsystem} \\
+The \ttt{LookupSubsystem} \\
+The \ttt{UIFacade} \\
 
 \begin{figure}[!htp]
     \centering
