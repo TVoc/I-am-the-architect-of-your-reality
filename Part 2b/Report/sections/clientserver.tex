@@ -1,4 +1,12 @@
 \section{Client-server view (UML Component diagram)}\label{sec:client-server}
+
+\begin{figure}[!htp]
+    \centering
+    \includegraphics[width=\textwidth]{figures/Context Diagram 1.png}
+    %\missingfigure[figwidth=0.8\textwidth]{Context diagram of the client-server view.}
+    \caption{Context diagram for the client-server view.}\label{fig:cc-context}
+\end{figure}
+
 In Figure \ref{fig:cc-context}, we present a context diagram of the client-server view, detailing the external communication to and from the system. The entry points to the system are the (mostly automated) external version of raw data submission. The Customer Organisation and/or Social Secretary can submit Raw Data Batches via the specified protocols supported by the eDocs system.
 The other entry point being the \ttt{UIfacade}, which is contacted by User Software for User Interface Actions, e.g. a management dashboard for the Customer Administrator (one or more per Organisation) to query for job statuses, or a log-in system for recipients to log in to the PDS.
 The exit points of the system are more versatile. There is one closely related to the UI Actions, where parts of the system respond to queries by directly supplying information to the user sessions, which in turn are individual (dedicated) intermediaries for instances of the client software. This bypasses the \ttt{UIFacade} as a bottleneck.
@@ -9,9 +17,9 @@ There are two other external communication mechanisms for document delivery, nam
 
 \begin{figure}[!htp]
     \centering
-    \includegraphics[width=\textwidth]{figures/Context Diagram 1.png}
-    %\missingfigure[figwidth=0.8\textwidth]{Context diagram of the client-server view.}
-    \caption{Context diagram for the client-server view.}\label{fig:cc-context}
+    \includegraphics[width=\textwidth]{figures/Subsystem Diagram.png}
+    %\missingfigure[figwidth=0.8\textwidth]{Primary diagram of the client-server view.}
+    \caption{Primary component-and-connector view of the proposed architecture.}\label{fig:cs-primary}
 \end{figure}
 
 Figure \ref{fig:cs-primary} shows the primary component-and-connector diagram of the system. The presented overview divides the eDocs system into several subsystems, each with their dedicated functionalitie(s). The division are straightforward, and make for a less coupled system.\\
@@ -26,25 +34,52 @@ The \ttt{UserManagementSubsystem} stores all information regarding the different
 The \ttt{BillingSubsystem} makes it possible to log any transaction consisting of document generation bills and document delivery bills, such that an invoice can be automatically sent to Customer Organizations for all activities performed on their behalf in a certain period. That period can be each month, each week or any other period length, whichever the financial department of eDocs deems most appropriate.\\
 The \ttt{LookupSubsystem} processes requests for document lookups. It can handle requests where either a download link, a \ttt{JobID} or a search query is provided. In order to handle download links, there is a \ttt{LookupLinkCodec}, which can encode and decode downloads links (and also links specified to the \ttt{Personal Document Store}) and a \ttt{DownloadLinkCatalogue} where download links are stored for 30 days. If a Registered Recipient issues a query for the \ttt{Personal Document Store}, the \ttt{PDSLookupModule} handles that. To enable to system to throttle lookup requests (see \emph{P2}), there is a \ttt{LoadBalancer} which has to explicitly approve each lookup before it can be executed.\\
 The \ttt{UIFacade} acts as an intermediary between all different kinds of user interfaces (a management dashboard, a Recipient PDS client etc.) and the system. The \ttt{UIFacade} passes all calls to the actual subsystems. It has a session infrastructure for user interface clients, so it is not one single bottleneck for all requests. The current different functionalities handled by the \ttt{UIFacade} are loging users in and out, registering new users, looking up job statuses and documents, submitting raw data through a dashboard and entering system information for load balancing in lookups.\\
-
-\begin{figure}[!htp]
-    \centering
-    \includegraphics[width=\textwidth]{figures/Subsystem Diagram.png}
-    %\missingfigure[figwidth=0.8\textwidth]{Primary diagram of the client-server view.}
-    \caption{Primary component-and-connector view of the proposed architecture.}\label{fig:cs-primary}
-\end{figure}
+Most of the previously named subsystems and components are further decomposed in Section \ref{sec:decomposition} to the required level of detail.
 
 \subsection{Main architectural decisions}
-Discuss your architectural decisions for the most important requirements in
-more detail using the components of the client-server view.
-Pay attention to the solutions that you employed and the alternatives that you
-considered.
-The explanation here must be self-contained and complete.
-Imagine you had to describe how the architecture supports the core
-functionality to someone that is looking at the client-server view only.
-Hide unnecessary details (these should be shown in the decomposition view).
+In the following subsections we will discuss how the non-functional requirements are met by our architecture. The solutions and possible alternatives to the non-functional requirements are explained in the most self-contained way possible. Where necessary, references are made to Figure \ref{fig:cs-primary} and one or more decompostion views in section \ref{sec:decomposition}.
 
-\subsubsection{Av1a and Av2a: notification of the eDocs Administrator}
+\subsubsection{Av1a and Av2a: notification of the eDocs Administrator}\label{march:av1a-av2a}
+The \ttt{CommunicationSubsystem} provides notification functionality for all users. Since signaling an internal error of the system has precedence over most if not all other message traffic, the \ttt{CommunicationSubsystem} is split into an \ttt{ErrorEmailDeliveryHandler} and \ttt{NotificationEmailDeliveryHandler}. The former delivers notices about errors internal to the system, the latter all other notices. As stated before, for precedence of these error notifications, the \ttt{ErrorEmailDeliveryHandler} can throttle or temporarily halt any e-mail traffic from the \ttt{NotificationEmailDeliveryHandler}. This allows the system to alert the eDocs administrator(s) in a timely fashion, uner one minute, as stated in both \emph{Availability scenarios}.
+
+\subsubsection*{Alternatives considered}
+\paragraph{Alternative(s) for splitting the \ttt{EmailDeliveryHandler}s} All notifications could be submitted to one single \ttt{EmailDeliveryHandler}, together with a priority number. This allows said \ttt{EmailDeliveryHandler} to give precedence to certain notification, e.g. the internal error notification, but this could slow down the \ttt{CommunicationSubsystem} due to constant priority sorting, and can even lead to regular notification starvation (without the intervention of error notifications) in the most extreme of cases.
+
+\subsubsection{Av1b: storing the status of an individual job}\label{march:av1b}
+The \ttt{JobStorageSubsystem} is responsible for storing the status of individual jobs. For this purpose, a dedicated \ttt{JobStatusDatabase} is introduced to the \ttt{JobStorageSubsystem}, next to a general \ttt{JobContentsDatabase}, which contains everything else concerning jobs.
+
+\subsubsection*{Alternatives considered}
+\paragraph{Not splitting the \ttt{JobDatabase} into two parts} The splitting into dedicated databases is on one hand a matter of separation of concerns, but on the other hand brought on by other non-functional requirements (mainly \emph{P3}). This will be addressed further on.
+
+\subsubsection{Av2b: temporary storage of Personal Document Store documents}\label{march:av2b}
+The system should be able to temporarily store three hours of documents, should the Personal Document Store fail. Also, a maximally functional user interface that clearly indicates that the Personal Document Store is down should be presented to the user. To tackle the first of these requirements, we institute a \ttt{PDSCache} in the \ttt{DocumentStorageHandler} (which is a subcomponent of the \ttt{DocumentDB}, in turn). This cache is able to store the sufficient amount of document IDs so it can later on funnel documents from the \ttt{DocumentDB} to the \ttt{PDSDB}. To fulfil the second, the \ttt{LookupSubsystem} keeps pinging the \ttt{PDSDB}, answering any lookup queries with a message that the Personal Document Store is not available until the ping succeeds. See \ref{decomp:storage-sub} for more details.
+
+\subsubsection*{Alternatives considered}
+\paragraph{Store whole documents in cache instead of document IDs} When storing whole documents, the cache can easily flush all of its contents to the \ttt{PDSDB} faster, since no lookup in the \ttt{DocumentDB} is needed. The \ttt{DocumentDB} will also undergo less load when the \ttt{PDSDB} comes back online. The downside to this being a much larger cache and another layer of redundancy in document storage. It is also not crucial to reduce 
+the load on the \ttt{DocumentDB}, since it is not heavily used (only for download lookups and filling of the PDS).
+
+\subsubsection{Av3: Zoomit failure}\label{march:av3}
+\emph{Av3} specifies (1) that the system should be able to detect when an invoice is not accepted by Zoomit (2) that the system should retry several times before taking other measures (3) notify the eDocs administrators of this failure and (4) store at least two days of documents to be delivered via Zoomit. Inside the \ttt{DeliverySubsystem}, different delivery channels are introduced, one of which being the \ttt{ZoomitDeliveryChannel}. This \ttt{ZoomitDeliveryChannel} will contain a \ttt{ZoomitDeliveryHandler}, which ultimately interfaces with the Zoomit service. To handle (1) and (2), the \ttt{ZoomitDeliveryHandler} should be implemented appropriately. In order to fulfill (3), the \ttt{ZoomitDeliveryHandler} has access to notification facilities in the \ttt{CommunicationSubsystem}. To tackle (4), the \ttt{ZoomitDocumentLinkCache} is introduced that stores document IDs of documents to be delivered via Zoomit. When the \ttt{ZoomitDeliveryHandler} knows the Zoomit service is unreachable, it will thus store the document IDs of documents to deliver, and will later on look up the actual document when Zoomit is reachable again.
+
+\subsubsection*{Alternatives considered}
+\paragraph{Store whole documents in cache instead of document IDs} This makes the \ttt{DeliverySubsystem} less coupled to the \ttt{DocumentStorageSubsystem}. A large downside is that the cache will become a lot bigger, since two days' worth of documents need to be stored, also making for another (unnecessary) layer of document storage redudance.
+
+\subsubsection{P2: document lookups}\label{march:p2}
+The \ttt{LookupSubsystem} processes lookup requests for the system. When under a certain threshold of load, all lookup will be processed normally. PDS lookups will be routed to the \ttt{PDSDB} and download lookups to the \ttt{DocumentDB}. Two components, the \ttt{PDSLookupModule} and the \ttt{DownloadLookupModule} are introduced to handle these respective types of requests, and are directly contacted by the \ttt{UIFacade}. The \ttt{Databases} will directly respond to the user's session, so the \ttt{LookupSubsystem} does not need to process two-way traffic for lookups. This makes for less of a bottleneck and possibly a substantial performance gain. When receiving excessive requests, the \ttt{LookupSubsystem} should be able to throttle these. A \ttt{LoadBalancer} is introduced to this effect. The \ttt{LoadBalancer} receives information (e.g. via a management dashboard of an eDocs administrator) about the resources of the respective databases. When either of the \ttt{LookupModules} is instructed to perform a lookup, it first requests permission from the \ttt{LoadBalancer} before performing this lookup as not to put excessive load on the database. Possible effects of excessive load would be delay in storing generated documents etc.
+
+\subsubsection*{Alternatives considered}
+\paragraph{Merging/not separating the \ttt{LookupModules} and the \ttt{LoadBalancer}} An advantage of this is internal throttling in one single lookup component, so no permission to perform a lookup has to be requested. This makes for a performance gain since less indirection is introduced. However, this introduces the problem of one type of lookups affecting the other, thus possibly lowering performance for both lookup types when only one type is undergoing excessive requests.
+
+\paragraph{Supplying each \ttt{LookupModule} with its own \emph{internal} \ttt{LoadBalancer}}
+Each \ttt{LookupModule} could have its own throttling capability internally (cfr. the previous alternative, but retaining two separate \ttt{LookupModules}). This makes for a performance gain by eliminating indirection, but makes for storage of system specifications in two places. It is a very viable option though, on par with our proposed solution. The problem remains that there is a tradeoff in eventually still introducing this indirection between the lookup and throttling behaviour, or lowering the \ttt{LookupModules}' coherence.
+
+\subsubsection{P3: status overview for Customer Administrators}\label{march:p3}
+The \ttt{JobStorageSubsystem} is decomposed into a \ttt{JobContentsDatabase} and a \ttt{JobStatusDatabase} (the latter being important for this \emph{Requirement}), together with a \ttt{JobSubmitter} (for submitting new jobs to both databases) and a \ttt{JobInfoManager} (to query and edit, but not remove or add individual entries in both databases). All \ttt{Subsystems} concerned with document generation, storage and delivery, can access the \ttt{JobStatusDatabase} to update a job's status when desired. When asked for status lookups, the system will use this database to provide an overview, by directly querying and returning all job statuses for a certain Customer Organisation. This makes for a very efficient lookup procedure, since simple database lookups are inherently optimized. The use of a dedicated database also avoids performance loss by influences from other parts of the system, as specified in the \emph{Requirement}.
+
+\subsubsection*{Alternatives considered}
+\paragraph{Not splitting the two database} This makes for a more cost-efficient system, but less performant lookups due to the database containing extra information. This also makes the lookups compete with storing and retrieving raw data/meta-data for processing jobs.
+
+\subsubsection{M1: New type of document - bank statements}\label{march:m1}
 Describe the design choices related to \emph{ReqX} together with the rationale
 of why these choices where made.
 
@@ -52,7 +87,7 @@ of why these choices where made.
 \paragraph{Alternative(s) for choice 1} Explain what alternative(s) you
 considered for this design choice and why they where not selected.
 
-\subsubsection{Av1b: storing the status of an individual job}
+\subsubsection{M2: Multiple print \& postal services}\label{march:m2}
 Describe the design choices related to \emph{ReqX} together with the rationale
 of why these choices where made.
 
@@ -60,55 +95,7 @@ of why these choices where made.
 \paragraph{Alternative(s) for choice 1} Explain what alternative(s) you
 considered for this design choice and why they where not selected.
 
-\subsubsection{Av2b: temporary storage of Personal Document Store documents}
-Describe the design choices related to \emph{ReqX} together with the rationale
-of why these choices where made.
-
-\subsubsection*{Alternatives considered}
-\paragraph{Alternative(s) for choice 1} Explain what alternative(s) you
-considered for this design choice and why they where not selected.
-
-\subsubsection{Av3: Zoomit failure}
-Describe the design choices related to \emph{ReqX} together with the rationale
-of why these choices where made.
-
-\subsubsection*{Alternatives considered}
-\paragraph{Alternative(s) for choice 1} Explain what alternative(s) you
-considered for this design choice and why they where not selected.
-
-\subsubsection{P2: document lookups}
-Describe the design choices related to \emph{ReqX} together with the rationale
-of why these choices where made.
-
-\subsubsection*{Alternatives considered}
-\paragraph{Alternative(s) for choice 1} Explain what alternative(s) you
-considered for this design choice and why they where not selected.
-
-\subsubsection{P3: status overview for Customer Administrators}
-Describe the design choices related to \emph{ReqX} together with the rationale
-of why these choices where made.
-
-\subsubsection*{Alternatives considered}
-\paragraph{Alternative(s) for choice 1} Explain what alternative(s) you
-considered for this design choice and why they where not selected.
-
-\subsubsection{M1: New type of document - bank statements}
-Describe the design choices related to \emph{ReqX} together with the rationale
-of why these choices where made.
-
-\subsubsection*{Alternatives considered}
-\paragraph{Alternative(s) for choice 1} Explain what alternative(s) you
-considered for this design choice and why they where not selected.
-
-\subsubsection{M2: Multiple print \& postal services}
-Describe the design choices related to \emph{ReqX} together with the rationale
-of why these choices where made.
-
-\subsubsection*{Alternatives considered}
-\paragraph{Alternative(s) for choice 1} Explain what alternative(s) you
-considered for this design choice and why they where not selected.
-
-\subsubsection{M3: Dynamic selection of the cheapest of print \& postal services}
+\subsubsection{M3: Dynamic selection of the cheapest of print \& postal services}\label{march:m3}
 Describe the design choices related to \emph{ReqX} together with the rationale
 of why these choices where made.
 
