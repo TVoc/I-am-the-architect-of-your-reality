@@ -16,16 +16,16 @@ There are two other external communication mechanisms for document delivery, nam
 
 Figure \ref{fig:cs-primary} shows the primary component-and-connector diagram of the system. The presented overview divides the eDocs system into several subsystems, each with their dedicated functionalitie(s). The division are straightforward, and make for a less coupled system.\\
 The \ttt{SubmissionSubsystem} accepts \ttt{Raw data batches} from an external user or via the \ttt{UIFacade}. It verifies these \ttt{Batches} and then registers them for generation in the \ttt{JobStorageSubsystem} and the \ttt{DocumentGenerationSubsystem}.\\
-The \ttt{JobStorageSubsystem} \\
+The \ttt{JobStorageSubsystem} stores the statuses of document generation and delivery jobs. It records raw data for document generation until said document has been succesfully generated succesfully. The \ttt{Subsystem} can be queried for job statuses, e.g. by the administrator of a Customer Organisation. It is contacted by the different subsystems concerned with the lifecycle of a document in the system, to record and update the document's status e.g. Waiting for generation, generated, delivered etc.\\
 The \ttt{DocumentGenerationSubsystem} \\
-The \ttt{GeneratedDocumentHandler} \\
+The \ttt{GeneratedDocumentHandler} is a passthrough point for generated documents. This component is not an actual subsystem, but an important branching point in the internal document flow. The \ttt{GeneratedDocumentHandler} determines for a document exactly where it has to go (e.g. whether e-mail actually means e-mail or should go to the PDS), and submits the document with the specific addressing data to both the \ttt{DeliverySubsystem} and the \ttt{DocumentStorageSubsystem}. It also marks a document as generated in the \ttt{JobStorageSubsystem}.\\
 The \ttt{DocumentStorageSubsystem} \\
-The \ttt{DeliverySubsystem} \\
+The \ttt{DeliverySubsystem} performs the actual document delivery (or notification of a new document) to recipients. It manages all \ttt{Delivery Channels} and determines from the addressing data by the \ttt{GeneratedDocumentHandler} which \ttt{Channel} to use for delivery. It directly addresses the used external service for delivery (e.g. Zoomit, Print \& Postal Service), except in the case of email delivery. Composed delivery or notification e-mails are passed to and delivered by the \ttt{CommunicationSubsystem}.\\
 The \ttt{CommunicationSubsystem} \\
-The \ttt{UserManagementSubsystem} \\
+The \ttt{UserManagementSubsystem} stores all information regarding the different types of users and registered (non-authenticable) entities , which currently are: Recipients, Customer Administrators, actual Customer Organisations and eDocs Administrators. For the authenticable users, the \ttt{UserManagementSubsystem} provides authentication and authorization functionality, in turn supported by session logic in the \ttt{UIFacade}. The \ttt{Subsystem} provides functionality for the system to query info about Recipients, Customer organisations etc. and add or update this information (mostly by the eDocs administrator). Since the \ttt{UserManagementSubsystem} also governs whether a recipient is \emph{Registered} or not, the \ttt{Subsystem} notifies the \ttt{DocumentStorageSubsystem} to add or remove a recipient's documents in the PDS system.\\
 The \ttt{BillingSubsystem} \\
 The \ttt{LookupSubsystem} \\
-The \ttt{UIFacade} \\
+The \ttt{UIFacade} acts as an intermediary between all different kinds of user interfaces (a management dashboard, a Recipient PDS client etc.) and the system. The \ttt{UIFacade} passes all calls to the actual subsystems. It has a session infrastructure for user interface clients, so it is not one single bottleneck for all requests. The current different functionalities handled by the \ttt{UIFacade} are loging users in and out, registering new users, looking up job statuses and documents, submitting raw data through a dashboard and entering system information for load balancing in lookups.\\
 
 \begin{figure}[!htp]
     \centering
