@@ -17,14 +17,14 @@ There are two other external communication mechanisms for document delivery, nam
 Figure \ref{fig:cs-primary} shows the primary component-and-connector diagram of the system. The presented overview divides the eDocs system into several subsystems, each with their dedicated functionalitie(s). The division are straightforward, and make for a less coupled system.\\
 The \ttt{SubmissionSubsystem} accepts \ttt{Raw data batches} from an external user or via the \ttt{UIFacade}. It verifies these \ttt{Batches} and then registers them for generation in the \ttt{JobStorageSubsystem} and the \ttt{DocumentGenerationSubsystem}.\\
 The \ttt{JobStorageSubsystem} stores the statuses of document generation and delivery jobs. It records raw data for document generation until said document has been succesfully generated succesfully. The \ttt{Subsystem} can be queried for job statuses, e.g. by the administrator of a Customer Organisation. It is contacted by the different subsystems concerned with the lifecycle of a document in the system, to record and update the document's status e.g. Waiting for generation, generated, delivered etc.\\
-The \ttt{DocumentGenerationSubsystem} \\
+The \ttt{DocumentGenerationSubsystem} generates documents from submitted batches and applies scheduling based on deadlines of jobs. This generation consists of fetching the template for the document type of the document currently being generated, filling out the fields and any special steps befitting the document type (e.g. signing invoices). When finished, it hands the document to the \ttt{GeneratedDocumentHandler} for storage and delivery.\\
 The \ttt{GeneratedDocumentHandler} is a passthrough point for generated documents. This component is not an actual subsystem, but an important branching point in the internal document flow. The \ttt{GeneratedDocumentHandler} determines for a document exactly where it has to go (e.g. whether e-mail actually means e-mail or should go to the PDS), and submits the document with the specific addressing data to both the \ttt{DeliverySubsystem} and the \ttt{DocumentStorageSubsystem}. It also marks a document as generated in the \ttt{JobStorageSubsystem}.\\
-The \ttt{DocumentStorageSubsystem} \\
+The \ttt{DocumentStorageSubsystem} is dedicated to the storage of documents. It has a database for \ttt{Personal Document Store} documents and a database for all documents; this means that the set of documents stored in the former is a subset of the set of documents stored in the latter. It also has an intermediary that makes constructing the \ttt{Personal Document Store} for newly registered Recipients more convenient on the one hand and an intermediary that contains a cache for documents to be stored in the \ttt{Personal Document Store} in case that database fails on the other.\\
 The \ttt{DeliverySubsystem} performs the actual document delivery (or notification of a new document) to recipients. It manages all \ttt{Delivery Channels} and determines from the addressing data by the \ttt{GeneratedDocumentHandler} which \ttt{Channel} to use for delivery. It directly addresses the used external service for delivery (e.g. Zoomit, Print \& Postal Service), except in the case of email delivery. Composed delivery or notification e-mails are passed to and delivered by the \ttt{CommunicationSubsystem}.\\
-The \ttt{CommunicationSubsystem} \\
+The \ttt{CommunicationSubsystem} handles outbound communication. There is a channel for notifications due to internal systems failure and a channel for all other communication. Due to the requirement that eDocs administrators be notified of any kind of failure within one minute (see \emph{Av1} and \emph{Av2}), the error channel can temporarily suppress the other communication to ensure that error notifications get to their destination on time.\\
 The \ttt{UserManagementSubsystem} stores all information regarding the different types of users and registered (non-authenticable) entities , which currently are: Recipients, Customer Administrators, actual Customer Organisations and eDocs Administrators. For the authenticable users, the \ttt{UserManagementSubsystem} provides authentication and authorization functionality, in turn supported by session logic in the \ttt{UIFacade}. The \ttt{Subsystem} provides functionality for the system to query info about Recipients, Customer organisations etc. and add or update this information (mostly by the eDocs administrator). Since the \ttt{UserManagementSubsystem} also governs whether a recipient is \emph{Registered} or not, the \ttt{Subsystem} notifies the \ttt{DocumentStorageSubsystem} to add or remove a recipient's documents in the PDS system.\\
-The \ttt{BillingSubsystem} \\
-The \ttt{LookupSubsystem} \\
+The \ttt{BillingSubsystem} makes it possible to log any transaction consisting of document generation bills and document delivery bills, such that an invoice can be automatically sent to Customer Organizations for all activities performed on their behalf in a certain period. That period can be each month, each week or any other period length, whichever the financial department of eDocs deems most appropriate.\\
+The \ttt{LookupSubsystem} processes requests for document lookups. It can handle requests where either a download link, a \ttt{JobID} or a search query is provided. In order to handle download links, there is a \ttt{LookupLinkCodec}, which can encode and decode downloads links (and also links specified to the \ttt{Personal Document Store}) and a \ttt{DownloadLinkCatalogue} where download links are stored for 30 days. If a Registered Recipient issues a query for the \ttt{Personal Document Store}, the \ttt{PDSLookupModule} handles that. To enable to system to throttle lookup requests (see \emph{P2}), there is a \ttt{LoadBalancer} which has to explicitly approve each lookup before it can be executed.\\
 The \ttt{UIFacade} acts as an intermediary between all different kinds of user interfaces (a management dashboard, a Recipient PDS client etc.) and the system. The \ttt{UIFacade} passes all calls to the actual subsystems. It has a session infrastructure for user interface clients, so it is not one single bottleneck for all requests. The current different functionalities handled by the \ttt{UIFacade} are loging users in and out, registering new users, looking up job statuses and documents, submitting raw data through a dashboard and entering system information for load balancing in lookups.\\
 
 \begin{figure}[!htp]
@@ -44,7 +44,71 @@ Imagine you had to describe how the architecture supports the core
 functionality to someone that is looking at the client-server view only.
 Hide unnecessary details (these should be shown in the decomposition view).
 
-\subsubsection{ReqX\@: requirement name}
+\subsubsection{Av1a and Av2a: notification of the eDocs Administrator}
+Describe the design choices related to \emph{ReqX} together with the rationale
+of why these choices where made.
+
+\subsubsection*{Alternatives considered}
+\paragraph{Alternative(s) for choice 1} Explain what alternative(s) you
+considered for this design choice and why they where not selected.
+
+\subsubsection{Av1b: storing the status of an individual job}
+Describe the design choices related to \emph{ReqX} together with the rationale
+of why these choices where made.
+
+\subsubsection*{Alternatives considered}
+\paragraph{Alternative(s) for choice 1} Explain what alternative(s) you
+considered for this design choice and why they where not selected.
+
+\subsubsection{Av2b: temporary storage of Personal Document Store documents}
+Describe the design choices related to \emph{ReqX} together with the rationale
+of why these choices where made.
+
+\subsubsection*{Alternatives considered}
+\paragraph{Alternative(s) for choice 1} Explain what alternative(s) you
+considered for this design choice and why they where not selected.
+
+\subsubsection{Av3: Zoomit failure}
+Describe the design choices related to \emph{ReqX} together with the rationale
+of why these choices where made.
+
+\subsubsection*{Alternatives considered}
+\paragraph{Alternative(s) for choice 1} Explain what alternative(s) you
+considered for this design choice and why they where not selected.
+
+\subsubsection{P2: document lookups}
+Describe the design choices related to \emph{ReqX} together with the rationale
+of why these choices where made.
+
+\subsubsection*{Alternatives considered}
+\paragraph{Alternative(s) for choice 1} Explain what alternative(s) you
+considered for this design choice and why they where not selected.
+
+\subsubsection{P3: status overview for Customer Administrators}
+Describe the design choices related to \emph{ReqX} together with the rationale
+of why these choices where made.
+
+\subsubsection*{Alternatives considered}
+\paragraph{Alternative(s) for choice 1} Explain what alternative(s) you
+considered for this design choice and why they where not selected.
+
+\subsubsection{M1: New type of document - bank statements}
+Describe the design choices related to \emph{ReqX} together with the rationale
+of why these choices where made.
+
+\subsubsection*{Alternatives considered}
+\paragraph{Alternative(s) for choice 1} Explain what alternative(s) you
+considered for this design choice and why they where not selected.
+
+\subsubsection{M2: Multiple print \& postal services}
+Describe the design choices related to \emph{ReqX} together with the rationale
+of why these choices where made.
+
+\subsubsection*{Alternatives considered}
+\paragraph{Alternative(s) for choice 1} Explain what alternative(s) you
+considered for this design choice and why they where not selected.
+
+\subsubsection{M3: Dynamic selection of the cheapest of print \& postal services}
 Describe the design choices related to \emph{ReqX} together with the rationale
 of why these choices where made.
 

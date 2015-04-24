@@ -8,3 +8,4 @@ Remarks:
 -NotificationEmailHandler offers raw email submission or email template submission, where it looks up the COAdmin address for you
 -JobID and DocID are identical, and are in the form of COID-COJobID
 -Document delivery and storage via FinalizeDocument should be idempotent
+-Remove active replication from JobStatusDatabase
