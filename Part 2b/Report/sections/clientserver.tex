@@ -88,17 +88,7 @@ of why these choices where made.
 considered for this design choice and why they where not selected.
 
 \subsubsection{M2: Multiple print \& postal services}\label{march:m2}
-Describe the design choices related to \emph{ReqX} together with the rationale
-of why these choices where made.
-
-\subsubsection*{Alternatives considered}
-\paragraph{Alternative(s) for choice 1} Explain what alternative(s) you
-considered for this design choice and why they where not selected.
+Any changes to be made to how the system handles delivery to print \& postal services have been isolated thus: there is a \ttt{DeliverySubsystem} which is responsible for delivering documents and has a \ttt{PostalDeliveryChannel}, in turn. In order to support multiple print \& postal services, the \ttt{PostalDeliveryChannel} can be equipped with a database that contains every print \& postal service that has partnered with eDocs and any relevant data (e.g. offices and their addresses, price, ...). This way, the \ttt{PostalDeliveryChannel} may, for example, randomly select a print \& postal service to deliver a document to (and try another one if that service does not respond). It is also possible for a document's meta-data to specify the desired print \& postal service, with a default if no such service has been specified.
 
 \subsubsection{M3: Dynamic selection of the cheapest of print \& postal services}\label{march:m3}
-Describe the design choices related to \emph{ReqX} together with the rationale
-of why these choices where made.
-
-\subsubsection*{Alternatives considered}
-\paragraph{Alternative(s) for choice 1} Explain what alternative(s) you
-considered for this design choice and why they where not selected.
+The solution specified in section \ref{march:m2} is also highly relevant to \emph{M3}. In addition to the database named in section \ref{march:m2}, the \ttt{PostalDeliveryChannel} should also have a component that receives information from print \& postal services (such as capacity and price per day), upon which the database is updated. In order to support buying printing capacity, there can also be an additional component in the \ttt{PostalDeliveryChannel} which queries the \ttt{UserManagementSubsystem} for details about any recurring batches imminent on that day and chooses to buy printing capacity at a print \& postal service based on information about the batch and the Customer Organization. For example, a print \& postal service may be chosen based on geographical proximity of its office to the Customer Organization's corporate headquarters and the prices the print \& postal service offers that day. This may result in suboptimal choices in some cases, however it is difficult to predict who the recipient of a document in a batch will be (except if a Customer Organization supplies information about the employees it currently employs, in which case a better solution is available for payslips; however, it would most likely be illegal for eDocs to store such information). For documents in non-recurring batches, the \ttt{PostalDeliveryChannel} can dynamically choose which print \& postal service to use, again based on geographical proximity to the recipient and the prices the service offers that day.
