@@ -80,12 +80,7 @@ The \ttt{JobStorageSubsystem} is decomposed into a \ttt{JobContentsDatabase} and
 \paragraph{Not splitting the two database} This makes for a more cost-efficient system, but less performant lookups due to the database containing extra information. This also makes the lookups compete with storing and retrieving raw data/meta-data for processing jobs.
 
 \subsubsection{M1: New type of document - bank statements}\label{march:m1}
-Describe the design choices related to \emph{ReqX} together with the rationale
-of why these choices where made.
-
-\subsubsection*{Alternatives considered}
-\paragraph{Alternative(s) for choice 1} Explain what alternative(s) you
-considered for this design choice and why they where not selected.
+As stated in the requirement, a new type of document has impact on (1) the submission of raw data, (2) company registration, (3) template behaviour, (4) generation of a document and (5) consulting the PDS. Otherwise, storing documents should not change, but our decomposition and interfaces of the \ttt{DocumentStorageSubsystem} makes the type of a document irrelevant, thus requiring no modifications. To accomodate (1) and (2), document types in the system should simply be represented by a String or Enumeration type, with possibility to simply add a value and check if a type actually exists. This is pure implementation. For easier fulfillment of (3), we introduced a \ttt{TemplateDatabase} in the \ttt{UserManagementSubsystem}. This allows for a localized addition of a document type template and template checking. Consequently, (4) should be taken into account when implementing the \ttt{Generator}s as to make the handling of templates as flexible as possible, so a new template (for a new type) is trivially supported. This allows our architecture to handle this \emph{Modifiability Scenario}.
 
 \subsubsection{M2: Multiple print \& postal services}\label{march:m2}
 Describe the design choices related to \emph{ReqX} together with the rationale
