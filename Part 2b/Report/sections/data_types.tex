@@ -17,7 +17,7 @@ them alphabetically for ease of navigation.
 	\item \texttt{BatchMetaData}: Contains information such as the CustomerOrganizationID, the document type of the batch, when it was received and which recurring batch it is (if applicable).
 	\item \texttt{CustomerOrganizationID}: Corresponds to a certain Customer Organization. Concretely, the Customer Organization's name serves as identifier.
 	\item \texttt{Document}: Represents a generated document
-	\item \texttt{DocumentMetaData}: Stored with the corresponding Document in the document database. Includes the JobID, the name of the Customer Organization, the time when it was received and the type of the document.
+	\item \texttt{DocumentMetaData}: Stored with the corresponding Document in the document database. Includes the JobID, the name of the Customer Organization, the time when it was received and the type of the document and details relevant to delivery (e.g. delivery method and Recipient address).
 	\item \texttt{DocumentQueryParameter}: Contains the query parameters of a lookup in the Personal Document Store database, such as type of document, (partially specified) name of the Customer Organization that sent it and date range. The RecipientID of the Recipient is always present.
 	\item \texttt{DownloadLink}: Encoded link which decodes to a JobID.
 	\item \texttt{GenerationErrorReport}: Contains information about the document for which generation failed (e.g. CustomerOrganizationID) and the reason for the error.
