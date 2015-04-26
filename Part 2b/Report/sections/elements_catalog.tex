@@ -72,9 +72,9 @@ In this section, we provide an alphabetically ordered catalog of all components 
 			\item Exceptions: None
 		\end{itemize}
 		
-		\item \texttt{Tuple<Document, DocumentMetaData> fetchDocument(JobID docID) throws NoSuchDocumentException}
+		\item \texttt{Document fetchDocument(JobID docID) throws NoSuchDocumentException}
 		\begin{itemize}
-			\item Effect: Fetches the Document matching \ttt{docID} and returns it together with its meta-data.
+			\item Effect: Fetches the Document matching \ttt{docID} and returns it.
 			\item Exceptions: 
 			\begin{itemize}
 				\item NoSuchDocumentException: there is no document matching \ttt{docID}.
@@ -140,9 +140,9 @@ In this section, we provide an alphabetically ordered catalog of all components 
 			\item Exceptions: None
 		\end{itemize}
 		
-		\item \texttt{Tuple<Document, DocumentMetaData> fetchDocument(JobID docID) throws NoSuchDocumentException}
+		\item \texttt{Document fetchDocument(JobID docID) throws NoSuchDocumentException}
 		\begin{itemize}
-			\item Effect: Fetches the Document matching \ttt{docID} from the database and returns it together with its meta-data.
+			\item Effect: Fetches the Document matching \ttt{docID} from the database and returns it.
 			\item Exceptions: 
 			\begin{itemize}
 				\item NoSuchDocumentException: there is no document matching \ttt{docID}.
