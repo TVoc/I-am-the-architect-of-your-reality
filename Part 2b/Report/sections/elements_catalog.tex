@@ -99,7 +99,7 @@ In this section, we provide an alphabetically ordered catalog of all components 
 \begin{itemize}
     \item \textbf{Description:} Receives documents to be stored and stores them in \ttt{DocumentDB} and also in \ttt{PDSDB}, if directed to.
     \item \textbf{Super-component:} \ttt{DocumentStorageSubsystem}.
-    \item \textbf{Sub-components:} None.
+    \item \textbf{Sub-components:} \ttt{GeneratedDocumentManager}, \ttt{PDSCache} \todo{add these to element catalog}.
 \end{itemize}
 
 \subsubsection*{Provided interfaces}
@@ -121,13 +121,34 @@ In this section, we provide an alphabetically ordered catalog of all components 
 			\end{itemize}
 		\end{itemize}
 	\end{itemize}
+
+	\item PDSContentManagement
+	\begin{itemize}
+		\item \texttt{void fillPDSWithDocumentsOf(RecipientID recipient) throws NoSuchRecipientException}
+		\begin{itemize}
+			\item Effect: Fetches all documents addressed to the specified Recipient and stores them in the Personal Document Store database.
+			\item Exceptions:
+			\begin{itemize}
+				\item NoSuchRecipientException: There are no documents stored in the document storage that are addressed to the specified Recipient.
+			\end{itemize}
+		\end{itemize}
+				
+		\item \texttt{void purgePDSOfDocumentsOf(RecipientID recipient) throws NoSuchRecipientException}
+		\begin{itemize}
+			\item Effect: Removes all documents addressed to the specified Recipient from the Personal Document Store database.
+			\item Exceptions:
+			\begin{itemize}
+				\item NoSuchRecipientException: There are no documents stored in the Personal Document Store database that are addressed to the specified Recipient.
+			\end{itemize}
+		\end{itemize}
+	\end{itemize}
 \end{itemize}
 
 \subsection{DocumentStorageSubsystem}
 \begin{itemize}
 	\item \textbf{Description:} Responsible for storing documents and answering lookup queries.
 	\item \textbf{Super-component:} None.
-	\item \textbf{Sub-components:} \ttt{DocumentDB}, \ttt{DocumentStorageHandler}, \ttt{PDSContentManager}, \ttt{PDSDB}.
+	\item \textbf{Sub-components:} \ttt{DocumentDB}, \ttt{DocumentStorageHandler}, \ttt{PDSDB}.
 \end{itemize}
 
 \subsubsection*{Provided interfaces}
@@ -227,37 +248,6 @@ In this section, we provide an alphabetically ordered catalog of all components 
 		\begin{itemize}
 			\item Effect: Generates \ttt{RawDataEntry} and \ttt{JobID} objects from each individual entry in \ttt{dataBatch}. Additionally, generates \ttt{BatchMetaData} and \ttt{BatchID} objects and associates each \ttt{RawDataEntry} with that \ttt{BatchID} by generating a \ttt{Job} object from the \ttt{JobID}, \ttt{RawDataEntry} and \ttt{BatchID}. After this is completed, submits all generated \ttt{Job} objects and the \ttt{BatchMetaData} to the \ttt{JobStorageSubsystem}
 			\item Exceptions: None
-		\end{itemize}
-	\end{itemize}
-\end{itemize}
-
-\subsection{PDSContentManager}
-\begin{itemize}
-    \item \textbf{Description:} Responsible for filling up the Personal Document Store and emptying the Personal Document Store when a Recipient registers and unregisters, respectively.
-    \item \textbf{Super-component:} \ttt{DocumentStorageSubsystem}.
-    \item \textbf{Sub-components:} None.
-\end{itemize}
-
-\subsubsection*{Provided interfaces}
-\begin{itemize}
-    \item PDSContentManagement
-	\begin{itemize}
-		\item \texttt{void fillPDSWithDocumentsOf(RecipientID recipient) throws NoSuchRecipientException}
-		\begin{itemize}
-			\item Effect: Fetches all documents addressed to the specified Recipient and stores them in the Personal Document Store database.
-			\item Exceptions:
-			\begin{itemize}
-				\item NoSuchRecipientException: There are no documents stored in the document storage that are addressed to the specified Recipient.
-			\end{itemize}
-		\end{itemize}
-				
-		\item \texttt{void purgePDSOfDocumentsOf(RecipientID recipient) throws NoSuchRecipientException}
-		\begin{itemize}
-			\item Effect: Removes all documents addressed to the specified Recipient from the Personal Document Store database.
-			\item Exceptions:
-			\begin{itemize}
-				\item NoSuchRecipientException: There are no documents stored in the Personal Document Store database that are addressed to the specified Recipient.
-			\end{itemize}
 		\end{itemize}
 	\end{itemize}
 \end{itemize}
@@ -584,4 +574,42 @@ In this section, we provide an alphabetically ordered catalog of all components 
     		\end{itemize}
     	\end{itemize}
     \end{itemize}
+
+\subsection{ZoomitDeliveryHandler}
+\begin{itemize}
+    \item \textbf{Description:} Responsibilities of the component.
+    \item \textbf{Super-component:} The direct super-component, if any.
+    \item \textbf{Sub-components:} the direct sub-components, if any.
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+    \item ZoomitDocumentDelivery
+    \begin{itemize}
+        \item \texttt{void checkServiceAvailability(ParamType param) throws SomeException}
+        \begin{itemize}
+            \item Effect: Describe the effect of the operation
+            \item Exceptions:
+            \begin{itemize}
+                \item SomeException: Describe when the exception is thrown.
+            \end{itemize}
+        \end{itemize}
+
+        \item \texttt{void operation2(ParamType2 param)}
+		    \begin{itemize}
+                \item Effect: Describe the effect of the operation
+                \item Exceptions: None
+            \end{itemize}
+    \end{itemize}
+
+    \item InterfaceB
+    \begin{itemize}
+        \item \texttt{returntType2 operation3()}
+        \begin{itemize}
+            \item Effect: Describe the effect of the operation
+            \item Exceptions: None
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
 \end{itemize}
