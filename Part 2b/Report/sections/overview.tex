@@ -17,21 +17,21 @@ A general \texttt{JobStorageSubsystem} is introduced to the system, to store amo
     
 \paragraph{P2: document lookups}
 For handling Document Lookups in a timely fashion, a \texttt{LookupSubsystem} has been introduced to the system. This \texttt{Subsystem} handles both PDS and Download lookups, monitoring the amount of requests for both sides. When one side is in danger performance-wise because of the other, the \texttt{Subsystem} will throttle the overactive side, so the system keeps performing as expected for both Download and PDS lookups. Enough redundancy in the form of \emph{active replication} is provided in the \texttt{StorageSubsystem} such that lookups and storage of generated documents can be executed simultaneously without having a large impact upon one another. For more details, we refer to section \ref{march:p2}.\\
-\emph{Employed tactics and patterns: Active replication, Manage event rate}
+\emph{Employed tactics and patterns: Active replication, Manage event rate, Sharding of databases}
     
 \paragraph{P3: status overview for Customer Administrators} \emph{P3} specifies that Customer Administrators should be able to retrieve the status of all documents in a timely fashion. Furthermore, retrieval of this status should have as low an impact as possible on the rest of the system. In view of this, the \texttt{JobStorageSubsystem} contains a dedicated database for storing and querying job statuses. \emph{P3} requires that the resulting view be consistent up to one minute ago. A dedicated database, kept up to date by all necessary parts of the system fulfills this requirement, since no delay is present. For more details, we refer to section \ref{march:p3}.\\
 \emph{Employed tactics and patterns: Increase available resources, active replication.}
     
 \paragraph{M1: New type of document - bank statements} \emph{M1} requires that the addition of bank statements as new document type to the system be as convenient as possible. The most important consideration is that the system should support specifying new templates for the new document type, since generation consists of filling out the fields contained in the template. In other parts of the system, we ensured that behaviour is not coupled too tightly to the type of a specific document. For more details, we refer to section \ref{march:m1}.\\
-\emph{Employed tactics and patterns: Hide information, generalize module.}
+\emph{Employed tactics and patterns: Hide information, Use an Intermediary, Abstract common services}
     
 \paragraph{M2: Multiple print \& postal services} 
-In the \texttt{DeliverySubsystem}, the different delivery channels are viewed as black boxes for delivery. They manage their own delivery, billing and job status management where necessary. The delivery channel for postal delivery is the only part of the system to be modified for this requirement. The delivery channel could have a set of possible PPS companies of which to select the desired one. The selection of the desired company could be an extra field in the delivery metadata, while no extra information warrants the default PPS company. For more details, we refer to section \ref{march:m2}.\\
-\emph{Employed tactics and patterns: Maintain existing interface, Abstract common services}
+In the \texttt{DeliverySubsystem}, the different delivery channels are viewed as black boxes for delivery, and are governed by a distributor component. They manage their own delivery, billing and job status management where necessary. The delivery channel for postal delivery is the only part of the system to be modified for this requirement. The delivery channel could have a set of possible PPS companies of which to select the desired one. The selection of the desired company could be an extra field in the delivery metadata, while no extra information warrants the default PPS company. For more details, we refer to section \ref{march:m2}.\\
+\emph{Employed tactics and patterns: Hide Information, Use an Intermediary, Abstract common services}
     
 \paragraph{M3: Dynamic selection of the cheapest of print \& postal services}
 Cfr. \emph{M2}, the postal delivery channel can be modified without changing the rest of the system. This delivery channel can then internally analyse the cost for the delivery of a document, based on the delivery address and set of PPS companies available. For more details, we refer to section \ref{march:m3}.\\
-\emph{Employed tactics and patterns: Abstract common services}
+\emph{Employed tactics and patterns: Hide Information, Use an Intermediary, Abstract common services}
 
 \subsection{Discussion}
 The proposed architecture is quite robust in the imposed specifications, both functional and non-functional. Requirements with high priorities are tackled in a more detailed way, but all requirements have been addressed in the proposed architecture. There are still some abstractions made, e.g. the internal workings of the \texttt{RawDataVerifier} or the \texttt{AuthenticationManager}. Extra attention should be paid to these components at implementation time.\\
