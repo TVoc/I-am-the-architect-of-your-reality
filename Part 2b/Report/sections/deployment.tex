@@ -13,13 +13,11 @@ The \ttt{DeliveryChannels} send documents to their respective services over the 
 Nodes from the \ttt{CommunicationSubsystem} use SMTP to send e-mails via the \ttt{E-mailSubmissionSystem}, and the \ttt{ExternalNotificationAcceptor} also receives messages over SMTP from e.g. Zoomit or the e-mail provider (in case of failures, deliveries...).\\
 The \ttt{BillingSubsystem} interfaces with an external billing system of the eDocs company through a general (FTP,SCP...) protocol to process billing to Customer Organisations.
 
-\begin{figure}[!htp]
+\begin{sidewaysfigure}[!htp]
     \centering
-    %\includegraphics[width=\textwidth]{}
-    \missingfigure[figwidth=0.8\textwidth]{Primary diagram for the deployment
-        view.}
+    \includegraphics[width=0.9\textwidth]{figures/Deployment.png}
     \caption{Primary diagram for the deployment view.}\label{fig:depl_primary}
-\end{figure}
+\end{sidewaysfigure}
 
 
 Figure \ref{fig:depl_primary}. The primary deployment diagram itself and accompanying explanation.
