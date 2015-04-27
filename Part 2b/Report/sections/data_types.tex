@@ -4,7 +4,6 @@ them alphabetically for ease of navigation.
 
 \begin{itemize}
 	\item \texttt{AuthToken}: Authorises any automated system of a Customer Organization or Social Secretary to submit batches of raw data/meta-data on the Customer Organization's behalf.
-	\item \texttt{DeliveryMetaData}: Contains the delivery channel, recipient address and other required delivery information (e.g. Customer Organization name, whether receipt tracking applies and whether it is from a recurring batch) for an individual document.
 	\item \texttt{BatchDetails}: Encapsulates details about the batch a Customer Organization intends to upload. Examples of such details are:
 	\begin{itemize}
 		\item Type of documents contained in the batch
@@ -15,7 +14,11 @@ them alphabetically for ease of navigation.
 	\end{itemize}
 	\item \texttt{BatchID}: Corresponds to a RawDataBatch
 	\item \texttt{BatchMetaData}: Contains information such as the CustomerOrganizationID, the document type of the batch, when it was received and which recurring batch it is (if applicable).
+	\item \ttt{DeliveryAddress}: The address to which a Document should be delivered.
+	\item \ttt{CapabilityReport}: Contains information about current processing power available to the document databases upon which decisions about load balancing may be based.
 	\item \texttt{CustomerOrganizationID}: Corresponds to a certain Customer Organization. Concretely, the Customer Organization's name serves as identifier.
+	\item \texttt{DeliveryMetaData}: Contains the delivery channel, recipient address and other required delivery information (e.g. Customer Organization name, whether receipt tracking applies and whether it is from a recurring batch) for an individual document.
+	\item \ttt{DeliveryMethod}: Enumeration of the available delivery methods (i.e. one of EMAIL\_DELIVERY, POSTAL\_DELIVERY or ZOOMIT\_DELIVERY)
 	\item \texttt{Document}: Represents a generated document
 	\item \texttt{DocumentMetaData}: Stored with the corresponding Document in the document database. Includes the JobID, the name of the Customer Organization, the time when it was received and the type of the document and details relevant to delivery (e.g. delivery method and Recipient address).
 	\item \texttt{DocumentQueryParameter}: Contains the query parameters of a lookup in the Personal Document Store database, such as type of document, (partially specified) name of the Customer Organization that sent it and date range. The RecipientID of the Recipient is always present.
