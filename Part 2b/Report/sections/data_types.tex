@@ -30,8 +30,9 @@ them alphabetically for ease of navigation.
     \item \texttt{LoginCredentials}: Used when the user wants to log in. Contains the username, password, function the user wants to log in as and general info about the user attempting the login (e.g. IP address).
     \item \texttt{LoginToken}: Depending on the type of user, authorises the user to perform certain actions within the system.
     \item \texttt{PDSLookupLink}: Encoded link which decodes to a JobID and RecipientID.
+	\item \texttt{PrintParameterObject}: Encapsulates details in the SLA negotiated with a Customer Organization about printing documents, e.g. paper type, whether they should be printed single-sided or double-sided.
     \item \texttt{RawDataBatch}: Contains several entries of raw data as supplied by the user, an indication whether it concerns a recurring batch and an indication if it contains corrections of entries in an earlier submitted recurring batch (and from which month). 
-    \item \texttt{RawDataEntry}: Contains all raw data and meta data necessary such that a document can be generated.
+    \item \texttt{RawDataEntry}: Contains all raw data necessary such that a document can be generated and also the corresponding \ttt{RawDataMetaData}.
     \item \texttt{RawDataMetaData}: Contains information such as the identifier of the raw data unique within the Customer Organization, the selected delivery channel, the name of the addressee and the address of the addressee (the form of which depends on the selected delivery channel).
     \item \texttt{RecipientID}: Corresponds to a Registered Recipient. Concretely, it matches the Registered Recipient's e-mail address.
     \item \texttt{RegistrationDetails}: Contains details that can be used to register a Recipient such as first name, last name, e-mail address and postal address.
