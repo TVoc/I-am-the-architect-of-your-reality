@@ -3,3 +3,10 @@
 -add scenarios to file
 -write small note for scenarios
 -Write ALL INTERFACES and meanwhile complete the data types
+
+check:
+-ErrorDeliveryHandler:receiptConfirmation
+-GenDocMan -> ErrorSignaling, is interface correct?
+-zoomitcache: exponential backoff
+-SomeException
+-Notify co admin of zoomit failure?
