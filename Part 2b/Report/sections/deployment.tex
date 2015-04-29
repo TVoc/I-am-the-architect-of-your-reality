@@ -20,7 +20,15 @@ The \ttt{BillingSubsystem} interfaces with an external billing system of the eDo
 \end{sidewaysfigure}
 
 
-Figure \ref{fig:depl_primary}. The primary deployment diagram itself and accompanying explanation.
-Pay attention to the parts of the deployment diagram which are crucial for
-achieving certain non-functional requirements.
-Also discuss any alternative deployments that you considered.
+Figure \ref{fig:depl_primary} presents the primary deployment of the internal architecture. All components for which no special deployment requirements were found are deployed on a general \ttt{OtherFunctionalityNode}.\\
+The \ttt{Generator}s are deployed on dedicated \ttt{GeneratorNode}s as given. These connect to the \ttt{GeneratedDocumentHandler}, deployed on its own dedicated node. The reason for this being that this \ttt{Handler} can be a bottleneck in the system, since all generated documents pass through it. This way, a powerful node can be instated for this function, so it does not slow down the finalisation of documents by the \ttt{Generator}s (\emph{P1}).\\
+The \ttt{GeneratedDocumentHandlerNode} connects back to the \ttt{OtherFunctionalityNode} for delivery purposes, but the \ttt{DocumentStorageHandler} component on it also connects to both \ttt{DBManagerNode}s for storage purposes. This \ttt{DocumentStorageHandler} is hosted on the same node as the \ttt{GeneratedDocumentHandler} to lower the layers of indirection and boost performance.\\
+The setup of the \ttt{PDSDB} nodes is the same as initially given, with the \ttt{PDSDBManagerNode} connecting to the \ttt{OtherFunctionalityNode} for various purposes, e.g. reporting \ttt{PDSDBReplica} failures, receive notice that stored documents should be moved to the \ttt{PDSDBReplicaDeliveredNode} etc.
+Analogous to the \ttt{PDSDB}, the \ttt{DocumentDB} is deployed as a \ttt{DocumentDBManagerNode} and multiple \ttt{DocumentDBReplicaNode}s. This setup conforms to the active replication we set up for \emph{Av2} (e.g. filling the \ttt{PDSDB} after coming back online warrants a decent replication of the \ttt{DocumentDB}), but most importantly for performance sake by the use of sharding, for e.g. the aforementioned filling of the pds, while also storing new documents and simultaneously serving lookup requests (\emph{P2}).\\
+Likewise, the components of the \ttt{LookupSubsystem} are deployed on their own respective nodes to suit \emph{P2} and connect to the necessary nodes for lookup.\\
+The \ttt{JobStatusDatabase} is deployed on its own node for \emph{P3}, being the single important component for this requirement.\\
+The \ttt{ErrorEmailDeliveryHandler} is also deployed individually, playing a crucial role in \emph{Av1a} and \emph{Av2a}.
+
+\subsection*{Alternatives Considered}
+
+%TODO Write alternatives
