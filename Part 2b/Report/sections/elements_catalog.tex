@@ -1,6 +1,146 @@
 \section{Element catalog}\label{app:catalog}\todo{write external interfaces}
 In this section, we provide an alphabetically ordered catalog of all components and the interfaces they offer.
 
+\subsection{AuthenticableUserManager}
+\begin{itemize}
+    \item \textbf{Description:} Responsible for storing the details of all Customer Administrators, Registered Recipients and eDocs Administrators. Also verifies login details and stores login tokens.
+    \item \textbf{Super-component:} \ttt{UserManagementSubsystem}.
+    \item \textbf{Sub-components:} \ttt{AuthenticationManager}, \ttt{COAdminDatabase}, \ttt{eDocsAdminDatabase}, \ttt{RegisteredRecipientDatabase}, \ttt{UserInfoEditor}.
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+	\item COAdminInfoManagement
+    \begin{itemize}
+		\item \texttt{void verifyComplete(List<CustomerAdministratorRegistrationDetails> details) throws IncompleteDetailsException}
+        \begin{itemize}
+            \item Effect: Verifies whether all entries in \ttt{details} are complete.
+            \item Exceptions:
+            \begin{itemize}
+                \item IncompleteDetailsException: Some details are missing (e-mail address, password, document type). It is indicated which entries in \ttt{details} are incomplete.
+            \end{itemize}
+        \end{itemize}
+
+        \item \texttt{void verifyNotExists(List<CustomerAdministratorRegistrationDetails> details) throws AlreadyExistsException}
+        \begin{itemize}
+            \item Effect: Verifies whether any entry in \ttt{details} conflicts with Customer Administrators that already exist.
+            \item Exceptions:
+            \begin{itemize}
+                \item AlreadyExistsException: Some entries in \ttt{details} correspond with Customer Administrators that already exist. It is indicated which entries conflict.
+            \end{itemize}
+        \end{itemize}
+
+        \item \texttt{void registerAdministrators(List<CustomerAdministratorRegistrationDetails> details)}
+        \begin{itemize}
+            \item Effect: Registers all Customer Administrators with corresponding details found in \ttt{details}.
+            \item Exceptions: None
+        \end{itemize}
+
+		\item \texttt{void unregisterAdministrators(CustomerOrganizationID coID) throws NoAdminsOfCustomerOrganizationException}
+        \begin{itemize}
+            \item Effect: Unregisters all Customer Administrators corresponding to the Customer Organization identified by \ttt{coID}.
+            \item Exceptions:
+			\begin{itemize}
+				\item NoAdminsOfCustomerOrganizationException: There are no Customer Administrators of the Customer Organization identified by \ttt{coID}.
+			\end{itemize}
+        \end{itemize}
+
+		\item \texttt{EmailAddress getCOAdminEmail(CustomerOrganizationID coID, DocumentType type) throws NoSuchAdministratorException}
+		    \begin{itemize}
+                \item Effect: Retrieves the e-mail address of the Customer Administrator of the Customer Organization identified by \ttt{coID} who is responsible for documents of \ttt{type}.
+                \item Exceptions:
+				\begin{itemize}
+					\item NoSuchAdministratorException: There is no Customer Administrator responsible for \ttt{type}.
+				\end{itemize}
+            \end{itemize}
+    \end{itemize}
+
+    \item RecipientInfoManagement
+    \begin{itemize}
+        \item \texttt{boolean isRegistered(RecipientID recID)}
+        \begin{itemize}
+            \item Effect: Indicates whether \ttt{recID} corresponds to a Registered Recipient.
+            \item Exceptions: None
+        \end{itemize}
+
+		\item \texttt{String getNameOf(RecipientID recID) throws NoSuchRecipientException}
+        \begin{itemize}
+            \item Effect: Retrieves the first and last name of the Registered Recipient identified by \ttt{recID}.
+            \item Exceptions:
+			\begin{itemize}
+				\item NoSuchRecipientException: There is no Registered Recipient corresponding to \ttt{recID}.
+			\end{itemize}
+        \end{itemize}
+
+		\item \texttt{PostalAddress getPostalAddressOf(RecipientID recID) throws NoSuchRecipientException}
+        \begin{itemize}
+            \item Effect: Retrieves the postal address of the Registered Recipient identified by \ttt{recID}.
+            \item Exceptions:
+			\begin{itemize}
+				\item NoSuchRecipientException: There is no Registered Recipient corresponding to \ttt{recID}.
+			\end{itemize}
+        \end{itemize}
+
+		\item \texttt{void verifyComplete(RegistrationDetails details) throws IncompleteRecipientDetailsException}
+        \begin{itemize}
+            \item Effect: Verifies that \ttt{details} is complete.
+            \item Exceptions:
+			\begin{itemize}
+				\item IncompleteRecipientDetailsException: Some details are missing (e-mail address, password, first or last name, postal address).
+			\end{itemize}
+        \end{itemize}
+		
+        \item \texttt{void verifyNotExists(RegistrationDetails details) throws AlreadyRegisteredException}
+        \begin{itemize}
+            \item Effect: Verifies that \ttt{details} does not conflict with Recipients that have already been registered
+            \item Exceptions:
+			\begin{itemize}
+				\item AlreadyRegisteredException: There already is a registration corresponding to \ttt{details} (e-mail address is already in use).
+			\end{itemize}
+        \end{itemize}
+
+		\item \texttt{void registerRecipient(RegistrationDetails details)}
+        \begin{itemize}
+            \item Effect: Registers a new Registered Recipient with the corresponding \ttt{details}.
+            \item Exceptions: None
+        \end{itemize}
+    \end{itemize}
+
+    \item UIAuthManagement
+    \begin{itemize}
+        \item \texttt{void authenticate(LoginCredentials cred) throws AuthException}
+        \begin{itemize}
+            \item Effect: Authenticates the login attempt with the credentials contained in \ttt{cred}. If successful, generates a login token valid for a limited time.
+            \item Exceptions:
+			\begin{itemize}
+				\item AuthException: Either the account specified in \ttt{cred} does not exists or the password is incorrect.
+			\end{itemize}
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsection{AuthenticationManager}
+\begin{itemize}
+    \item \textbf{Description:} Responsible for verifying attempted logins. Also stores login tokens that are valid during a certain time interval.
+    \item \textbf{Super-component:} \ttt{AuthenticableUserManager}.
+    \item \textbf{Sub-components:} None.
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+    \item UIAuthManagement
+    \begin{itemize}
+        \item \texttt{void authenticate(LoginCredentials cred) throws AuthException}
+        \begin{itemize}
+            \item Effect: Authenticates the login attempt with the credentials contained in \ttt{cred}. If successful, generates a login token valid for a limited time.
+            \item Exceptions:
+			\begin{itemize}
+				\item AuthException: Either the account specified in \ttt{cred} does not exists or the password is incorrect.
+			\end{itemize}
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
 \subsection{ConnectionManager}
 \begin{itemize}
 	\item \textbf{Description:} The \ttt{ConnectionManager} accepts connections from automated Customer Organization or Social Secretary systems so they may submit raw data batches
@@ -53,6 +193,299 @@ In this section, we provide an alphabetically ordered catalog of all components 
 			\end{itemize}
 		\end{itemize}
 	\end{itemize}
+\end{itemize}
+
+\subsection{COAdminDatabase}
+\begin{itemize}
+    \item \textbf{Description:} Responsible for storing the accounts of all Customer Administrators.
+    \item \textbf{Super-component:} \ttt{AuthenticableUserManager}.
+    \item \textbf{Sub-components:} None.
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+    \item ExtendedCOAdminInfoManagement
+    \begin{itemize}
+        \item \texttt{void verifyNotExists(List<CustomerAdministratorRegistrationDetails> details) throws AlreadyExistsException}
+        \begin{itemize}
+            \item Effect: Verifies whether any entry in \ttt{details} conflicts with Customer Administrators that already exist.
+            \item Exceptions:
+            \begin{itemize}
+                \item AlreadyExistsException: Some entries in \ttt{details} correspond with Customer Administrators that already exist. It is indicated which entries conflict.
+            \end{itemize}
+        \end{itemize}
+
+        \item \texttt{void registerAdministrators(List<CustomerAdministratorRegistrationDetails> details)}
+        \begin{itemize}
+            \item Effect: Registers all Customer Administrators with corresponding details found in \ttt{details}.
+            \item Exceptions: None
+        \end{itemize}
+
+		\item \texttt{void unregisterAdministrators(CustomerOrganizationID coID) throws NoAdminsOfCustomerOrganizationException}
+        \begin{itemize}
+            \item Effect: Unregisters all Customer Administrators corresponding to the Customer Organization identified by \ttt{coID}.
+            \item Exceptions:
+			\begin{itemize}
+				\item NoAdminsOfCustomerOrganizationException: There are no Customer Administrators of the Customer Organization identified by \ttt{coID}.
+			\end{itemize}
+        \end{itemize}
+
+		\item \texttt{EmailAddress getCOAdminEmail(CustomerOrganizationID coID, DocumentType type) throws NoSuchAdministratorException}
+		    \begin{itemize}
+                \item Effect: Retrieves the e-mail address of the Customer Administrator of the Customer Organization identified by \ttt{coID} who is responsible for documents of \ttt{type}.
+                \item Exceptions:
+				\begin{itemize}
+					\item NoSuchAdministratorException: There is no Customer Administrator responsible for \ttt{type}.
+				\end{itemize}
+            \end{itemize}
+
+		\item \texttt{LoginDetails lookupAuthDetails(CustomerAdministratorID caID) throws NoSuchAdministratorException}
+		    \begin{itemize}
+                \item Effect: Retrieves the \ttt{LoginDetails} of the Customer Administrator identified by \ttt{caID}.
+                \item Exceptions:
+				\begin{itemize}
+					\item NoSuchAdministratorException: There is no Customer Administrator corresponding to \ttt{caID}.
+				\end{itemize}
+            \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsection{COInfoFacade}
+\begin{itemize}
+    \item \textbf{Description:} Responsible for forwarding requests for Customer Organization details to the right components.
+    \item \textbf{Super-component:} \ttt{UserManagementSubsystem}.
+    \item \textbf{Sub-components:} None.
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+    \item COInfoManagement
+    \begin{itemize}
+		\item \texttt{boolean verifyExists(CustomerOrganizationID coID)}
+		    \begin{itemize}
+                \item Effect: Indicates whether a Customer Organization corresponding to \ttt{coID} has been registered.
+                \item Exceptions: None
+            \end{itemize}
+		
+        \item \texttt{Template getTemplate(CustomerOrganizationID coID, DocumentType docType, TimeStamp matchTime) throws NoSuchCustomerOrganizationException, NoSuchTemplateException}
+        \begin{itemize}
+            \item Effect: Retrieves the \ttt{Template} for documents of the type \ttt{docType} of the Customer Organization identified by \ttt{coID}. The exact version retrieved is the most recent version earlier than \ttt{matchTime}.
+            \item Exceptions:
+            \begin{itemize}
+                \item NoSuchTemplateException: The template as described in the above Effect clause does not exist.
+				\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
+            \end{itemize}
+        \end{itemize}
+
+		\item \texttt{void updateTemplate(CustomerOrganizationID coID, Template template, DocumentType type) throws NoSuchCustomerOrganizationException, InvalidDocumentTypeException}
+		    \begin{itemize}
+                \item Effect: Updates the template for documents of \ttt{type} for the Customer Organization identified by \ttt{coID}.
+                \item Exceptions:
+				\begin{itemize}
+					\item InvalidDocumentTypeException: The Customer Organization identified by \ttt{coID} is not allowed to generate documents of \ttt{type}.
+					\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
+				\end{itemize}
+            \end{itemize}
+
+        \item \texttt{Key getKey(CustomerOrganizationID coID) throws NoSuchCustomerOrganizationException}
+		    \begin{itemize}
+                \item Effect: Retrieves the signing key of the Customer Organization identified by \ttt{coID}.
+                \item Exceptions:
+				\begin{itemize}
+					\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
+				\end{itemize}
+            \end{itemize}
+
+		\item \texttt{Priority getDefaultPriority(CustomerOrganizationID coID) throws NoSuchCustomerOrganizationException}
+		    \begin{itemize}
+                \item Effect: Retrieves the default priority of the Customer Organization identified by \ttt{coID}.
+                \item Exceptions:
+				\begin{itemize}
+					\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
+				\end{itemize}
+            \end{itemize}
+
+		\item \texttt{boolean queryReceiptTracking(CustomerOrganizationID coID) throws NoSuchCustomerOrganizationException}
+		    \begin{itemize}
+                \item Effect: Indicates whether the Customer Organization identified by \ttt{coID} has enabled receipt tracking.
+                \item Exceptions:
+				\begin{itemize}
+					\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
+				\end{itemize}
+            \end{itemize}
+
+		\item \texttt{boolean canGenerateDocumentsOfType(CustomerOrganizationID coID, DocumentType type) throws NoSuchCustomerOrganizationException}
+		    \begin{itemize}
+                \item Effect: Indicates whether the Customer Organization identified by \ttt{coID} may generate documents of \ttt{type}.
+                \item Exceptions:
+				\begin{itemize}
+					\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
+				\end{itemize}
+            \end{itemize}
+
+		\item \texttt{List<DocumentType> getAllAllowedDocTypes(CustomerOrganizationID coID) throws NoSuchCustomerOrganizationException}
+		    \begin{itemize}
+                \item Effect: Retrieves the document types the Customer Organization identified by \ttt{coID} may generate.
+                \item Exceptions:
+				\begin{itemize}
+					\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
+				\end{itemize}
+            \end{itemize}
+
+		\item \texttt{EmailAddress getCOAdminEmail(CustomerOrganizationID coID, DocumentType type) throws NoSuchCustomerOrganizationException, NoSuchAdministratorException}
+		    \begin{itemize}
+                \item Effect: Retrieves the e-mail address of the Customer Administrator of the Customer Organization identified by \ttt{coID} who is responsible for documents of \ttt{type}.
+                \item Exceptions:
+				\begin{itemize}
+					\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
+					\item NoSuchAdministratorException: There is no Customer Administrator responsible for \ttt{type}.
+				\end{itemize}
+            \end{itemize}
+
+		\item \texttt{BankAccountNumber getCOBankAccountNumber(CustomerOrganizationID coID) throws NoSuchCustomerOrganizationException}
+		    \begin{itemize}
+                \item Effect: Retrieves the bank account number of the Customer Organization identified by \ttt{coID} which the eDocs system should bill.
+                \item Exceptions:
+				\begin{itemize}
+					\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
+				\end{itemize}
+            \end{itemize}
+
+		\item \texttt{PrintParameterObject getPrintParameters(CustomerOrganizationID coID) throws NoSuchCustomerOrganizationException}
+		    \begin{itemize}
+                \item Effect: Retrieves the \ttt{PrintParameterObject} of the Customer Organization identified by \ttt{coID}.
+                \item Exceptions:
+				\begin{itemize}
+					\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
+				\end{itemize}
+            \end{itemize}
+
+		\item \texttt{RecurringBatchSpecification getRecurringBatchSpecification(CustomerOrganizationID coID, RecurringBatchID) throws NoSuchCustomerOrganizationException, NoSuchRecurringBatchException}
+		    \begin{itemize}
+                \item Effect: Retrieves the \ttt{RecurringBatchSpecification} of the recurring batch identified by \ttt{RecurringBatchID}.
+                \item Exceptions:
+					\begin{itemize}
+						\item NoSuchRecurringBatchException: Either there is no recurring batch matching \ttt{RecurringBatchID} or that batch does not belong to the Customer Organization identified by \ttt{coID}.
+						\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
+					\end{itemize}
+            \end{itemize}
+
+		\item \texttt{void registerNewCustomerOrganization(CustomerOrganizationRegistrationDetails details) throws IncorrectRegistrationDetailsException}
+		    \begin{itemize}
+                \item Effect: Registers a new Customer Organization with the details specified in \ttt{details}.
+                \item Exceptions:
+				\begin{itemize}
+					\item IncorrectRegistrationDetailsException: Either \ttt{details} is incomplete (e.g. no signing key) or incorrect (e.g. the e-mail address for a new Customer Administrator has already been used for another Customer Administrator). The exception indicates what exactly went wrong.
+				\end{itemize}
+            \end{itemize}
+
+		\item \texttt{void unregisterCustomerOrganization(CustomerOrganizationID coID) throws NoSuchCustomerOrganizationException}
+		    \begin{itemize}
+                \item Effect: Unregisters the Customer Organization identified by \ttt{coID}.
+                \item Exceptions:
+				\begin{itemize}
+					\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
+				\end{itemize}
+            \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsection{CustomerOrganizationDatabase}
+\begin{itemize}
+    \item \textbf{Description:} Responsible for storing all details of Customer Organizations (excluding templates, signing key and Customer Administrator details).
+    \item \textbf{Super-component:} \ttt{UserManagementSubsystem}.
+    \item \textbf{Sub-components:} None.
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+    \item CODetailsManagement
+    \begin{itemize}
+		\item \texttt{boolean verifyExists(CustomerOrganizationID coID)}
+		    \begin{itemize}
+                \item Effect: Indicates whether a Customer Organization corresponding to \ttt{coID} has been registered.
+                \item Exceptions: None
+            \end{itemize}
+
+		\item \texttt{Priority getDefaultPriority(CustomerOrganizationID coID) throws NoSuchCustomerOrganizationException}
+		    \begin{itemize}
+                \item Effect: Retrieves the default priority of the Customer Organization identified by \ttt{coID}.
+                \item Exceptions:
+				\begin{itemize}
+					\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
+				\end{itemize}
+            \end{itemize}
+
+		\item \texttt{boolean queryReceiptTracking(CustomerOrganizationID coID) throws NoSuchCustomerOrganizationException}
+		    \begin{itemize}
+                \item Effect: Indicates whether the Customer Organization identified by \ttt{coID} has enabled receipt tracking.
+                \item Exceptions:
+				\begin{itemize}
+					\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
+				\end{itemize}
+            \end{itemize}
+
+		\item \texttt{boolean canGenerateDocumentsOfType(CustomerOrganizationID coID, DocumentType type) throws NoSuchCustomerOrganizationException}
+		    \begin{itemize}
+                \item Effect: Indicates whether the Customer Organization identified by \ttt{coID} may generate documents of \ttt{type}.
+                \item Exceptions:
+				\begin{itemize}
+					\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
+				\end{itemize}
+            \end{itemize}
+
+		\item \texttt{List<DocumentType> getAllAllowedDocTypes(CustomerOrganizationID coID) throws NoSuchCustomerOrganizationException}
+		    \begin{itemize}
+                \item Effect: Retrieves the document types the Customer Organization identified by \ttt{coID} may generate.
+                \item Exceptions:
+				\begin{itemize}
+					\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
+				\end{itemize}
+            \end{itemize}
+
+		\item \texttt{BankAccountNumber getCOBankAccountNumber(CustomerOrganizationID coID) throws NoSuchCustomerOrganizationException}
+		    \begin{itemize}
+                \item Effect: Retrieves the bank account number of the Customer Organization identified by \ttt{coID} which the eDocs system should bill.
+                \item Exceptions:
+				\begin{itemize}
+					\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
+				\end{itemize}
+            \end{itemize}
+
+		\item \texttt{PrintParameterObject getPrintParameters(CustomerOrganizationID coID) throws NoSuchCustomerOrganizationException}
+		    \begin{itemize}
+                \item Effect: Retrieves the \ttt{PrintParameterObject} of the Customer Organization identified by \ttt{coID}.
+                \item Exceptions:
+				\begin{itemize}
+					\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
+				\end{itemize}
+            \end{itemize}
+
+		\item \texttt{RecurringBatchSpecification getRecurringBatchSpecification(CustomerOrganizationID coID, RecurringBatchID) throws NoSuchCustomerOrganizationException, NoSuchRecurringBatchException}
+		    \begin{itemize}
+                \item Effect: Retrieves the \ttt{RecurringBatchSpecification} of the recurring batch identified by \ttt{RecurringBatchID}.
+                \item Exceptions:
+					\begin{itemize}
+						\item NoSuchRecurringBatchException: Either there is no recurring batch matching \ttt{RecurringBatchID} or that batch does not belong to the Customer Organization identified by \ttt{coID}.
+						\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
+					\end{itemize}
+            \end{itemize}
+
+		\item \texttt{void registerNewCustomerOrganization(CustomerOrganizationRegistrationDetails details)}
+		    \begin{itemize}
+                \item Effect: Registers a new Customer Organization with the details specified in \ttt{details}; extracts all information excluding templates, signing key and Customer Administrator details.
+                \item Exceptions: None
+            \end{itemize}
+
+		\item \texttt{void unregisterCustomerOrganization(CustomerOrganizationID coID) throws NoSuchCustomerOrganizationException}
+		    \begin{itemize}
+                \item Effect: Unregisters the Customer Organization identified by \ttt{coID}.
+                \item Exceptions:
+				\begin{itemize}
+					\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
+				\end{itemize}
+            \end{itemize}
+    \end{itemize}
 \end{itemize}
 
 \subsection{DeliverySubsystem}
@@ -438,6 +871,49 @@ In this section, we provide an alphabetically ordered catalog of all components 
     \end{itemize}
 \end{itemize}
 
+\subsection{eDocsAdminDatabase}
+\begin{itemize}
+    \item \textbf{Description:} Responsible for storing the accounts of all eDocs Administrators.
+    \item \textbf{Super-component:} \ttt{AuthenticableUserManager}.
+    \item \textbf{Sub-components:} None.
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+    \item eDocsAdminInfoManagement
+    \begin{itemize}
+        \item \texttt{void verifyNotExists(EDocsAdminRegistrationDetails details) throws AlreadyRegisteredException}
+        \begin{itemize}
+            \item Effect: Verifies that \ttt{details} does not conflict with eDocs Administrators that have already been registered.
+            \item Exceptions:
+			\begin{itemize}
+				\item AlreadyRegisteredException: There already is a registration corresponding to \ttt{details}.
+			\end{itemize}
+        \end{itemize}
+
+        \item \texttt{void registerAdministrator(EDocsAdminRegistrationDetails details)}
+        \begin{itemize}
+            \item Effect: Registers a new eDocs administrator with corresponding \ttt{details}.
+            \item Exceptions: None
+        \end{itemize}
+
+		\item \texttt{void unregisterAdministrator(eDocsAdminID adminID)}
+        \begin{itemize}
+            \item Effect: Unregisters the eDocs administrator identified by \ttt{adminID}.
+            \item Exceptions: None
+        \end{itemize}
+
+		\item \texttt{LoginDetails lookupAuthDetails(eDocsAdminID adminID) throws NoSucheDocsAdminException}
+		    \begin{itemize}
+                \item Effect: Retrieves the \ttt{LoginDetails} of the eDocs Administrator identified by \ttt{adminID}.
+                \item Exceptions:
+				\begin{itemize}
+					\item NoSucheDocsAdminException: There is no eDocs Administrator corresponding to \ttt{adminID}.
+				\end{itemize}
+            \end{itemize}
+    \end{itemize}
+\end{itemize}
+
 \subsection{EmailDeliveryChannel}
 \begin{itemize}
     \item \textbf{Description:} Responsible for composing e-mails containing either a document to be delivered as an attachment or including a unique link through which to download the document if the Customer Organization has enabled receipt tracking. The resulting e-mail is handed off to the \ttt{CommunicationSubsystem} for submission to an external e-mail provider. Also signals to the \ttt{JobStatusDatabase} that the document's status must be updated, indicating whether receipt tracking has been activated or not.
@@ -535,6 +1011,21 @@ In this section, we provide an alphabetically ordered catalog of all components 
             \item Exceptions: None
         \end{itemize}
 
+		\item \texttt{int getNumberOfDocumentsOfRecurringBatch(RecurringBatchID batchID, TimeStamp time)}
+		\begin{itemize}
+            \item Effect: Retrieves the number of documents submitted for the recurring batch identified by \ttt{batchID} in the month specified by \ttt{time}.
+            \item Exceptions: None
+        \end{itemize}
+
+		\item \texttt{BatchID getBatchIDofRecurringBatch(RecurringBatchID recurringBatchID, TimeStamp time) throws NoSuchBatchException}
+		\begin{itemize}
+            \item Effect: Retrieves the \ttt{BatchID} of the recurring batch identified by \ttt{recurringBatchID} that was submitted in the month specified by \ttt{time}.
+            \item Exceptions:
+			\begin{itemize}
+				\item NoSuchBatchException: There was no submission of the recurring batch identified by \ttt{recurringBatchID} in the month specified by \ttt{time}.
+			\end{itemize}
+        \end{itemize}
+
 		\item \texttt{void removeRawDataOf(JobID jobID)}
 		\begin{itemize}
             \item Effect: Removes the raw data of the \ttt{Job} identified by \ttt{jobID}.
@@ -564,6 +1055,21 @@ In this section, we provide an alphabetically ordered catalog of all components 
 		\begin{itemize}
             \item Effect: Retrieves the \ttt{BatchMetaData} corresponding to the given \ttt{batchID}
             \item Exceptions: None
+        \end{itemize}
+
+		\item \texttt{int getNumberOfDocumentsOfRecurringBatch(RecurringBatchID batchID, TimeStamp time)}
+		\begin{itemize}
+            \item Effect: Retrieves the number of documents submitted for the recurring batch identified by \ttt{batchID} in the month specified by \ttt{time}.
+            \item Exceptions: None
+        \end{itemize}
+
+		\item \texttt{BatchID getBatchIDofRecurringBatch(RecurringBatchID recurringBatchID, TimeStamp time) throws NoSuchBatchException}
+		\begin{itemize}
+            \item Effect: Retrieves the \ttt{BatchID} of the recurring batch identified by \ttt{recurringBatchID} that was submitted in the month specified by \ttt{time}.
+            \item Exceptions:
+			\begin{itemize}
+				\item NoSuchBatchException: There was no submission of the recurring batch identified by \ttt{recurringBatchID} in the month specified by \ttt{time}.
+			\end{itemize}
         \end{itemize}
 
 		\item \texttt{void updateStatusSent(JobID jobID, boolean receiptTracking)}
@@ -714,6 +1220,21 @@ In this section, we provide an alphabetically ordered catalog of all components 
 		\begin{itemize}
             \item Effect: Retrieves the \ttt{BatchMetaData} corresponding to the given \ttt{batchID}
             \item Exceptions: None
+        \end{itemize}
+
+		\item \texttt{int getNumberOfDocumentsOfRecurringBatch(RecurringBatchID batchID, TimeStamp time)}
+		\begin{itemize}
+            \item Effect: Retrieves the number of documents submitted for the recurring batch identified by \ttt{batchID} in the month specified by \ttt{time}.
+            \item Exceptions: None
+        \end{itemize}
+
+		\item \texttt{BatchID getBatchIDofRecurringBatch(RecurringBatchID recurringBatchID, TimeStamp time) throws NoSuchBatchException}
+		\begin{itemize}
+            \item Effect: Retrieves the \ttt{BatchID} of the recurring batch identified by \ttt{recurringBatchID} that was submitted in the month specified by \ttt{time}.
+            \item Exceptions:
+			\begin{itemize}
+				\item NoSuchBatchException: There was no submission of the recurring batch identified by \ttt{recurringBatchID} in the month specified by \ttt{time}.
+			\end{itemize}
         \end{itemize}
 
 		\item \texttt{void updateStatusSent(JobID jobID, boolean receiptTracking)}
@@ -1349,6 +1870,101 @@ In this section, we provide an alphabetically ordered catalog of all components 
 	\end{itemize}
 \end{itemize}
 
+\subsection{RegisteredRecipientDatabase}
+\begin{itemize}
+    \item \textbf{Description:} Responsible for storing the accounts of all Registered Recipients.
+    \item \textbf{Super-component:} \ttt{AuthenticableUserManager}.
+    \item \textbf{Sub-components:} None.
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+    \item RecipientInfoManagement
+    \begin{itemize}
+        \item \texttt{boolean isRegistered(RecipientID recID)}
+        \begin{itemize}
+            \item Effect: Indicates whether \ttt{recID} corresponds to a Registered Recipient.
+            \item Exceptions: None
+        \end{itemize}
+
+		\item \texttt{String getNameOf(RecipientID recID) throws NoSuchRecipientException}
+        \begin{itemize}
+            \item Effect: Retrieves the first and last name of the Registered Recipient identified by \ttt{recID}.
+            \item Exceptions:
+			\begin{itemize}
+				\item NoSuchRecipientException: There is no Registered Recipient corresponding to \ttt{recID}.
+			\end{itemize}
+        \end{itemize}
+
+		\item \texttt{PostalAddress getPostalAddressOf(RecipientID recID) throws NoSuchRecipientException}
+        \begin{itemize}
+            \item Effect: Retrieves the postal address of the Registered Recipient identified by \ttt{recID}.
+            \item Exceptions:
+			\begin{itemize}
+				\item NoSuchRecipientException: There is no Registered Recipient corresponding to \ttt{recID}.
+			\end{itemize}
+        \end{itemize}
+		
+        \item \texttt{void verifyNotExists(RegistrationDetails details) throws AlreadyRegisteredException}
+        \begin{itemize}
+            \item Effect: Verifies that \ttt{details} does not conflict with Recipients that have already been registered
+            \item Exceptions:
+			\begin{itemize}
+				\item AlreadyRegisteredException: There already is a registration corresponding to \ttt{details} (e-mail address is already in use).
+			\end{itemize}
+        \end{itemize}
+
+		\item \texttt{void registerRecipient(RegistrationDetails details)}
+        \begin{itemize}
+            \item Effect: Registers a new Registered Recipient with the corresponding \ttt{details}.
+            \item Exceptions: None
+        \end{itemize}
+
+		\item \texttt{void unregisterRecipient(RecipientID recID) throws NoSuchRecipientException}
+        \begin{itemize}
+            \item Effect: Unregisters the Registered Recipient identified by \ttt{recID}.
+            \item Exceptions:
+			\begin{itemize}
+				\item NoSuchRecipientException: There is no Registered Recipient corresponding to \ttt{recID}.
+			\end{itemize}
+        \end{itemize}
+
+		\item \texttt{LoginDetails lookupAuthDetails(RecipientID recID) throws NoSuchRecipientException}
+		    \begin{itemize}
+                \item Effect: Retrieves the \ttt{LoginDetails} of the Registered Recipient identified by \ttt{recID}.
+                \item Exceptions:
+				\begin{itemize}
+					\item NoSuchRecipientException: There is no Registered Recipient corresponding to \ttt{recID}.
+				\end{itemize}
+            \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsection{SigningKeyManager}
+\begin{itemize}
+    \item \textbf{Description:} Responsible for storing the signing key of all Customer Organizations.
+    \item \textbf{Super-component:} \ttt{UserManagementSubsystem}.
+    \item \textbf{Sub-components:} None.
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+    \item SigningKeyManagement
+    \begin{itemize}
+        \item \texttt{Key getKey(CustomerOrganizationID coID) throws NoSuchCustomerOrganizationException}
+		    \begin{itemize}
+                \item Effect: Retrieves the signing key of the Customer Organization identified by \ttt{coID}.
+                \item Exceptions: None
+            \end{itemize}
+
+		\item \texttt{void setKey(CustomerOrganizationID coID, Key key)}
+		    \begin{itemize}
+                \item Effect: Sets the key of the Customer Organization identified by \ttt{coID} to \ttt{key}.
+                \item Exceptions: None
+            \end{itemize}
+    \end{itemize}
+\end{itemize}
+
 \subsection{SubmissionSubsystem}
 \begin{itemize}
     \item \textbf{Description:} The \ttt{SubmissionSubsystem} is responsible for receiving batches of raw data/meta-data and generating jobs from them. These batches may be both recurring and non-recurring. 
@@ -1433,6 +2049,334 @@ In this section, we provide an alphabetically ordered catalog of all components 
     			\end{enumerate} 
     		\end{itemize}
     	\end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsection{TemplateDatabase}
+\begin{itemize}
+    \item \textbf{Description:} Responsible for storing all templates of all Customer Organizations.
+    \item \textbf{Super-component:} \ttt{UserManagementSubsystem}.
+    \item \textbf{Sub-components:} None.
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+    \item TemplateManagement
+    \begin{itemize}
+        \item \texttt{Template getTemplate(CustomerOrganizationID coID, DocumentType docType, TimeStamp matchTime) throws NoSuchTemplateException}
+        \begin{itemize}
+            \item Effect: Retrieves the \ttt{Template} for documents of the type \ttt{docType} of the Customer Organization identified by \ttt{coID}. The exact version retrieved is the most recent version earlier than \ttt{matchTime}.
+            \item Exceptions:
+            \begin{itemize}
+                \item NoSuchTemplateException: The template as described in the above Effect clause does not exist.
+            \end{itemize}
+        \end{itemize}
+
+		\item \texttt{void updateTemplate(CustomerOrganizationID coID, Template template, DocumentType type)}
+		    \begin{itemize}
+                \item Effect: Updates the template for documents of \ttt{type} for the Customer Organization identified by \ttt{coID}.
+                \item Exceptions: None
+            \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsection{UserInfoEditor}
+\begin{itemize}
+    \item \textbf{Description:} Responsible for verifying registration details for attempted registrations and storing new accounts in the appropriate databases.
+    \item \textbf{Super-component:} \ttt{AuthenticableUserManager}.
+    \item \textbf{Sub-components:} None.
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+	\item COAdminInfoManagement
+    \begin{itemize}
+		\item \texttt{void verifyComplete(List<CustomerAdministratorRegistrationDetails> details) throws IncompleteDetailsException}
+        \begin{itemize}
+            \item Effect: Verifies whether all entries in \ttt{details} are complete.
+            \item Exceptions:
+            \begin{itemize}
+                \item IncompleteDetailsException: Some details are missing (e-mail address, password, document type). It is indicated which entries in \ttt{details} are incomplete.
+            \end{itemize}
+        \end{itemize}
+
+        \item \texttt{void verifyNotExists(List<CustomerAdministratorRegistrationDetails> details) throws AlreadyExistsException}
+        \begin{itemize}
+            \item Effect: Verifies whether any entry in \ttt{details} conflicts with Customer Administrators that already exist.
+            \item Exceptions:
+            \begin{itemize}
+                \item AlreadyExistsException: Some entries in \ttt{details} correspond with Customer Administrators that already exist. It is indicated which entries conflict.
+            \end{itemize}
+        \end{itemize}
+
+        \item \texttt{void registerAdministrators(List<CustomerAdministratorRegistrationDetails> details)}
+        \begin{itemize}
+            \item Effect: Registers all Customer Administrators with corresponding details found in \ttt{details}.
+            \item Exceptions: None
+        \end{itemize}
+
+		\item \texttt{EmailAddress getCOAdminEmail(CustomerOrganizationID coID, DocumentType type) throws NoSuchAdministratorException}
+		    \begin{itemize}
+                \item Effect: Retrieves the e-mail address of the Customer Administrator of the Customer Organization identified by \ttt{coID} who is responsible for documents of \ttt{type}.
+                \item Exceptions:
+				\begin{itemize}
+					\item NoSuchAdministratorException: There is no Customer Administrator responsible for \ttt{type}.
+				\end{itemize}
+            \end{itemize}
+    \end{itemize}
+
+    \item RecipientInfoManagement
+    \begin{itemize}
+        \item \texttt{boolean isRegistered(RecipientID recID)}
+        \begin{itemize}
+            \item Effect: Indicates whether \ttt{recID} corresponds to a Registered Recipient.
+            \item Exceptions: None
+        \end{itemize}
+
+		\item \texttt{String getNameOf(RecipientID recID) throws NoSuchRecipientException}
+        \begin{itemize}
+            \item Effect: Retrieves the first and last name of the Registered Recipient identified by \ttt{recID}.
+            \item Exceptions:
+			\begin{itemize}
+				\item NoSuchRecipientException: There is no Registered Recipient corresponding to \ttt{recID}.
+			\end{itemize}
+        \end{itemize}
+
+		\item \texttt{PostalAddress getPostalAddressOf(RecipientID recID) throws NoSuchRecipientException}
+        \begin{itemize}
+            \item Effect: Retrieves the postal address of the Registered Recipient identified by \ttt{recID}.
+            \item Exceptions:
+			\begin{itemize}
+				\item NoSuchRecipientException: There is no Registered Recipient corresponding to \ttt{recID}.
+			\end{itemize}
+        \end{itemize}
+
+		\item \texttt{void verifyComplete(RegistrationDetails details) throws IncompleteRecipientDetailsException}
+        \begin{itemize}
+            \item Effect: Verifies that \ttt{details} is complete.
+            \item Exceptions:
+			\begin{itemize}
+				\item IncompleteRecipientDetailsException: Some details are missing (e-mail address, password, first or last name, postal address).
+			\end{itemize}
+        \end{itemize}
+		
+        \item \texttt{void verifyNotExists(RegistrationDetails details) throws AlreadyRegisteredException}
+        \begin{itemize}
+            \item Effect: Verifies that \ttt{details} does not conflict with Recipients that have already been registered
+            \item Exceptions:
+			\begin{itemize}
+				\item AlreadyRegisteredException: There already is a registration corresponding to \ttt{details} (e-mail address is already in use).
+			\end{itemize}
+        \end{itemize}
+
+		\item \texttt{void registerRecipient(RegistrationDetails details)}
+        \begin{itemize}
+            \item Effect: Registers a new Registered Recipient with the corresponding \ttt{details}.
+            \item Exceptions: None
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsection{UserManagementSubsystem}
+\begin{itemize}
+    \item \textbf{Description:} Responsible for storing information about Customer Organizations and the account details of Customer Administrators, Registered Recipients and eDocs Administrators.
+    \item \textbf{Super-component:} None.
+    \item \textbf{Sub-components:} \ttt{AuthenticableUserManager}, \ttt{CustomerOrganizationDatabase}, \ttt{SigningKeyManager}, \ttt{TemplateDatabase}.
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+    \item COInfoManagement
+    \begin{itemize}
+		\item \texttt{boolean verifyExists(CustomerOrganizationID coID)}
+		    \begin{itemize}
+                \item Effect: Indicates whether a Customer Organization corresponding to \ttt{coID} has been registered.
+                \item Exceptions: None
+            \end{itemize}
+		
+        \item \texttt{Template getTemplate(CustomerOrganizationID coID, DocumentType docType, TimeStamp matchTime) throws NoSuchCustomerOrganizationException, NoSuchTemplateException}
+        \begin{itemize}
+            \item Effect: Retrieves the \ttt{Template} for documents of the type \ttt{docType} of the Customer Organization identified by \ttt{coID}. The exact version retrieved is the most recent version earlier than \ttt{matchTime}.
+            \item Exceptions:
+            \begin{itemize}
+                \item NoSuchTemplateException: The template as described in the above Effect clause does not exist.
+				\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
+            \end{itemize}
+        \end{itemize}
+
+		\item \texttt{void updateTemplate(CustomerOrganizationID coID, Template template, DocumentType type) throws NoSuchCustomerOrganizationException, InvalidDocumentTypeException}
+		    \begin{itemize}
+                \item Effect: Updates the template for documents of \ttt{type} for the Customer Organization identified by \ttt{coID}.
+                \item Exceptions:
+				\begin{itemize}
+					\item InvalidDocumentTypeException: The Customer Organization identified by \ttt{coID} is not allowed to generate documents of \ttt{type}.
+					\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
+				\end{itemize}
+            \end{itemize}
+
+        \item \texttt{Key getKey(CustomerOrganizationID coID) throws NoSuchCustomerOrganizationException}
+		    \begin{itemize}
+                \item Effect: Retrieves the signing key of the Customer Organization identified by \ttt{coID}.
+                \item Exceptions:
+				\begin{itemize}
+					\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
+				\end{itemize}
+            \end{itemize}
+
+		\item \texttt{Priority getDefaultPriority(CustomerOrganizationID coID) throws NoSuchCustomerOrganizationException}
+		    \begin{itemize}
+                \item Effect: Retrieves the default priority of the Customer Organization identified by \ttt{coID}.
+                \item Exceptions:
+				\begin{itemize}
+					\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
+				\end{itemize}
+            \end{itemize}
+
+		\item \texttt{boolean queryReceiptTracking(CustomerOrganizationID coID) throws NoSuchCustomerOrganizationException}
+		    \begin{itemize}
+                \item Effect: Indicates whether the Customer Organization identified by \ttt{coID} has enabled receipt tracking.
+                \item Exceptions:
+				\begin{itemize}
+					\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
+				\end{itemize}
+            \end{itemize}
+
+		\item \texttt{boolean canGenerateDocumentsOfType(CustomerOrganizationID coID, DocumentType type) throws NoSuchCustomerOrganizationException}
+		    \begin{itemize}
+                \item Effect: Indicates whether the Customer Organization identified by \ttt{coID} may generate documents of \ttt{type}.
+                \item Exceptions:
+				\begin{itemize}
+					\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
+				\end{itemize}
+            \end{itemize}
+
+		\item \texttt{List<DocumentType> getAllAllowedDocTypes(CustomerOrganizationID coID) throws NoSuchCustomerOrganizationException}
+		    \begin{itemize}
+                \item Effect: Retrieves the document types the Customer Organization identified by \ttt{coID} may generate.
+                \item Exceptions:
+				\begin{itemize}
+					\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
+				\end{itemize}
+            \end{itemize}
+
+		\item \texttt{EmailAddress getCOAdminEmail(CustomerOrganizationID coID, DocumentType type) throws NoSuchCustomerOrganizationException, NoSuchAdministratorException}
+		    \begin{itemize}
+                \item Effect: Retrieves the e-mail address of the Customer Administrator of the Customer Organization identified by \ttt{coID} who is responsible for documents of \ttt{type}.
+                \item Exceptions:
+				\begin{itemize}
+					\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
+					\item NoSuchAdministratorException: There is no Customer Administrator responsible for \ttt{type}.
+				\end{itemize}
+            \end{itemize}
+
+		\item \texttt{BankAccountNumber getCOBankAccountNumber(CustomerOrganizationID coID) throws NoSuchCustomerOrganizationException}
+		    \begin{itemize}
+                \item Effect: Retrieves the bank account number of the Customer Organization identified by \ttt{coID} which the eDocs system should bill.
+                \item Exceptions:
+				\begin{itemize}
+					\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
+				\end{itemize}
+            \end{itemize}
+
+		\item \texttt{PrintParameterObject getPrintParameters(CustomerOrganizationID coID) throws NoSuchCustomerOrganizationException}
+		    \begin{itemize}
+                \item Effect: Retrieves the \ttt{PrintParameterObject} of the Customer Organization identified by \ttt{coID}.
+                \item Exceptions:
+				\begin{itemize}
+					\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
+				\end{itemize}
+            \end{itemize}
+
+		\item \texttt{RecurringBatchSpecification getRecurringBatchSpecification(CustomerOrganizationID coID, RecurringBatchID) throws NoSuchCustomerOrganizationException, NoSuchRecurringBatchException}
+		    \begin{itemize}
+                \item Effect: Retrieves the \ttt{RecurringBatchSpecification} of the recurring batch identified by \ttt{RecurringBatchID}.
+                \item Exceptions:
+					\begin{itemize}
+						\item NoSuchRecurringBatchException: Either there is no recurring batch matching \ttt{RecurringBatchID} or that batch does not belong to the Customer Organization identified by \ttt{coID}.
+						\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
+					\end{itemize}
+            \end{itemize}
+
+		\item \texttt{void registerNewCustomerOrganization(CustomerOrganizationRegistrationDetails details) throws IncorrectRegistrationDetailsException}
+		    \begin{itemize}
+                \item Effect: Registers a new Customer Organization with the details specified in \ttt{details}.
+                \item Exceptions:
+				\begin{itemize}
+					\item IncorrectRegistrationDetailsException: Either \ttt{details} is incomplete (e.g. no signing key) or incorrect (e.g. the e-mail address for a new Customer Administrator has already been used for another Customer Administrator). The exception indicates what exactly went wrong.
+				\end{itemize}
+            \end{itemize}
+
+		\item \texttt{void unregisterCustomerOrganization(CustomerOrganizationID coID) throws NoSuchCustomerOrganizationException}
+		    \begin{itemize}
+                \item Effect: Unregisters the Customer Organization identified by \ttt{coID}.
+                \item Exceptions:
+				\begin{itemize}
+					\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
+				\end{itemize}
+            \end{itemize}
+    \end{itemize}
+
+    \item RecipientInfoManagement
+    \begin{itemize}
+        \item \texttt{boolean isRegistered(RecipientID recID)}
+        \begin{itemize}
+            \item Effect: Indicates whether \ttt{recID} corresponds to a Registered Recipient.
+            \item Exceptions: None
+        \end{itemize}
+
+		\item \texttt{String getNameOf(RecipientID recID) throws NoSuchRecipientException}
+        \begin{itemize}
+            \item Effect: Retrieves the first and last name of the Registered Recipient identified by \ttt{recID}.
+            \item Exceptions:
+			\begin{itemize}
+				\item NoSuchRecipientException: There is no Registered Recipient corresponding to \ttt{recID}.
+			\end{itemize}
+        \end{itemize}
+
+		\item \texttt{PostalAddress getPostalAddressOf(RecipientID recID) throws NoSuchRecipientException}
+        \begin{itemize}
+            \item Effect: Retrieves the postal address of the Registered Recipient identified by \ttt{recID}.
+            \item Exceptions:
+			\begin{itemize}
+				\item NoSuchRecipientException: There is no Registered Recipient corresponding to \ttt{recID}.
+			\end{itemize}
+        \end{itemize}
+
+		\item \texttt{void verifyComplete(RegistrationDetails details) throws IncompleteRecipientDetailsException}
+        \begin{itemize}
+            \item Effect: Verifies that \ttt{details} is complete.
+            \item Exceptions:
+			\begin{itemize}
+				\item IncompleteRecipientDetailsException: Some details are missing (e-mail address, password, first or last name, postal address).
+			\end{itemize}
+        \end{itemize}
+		
+        \item \texttt{void verifyNotExists(RegistrationDetails details) throws AlreadyRegisteredException}
+        \begin{itemize}
+            \item Effect: Verifies that \ttt{details} does not conflict with Recipients that have already been registered
+            \item Exceptions:
+			\begin{itemize}
+				\item AlreadyRegisteredException: There already is a registration corresponding to \ttt{details} (e-mail address is already in use).
+			\end{itemize}
+        \end{itemize}
+
+		\item \texttt{void registerRecipient(RegistrationDetails details)}
+        \begin{itemize}
+            \item Effect: Registers a new Registered Recipient with the corresponding \ttt{details}.
+            \item Exceptions: None
+        \end{itemize}
+    \end{itemize}
+
+	\item UIAuthManagement
+    \begin{itemize}
+        \item \texttt{void authenticate(LoginCredentials cred) throws AuthException}
+        \begin{itemize}
+            \item Effect: Authenticates the login attempt with the credentials contained in \ttt{cred}. If successful, generates a login token valid for a limited time.
+            \item Exceptions:
+			\begin{itemize}
+				\item AuthException: Either the account specified in \ttt{cred} does not exists or the password is incorrect.
+			\end{itemize}
+        \end{itemize}
     \end{itemize}
 \end{itemize}
 
