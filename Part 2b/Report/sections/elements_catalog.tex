@@ -390,6 +390,85 @@ In this section, we provide an alphabetically ordered catalog of all components 
     \end{itemize}
 \end{itemize}
 
+\subsection{CommunicationSubsystem}\todo{JobStorageSubsystem no longer needs ErrorSignaling}
+\begin{itemize}
+    \item \textbf{Description:} Responsible for receiving all inbound communication and sending most outbound communication (e.g. sending mails) that is not highly specific to the domain of discourse (i.e. generation and delivery of documents). Most of that communication involves e-mail.
+    \item \textbf{Super-component:} None.
+    \item \textbf{Sub-components:} \ttt{ErrorEmailDeliveryHandler}, \ttt{ExternalNotificationAcceptor}, \ttt{NotificationEmailDeliveryHandler}.
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+    \item ErrorSignaling
+    \begin{itemize}
+        \item \texttt{void notifyOperatorOfPDSDBReplicaFailure(String name, TimeStamp dateTime)}
+        \begin{itemize}
+            \item Effect: Notifies the eDocs administrators of the failure of the \ttt{PDSDBReplica} identified by \ttt{name} at the time specified by \ttt{dateTime}
+            \item Exceptions: None
+        \end{itemize}
+
+        \item \texttt{void notifyOperatorOfGeneratorFailure(String name, TimeStamp dateTime)}
+        \begin{itemize}
+            \item Effect: Notifies the eDocs administrators of the failure of the \ttt{Generator} identified by \ttt{name} at the time specified by \ttt{dateTime}
+            \item Exceptions: None
+        \end{itemize}
+
+		\item \texttt{void notifyOperatorOfDocumentDBReplicaFailure(String name, TimeStamp dateTime)}
+        \begin{itemize}
+            \item Effect: Notifies the eDocs administrators of the failure of the \ttt{DocumentDBReplica} identified by \ttt{name} at the time specified by \ttt{dateTime}
+            \item Exceptions: None
+        \end{itemize}
+    \end{itemize}
+
+    \item ExternalNotificationHandling
+    \begin{itemize}
+        \item \texttt{void signalEmailDeliveryFailure(Email email)}
+        \begin{itemize}
+            \item Effect: Extracts the context out of the given e-mail (e.g. if it concerns document delivery, extracts JobID) and handles it appropriately (e.g. setting the status of the Job to "Delivery failed").
+            \item Exceptions: None
+        \end{itemize}
+
+		\item \texttt{void confirmDelivery(DocumentName doc)}
+        \begin{itemize}
+            \item Effect: Extracts the \ttt{JobID} from \ttt{doc} (it is assumed that the \ttt{JobID} is a part of the \ttt{DocumentName}) and sets the status of the document to "Delivery confirmed".
+            \item Exceptions: None
+        \end{itemize}
+    \end{itemize}
+
+	\item MessageManagement
+    \begin{itemize}
+        \item \texttt{void notifyOperatorOfZoomitFailure(TimeStamp dateTime)}
+        \begin{itemize}
+            \item Effect: Notifies the eDocs Administrators of the failure of the Zoomit service at the time specified by \ttt{dateTime}.
+            \item Exceptions: None
+        \end{itemize}
+		
+		\item \texttt{void notifyCustomerAdministratorOfZoomitDeliveryFailure(ZoomitDeliveryErrorReport error)}
+        \begin{itemize}
+            \item Effect: Looks up the Customer Organization that submitted the \ttt{Job} identified by \ttt{jobID} contained in \ttt{error}, identifies the Customer Administrator responsible for the document type of the \ttt{Job} and sends an e-mail containing \ttt{error}. Also updates the status to "Delivery failed"
+            \item Exceptions: None
+        \end{itemize}
+
+        \item \texttt{void generationError(JobId jobID, GenerationErrorReport error)}
+		    \begin{itemize}
+                \item Effect: Looks up the Customer Organization that submitted the \ttt{Job} identified by \ttt{jobID}, identifies the Customer Administrator responsible for the document type of the \ttt{Job} and sends an e-mail containing \ttt{error}. Also updates the status to "Generation failed"
+                \item Exceptions: None
+            \end{itemize}
+
+		\item \texttt{void notifyDownloadLinkExpiration(JobId jobID)}
+		    \begin{itemize}
+                \item Effect: Looks up the Customer Organization that submitted the \ttt{Job} identified by \ttt{jobID}, identifies the Customer Administrator responsible for the document type of the \ttt{Job} and sends an e-mail indicating that the download link corresponding to the document expired. Also updates the status to "Document link expired".
+                \item Exceptions: None
+            \end{itemize}
+
+		\item \texttt{void submitEmail(Email email)}
+        \begin{itemize}
+            \item Effect: Submits the given e-mail to the external e-mail provider.
+            \item Exceptions: None
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
 \subsection{CustomerOrganizationDatabase}
 \begin{itemize}
     \item \textbf{Description:} Responsible for storing all details of Customer Organizations (excluding templates, signing key and Customer Administrator details).
@@ -933,6 +1012,59 @@ In this section, we provide an alphabetically ordered catalog of all components 
     \end{itemize}
 \end{itemize}
 
+\subsection{ErrorEmailDeliveryHandler}
+\begin{itemize}
+    \item \textbf{Description:} Responsible for reporting internal system errors/failures to eDocs system administrators. Can inhibit activity of the \ttt{NotificationEmailDeliveryHandler} to ensure that all its notifications leave on time.
+    \item \textbf{Super-component:} \ttt{CommunicationSubsystem}.
+    \item \textbf{Sub-components:} None.
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+    \item ErrorSignaling
+    \begin{itemize}
+        \item \texttt{void notifyOperatorOfPDSDBReplicaFailure(String name, TimeStamp dateTime)}
+        \begin{itemize}
+            \item Effect: Notifies the eDocs administrators of the failure of the \ttt{PDSDBReplica} identified by \ttt{name} at the time specified by \ttt{dateTime}
+            \item Exceptions: None
+        \end{itemize}
+
+        \item \texttt{void notifyOperatorOfGeneratorFailure(String name, TimeStamp dateTime)}
+        \begin{itemize}
+            \item Effect: Notifies the eDocs administrators of the failure of the \ttt{Generator} identified by \ttt{name} at the time specified by \ttt{dateTime}
+            \item Exceptions: None
+        \end{itemize}
+
+		\item \texttt{void notifyOperatorOfDocumentDBReplicaFailure(String name, TimeStamp dateTime)}
+        \begin{itemize}
+            \item Effect: Notifies the eDocs administrators of the failure of the \ttt{DocumentDBReplica} identified by \ttt{name} at the time specified by \ttt{dateTime}
+            \item Exceptions: None
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsection{ExternalNotificationAcceptor}
+\begin{itemize}
+    \item \textbf{Description:} Responsible for receiving all inbound communication not highly specific to the domain of discourse (i.e. document generation and delivery).
+    \item \textbf{Super-component:} \ttt{CommunicationSubsystem}.
+    \item \textbf{Sub-components:} None.
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+    \item \texttt{void signalEmailDeliveryFailure(Email email)}
+        \begin{itemize}
+            \item Effect: Extracts the context out of the given e-mail (e.g. if it concerns document delivery, extracts JobID) and handles it appropriately (e.g. setting the status of the Job to "Delivery failed").
+            \item Exceptions: None
+        \end{itemize}
+
+		\item \texttt{void confirmDelivery(DocumentName doc)}
+        \begin{itemize}
+            \item Effect: Extracts the \ttt{JobID} from \ttt{doc} (it is assumed that the \ttt{JobID} is a part of the \ttt{DocumentName}) and sets the status of the document to "Delivery confirmed".
+            \item Exceptions: None
+        \end{itemize}
+\end{itemize}
+
 \subsection{GeneratedDocumentManager}
 \begin{itemize}
     \item \textbf{Description:} Responsible for storing documents in the \ttt{DocumentDB} and also the \ttt{PDSDB} (whenever appropriate). If the \ttt{PDSDB} fails, it must store documents in the \ttt{PDSCache} and retrieve them when the \ttt{PDSDB} comes back online.
@@ -1462,6 +1594,64 @@ In this section, we provide an alphabetically ordered catalog of all components 
         \begin{itemize}
             \item Effect: Looks up all Documents matching \ttt{query} and them directly to the user's software via \ttt{session}.
             \item Exceptions: None.
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsection{NotificationEmailDeliveryHandler}
+\begin{itemize}
+    \item \textbf{Description:} Responsible for submitting pre-made e-mails to the external e-mail provider and generating an e-mail with contents consistent with information received from other components.
+    \item \textbf{Super-component:} \ttt{CommunicationSubsystem}.
+    \item \textbf{Sub-components:} None.
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+    \item MessageManagement
+    \begin{itemize}
+        \item \texttt{void notifyOperatorOfZoomitFailure(TimeStamp dateTime)}
+        \begin{itemize}
+            \item Effect: Notifies the eDocs Administrators of the failure of the Zoomit service at the time specified by \ttt{dateTime}.
+            \item Exceptions: None
+        \end{itemize}
+		
+		\item \texttt{void notifyCustomerAdministratorOfZoomitDeliveryFailure(ZoomitDeliveryErrorReport error)}
+        \begin{itemize}
+            \item Effect: Looks up the Customer Organization that submitted the \ttt{Job} identified by \ttt{jobID} contained in \ttt{error}, identifies the Customer Administrator responsible for the document type of the \ttt{Job} and sends an e-mail containing \ttt{error}. Also updates the status to "Delivery failed"
+            \item Exceptions: None
+        \end{itemize}
+
+        \item \texttt{void generationError(JobId jobID, GenerationErrorReport error)}
+		    \begin{itemize}
+                \item Effect: Looks up the Customer Organization that submitted the \ttt{Job} identified by \ttt{jobID}, identifies the Customer Administrator responsible for the document type of the \ttt{Job} and sends an e-mail containing \ttt{error}. Also updates the status to "Generation failed"
+                \item Exceptions: None
+            \end{itemize}
+
+		\item \texttt{void notifyDownloadLinkExpiration(JobId jobID)}
+		    \begin{itemize}
+                \item Effect: Looks up the Customer Organization that submitted the \ttt{Job} identified by \ttt{jobID}, identifies the Customer Administrator responsible for the document type of the \ttt{Job} and sends an e-mail indicating that the download link corresponding to the document expired. Also updates the status to "Document link expired".
+                \item Exceptions: None
+            \end{itemize}
+
+		\item \texttt{void submitEmail(Email email)}
+        \begin{itemize}
+            \item Effect: Submits the given e-mail to the external e-mail provider.
+            \item Exceptions: None
+        \end{itemize}
+    \end{itemize}
+
+	\item EmailThrottling
+    \begin{itemize}
+        \item \texttt{void throttleEmailSubmission(int numMailsPerSecond)}
+        \begin{itemize}
+            \item Effect: Throttles submission of e-mails to external e-mail providers such that a maximum of \ttt{numMailsPerSecond} are sent per second in order to ensure that higher-priority communication leaves on time. 
+            \item Exceptions: None
+        \end{itemize}
+
+		\item \texttt{void cancelEmailThrottling()}
+        \begin{itemize}
+            \item Effect: The \ttt{NotificationEmailDeliveryHandler} will no longer throttle submission of e-mails to external e-mail providers. 
+            \item Exceptions: None
         \end{itemize}
     \end{itemize}
 \end{itemize}
