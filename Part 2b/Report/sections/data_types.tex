@@ -46,4 +46,5 @@ them alphabetically for ease of navigation.
     \item \texttt{RegistrationDetails}: Contains details that can be used to register a Recipient such as first name, last name, e-mail address and postal address.
     \item \texttt{Template}: Contains fields that can be filled out and an indication which fields are mandatory.
     \item \texttt{UserSession}: Container for login token; keeps state for logged-in user (such as IP address in order to, for example, directly send the answer to document lookup queries to the user).
+	\item \ttt{ZoomitDeliveryErrorReport}: Indicates the reason for failure of document delivery via Zoomit (e.g. invalid Zoomit account identifier or Recipient no longer wishes to receive invoices via Zoomit from the Customer Organization). Contains the \ttt{JobID} of the document under consideration.
 \end{itemize}
