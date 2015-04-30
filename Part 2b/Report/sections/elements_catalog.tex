@@ -618,6 +618,15 @@ In this section, we provide an alphabetically ordered catalog of all components 
 			\end{itemize}
 		\end{itemize}
 
+		\item \texttt{List<Tuple<Document, DocumentMetaData>> fetchDocumentsAndMetaData(List<JobID> docIDs) throws NoSuchDocumentException}
+		\begin{itemize}
+			\item Effect: Fetches the Documents matching \ttt{docID} and returns them along with their \ttt{DocumentMetaData}.
+			\item Exceptions: 
+			\begin{itemize}
+				\item NoSuchDocumentException: One of the requested documents does not exist in the database.
+			\end{itemize}
+		\end{itemize}
+
 		\item \texttt{List<Tuple<Document, DocumentMetaData>> getAllDocumentsFor(DeliveryMethod deliveryMethod, DeliveryAddress deliveryAddress) throws NoSuchRecipientException}
 		\begin{itemize}
 			\item Effect: Fetches the Documents and their corresponding DocumentMetaData for the Recipient specified by \ttt{deliveryAddress}. What type of address is checked for is determined by \ttt{deliveryMethod}
@@ -670,6 +679,15 @@ In this section, we provide an alphabetically ordered catalog of all components 
 			\item Exceptions: 
 			\begin{itemize}
 				\item NoSuchDocumentException: there is no document matching \ttt{docID}.
+			\end{itemize}
+		\end{itemize}
+
+		\item \texttt{List<Tuple<Document, DocumentMetaData>> fetchDocumentsAndMetaData(List<JobID> docIDs) throws NoSuchDocumentException}
+		\begin{itemize}
+			\item Effect: Fetches the Documents matching \ttt{docID} and returns them along with their \ttt{DocumentMetaData}.
+			\item Exceptions: 
+			\begin{itemize}
+				\item NoSuchDocumentException: One of the requested documents does not exist in the database.
 			\end{itemize}
 		\end{itemize}
 
@@ -734,6 +752,15 @@ In this section, we provide an alphabetically ordered catalog of all components 
 			\item Exceptions: 
 			\begin{itemize}
 				\item NoSuchDocumentException: there is no document matching \ttt{docID}.
+			\end{itemize}
+		\end{itemize}
+
+		\item \texttt{List<Tuple<Document, DocumentMetaData>> fetchDocumentsAndMetaData(List<JobID> docIDs) throws NoSuchDocumentException}
+		\begin{itemize}
+			\item Effect: Fetches the Documents matching \ttt{docID} and returns them along with their \ttt{DocumentMetaData}.
+			\item Exceptions: 
+			\begin{itemize}
+				\item NoSuchDocumentException: One of the requested documents does not exist in the database.
 			\end{itemize}
 		\end{itemize}
 
@@ -1041,6 +1068,15 @@ In this section, we provide an alphabetically ordered catalog of all components 
             \item Exceptions: None
         \end{itemize}
     \end{itemize}
+
+	\item ReceiptConfirmation
+    \begin{itemize}
+        \item \texttt{void confirmErrorMailReceipt(MailID)}
+        \begin{itemize}
+            \item Effect: Processes confirmation of receipt of the specified error notification e-mail by an eDocs Administrator (i.e. cancelling the throttling of the \ttt{NotificationEmailDeliveryHandler} when no more error e-mails remain to be sent and receipt thereof confirmed).
+            \item Exceptions: None
+        \end{itemize}
+    \end{itemize}
 \end{itemize}
 
 \subsection{ExternalNotificationAcceptor}
@@ -1245,7 +1281,7 @@ In this section, we provide an alphabetically ordered catalog of all components 
     \end{itemize}
 \end{itemize}
 
-\subsection{JobGenerator} \todo{ensure SubmissionSubsystem can retrieve CO's priority}
+\subsection{JobGenerator}
 \begin{itemize}
 	\item \textbf{Description:} Accepts verified batches of raw data and generates jobs from them
 	\item \textbf{Super-component:} \ttt{SubmissionSubsystem}.
@@ -1278,6 +1314,12 @@ In this section, we provide an alphabetically ordered catalog of all components 
 		\item \texttt{void addJobStatus(JobID jobID)}
 		\begin{itemize}
             \item Effect: Adds an entry for the given \ttt{jobID} and sets its status to "Initiated".
+            \item Exceptions: None
+        \end{itemize}
+
+		\item \texttt{void addJobStatuses(List<JobID> jobIDs)}
+		\begin{itemize}
+            \item Effect: Adds entries for the given \ttt{jobIDs} and sets their statuses to "Initiated".
             \item Exceptions: None
         \end{itemize}
 
@@ -1418,7 +1460,7 @@ In this section, we provide an alphabetically ordered catalog of all components 
         \end{itemize}
     \end{itemize}
 
-	\item JobSubmission \todo{add parameter "BatchMetaData" to submitJobs in sequence diagram}
+	\item JobSubmission
     \begin{itemize}
         \item \texttt{void submitJobs(List<Job> jobs, BatchMetaData batchData)}
         \begin{itemize}
@@ -1667,15 +1709,15 @@ In this section, we provide an alphabetically ordered catalog of all components 
 \begin{itemize}
     \item PDSCacheManagement
     \begin{itemize}
-        \item \texttt{void cacheDocument(Document document, DocumentMetaData data) throws SomeException}
+        \item \texttt{void cacheDocument(JobID)}
         \begin{itemize}
-            \item Effect: Stores the specified \ttt{Document} together with its \ttt{DocumentMetaData} in the cache.
+            \item Effect: Stores the specified \ttt{JobID} in the cache.
             \item Exceptions: None
         \end{itemize}
 
-        \item \texttt{List<Tuple<Document, DocumentMetaData>> flushCache()}
+        \item \texttt{List<JobID> flushCache()}
 		    \begin{itemize}
-                \item Effect: Retrieves all documents stored in the cache and removes them from the cache.
+                \item Effect: Retrieves all \ttt{JobID}s stored in the cache and removes them from the cache.
                 \item Exceptions: None
             \end{itemize}
     \end{itemize}
