@@ -806,6 +806,42 @@ In this section, we provide an alphabetically ordered catalog of all components 
     \end{itemize}
 \end{itemize}
 
+\subsection{DocumentGenerationSubsystem}
+\begin{itemize}
+    \item \textbf{Description:} The subsystem responsible for generating a document from Raw Data and Batch Metadata. Retrieves the necessary Raw Data from the \ttt{JobStorageSubsystem}.
+    \item \textbf{Super-component:} None.
+    \item \textbf{Sub-components:} \ttt{DocumentGenerationManger}, \ttt{}
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+    \item InterfaceA
+    \begin{itemize}
+        \item \texttt{returntType1 operation1(ParamType param) throws SomeException}
+        \begin{itemize}
+            \item Effect: Describe the effect of the operation
+            \item Exceptions:
+            \begin{itemize}
+                \item SomeException: Describe when the exception is thrown.
+            \end{itemize}
+        \end{itemize}
+
+        \item \texttt{void operation2(ParamType2 param)}
+		    \begin{itemize}
+                \item Effect: Describe the effect of the operation
+                \item Exceptions: None
+            \end{itemize}
+    \end{itemize}
+
+    \item InterfaceB
+    \begin{itemize}
+        \item \texttt{returntType2 operation3()}
+        \begin{itemize}
+            \item Effect: Describe the effect of the operation
+            \item Exceptions: None
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
 
 \subsection{DocumentStorageHandler} 
 \begin{itemize}
