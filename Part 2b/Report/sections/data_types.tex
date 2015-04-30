@@ -13,8 +13,7 @@ them alphabetically for ease of navigation.
 		\item Whether it contains corrections of entries that the Customer Organization tried to submit earlier as part of a recurring batch (and from which month)
 	\end{itemize}
 	\item \texttt{BatchID}: Corresponds to a RawDataBatch
-	\item \texttt{BatchMetaData}: Contains information such as the CustomerOrganizationID, the document type of the batch, when it was received and the \ttt{RecurringBatchID} if it is a recurring batch.
-	\item \ttt{DeliveryAddress}: The address to which a Document should be delivered.
+	\item \texttt{BatchMetaData}: Contains information such as the CustomerOrganizationID, the document type of the batch, the priority of the batch (if it is a non-recurring batch and the Customer Organization opted for a non-default priority level), when it was received and the \ttt{RecurringBatchID} if it is a recurring batch.
 	\item \ttt{CapabilityReport}: Contains information about current processing power available to the document databases upon which decisions about load balancing may be based.
 	\item \ttt{CheckableInformationObject}: Container for checkable information for e.g. addressing details consistency.
 	\item \ttt{CustomerAdministratorID}: Corresponds to a Customer Administrator. Concretely, the e-mail address serves as identifier.
@@ -22,6 +21,7 @@ them alphabetically for ease of navigation.
 	\item \ttt{CustomerOrganizationBillingDetails}: Contains the necessary information to bill a Customer Organization.
 	\item \texttt{CustomerOrganizationID}: Corresponds to a certain Customer Organization. Concretely, the Customer Organization's name serves as identifier.
 	\item \texttt{CustomerOrganizationRegistrationDetails}: Encapsulates all information submitted when attempting to register a new Customer Organization. Includes the name (from which the \ttt{CustomerOrganizationID} will be generated), the postal address, the e-mail addresses and passwords of all Customer Administrators, whether the Customer Organization has opted for receipt tracking, the types of documents they will be able to generate, the initial template for every document type, the price per document for every type for non-recurring batches, the default priority, the print parameters used for delivery via print \& postal services, the signing key, the \ttt{RecurringBatchSpecification} for every recurring batch and technical details of the information systems of the Customer Organization used for submitting documents.
+	\item \ttt{DeliveryAddress}: The address to which a Document should be delivered.
 	\item \texttt{DeliveryMetaData}: Contains the delivery channel, recipient address and other required delivery information (e.g. Customer Organization name, whether receipt tracking applies and whether it is from a recurring batch) for an individual document.
 	\item \ttt{DeliveryMethod}: Enumeration of the available delivery methods (i.e. one of EMAIL\_DELIVERY, POSTAL\_DELIVERY or ZOOMIT\_DELIVERY)
 	\item \texttt{Document}: Represents a generated document
