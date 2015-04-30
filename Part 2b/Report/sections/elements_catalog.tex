@@ -713,7 +713,7 @@ In this section, we provide an alphabetically ordered catalog of all components 
 		\end{itemize}
 	\end{itemize}
 
-	\item Ping
+    \item Ping
 	\begin{itemize}
 		\item \texttt{Echo ping()}
 		\begin{itemize}
@@ -786,6 +786,26 @@ In this section, we provide an alphabetically ordered catalog of all components 
 		\end{itemize}
 	\end{itemize}
 \end{itemize}
+
+\subsection{DocumentDistributor}
+\begin{itemize}
+    \item \textbf{Description:} Receives documents along with delivery details, and based on these details, hands the document to the required \ttt{DeliveryChannel}.
+    \item \textbf{Super-component:} \ttt{DeliverySubsystem}.
+    \item \textbf{Sub-components:} None.
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+    \item DocumentDelivery
+    \begin{itemize}
+        \item \texttt{void deliveryDocument(JobID docID, Document document, DeliveryMetaData deliveryData)}
+        \begin{itemize}
+            \item Effect: Selects the appropriate delivery channel for the given document from \ttt{deliveryData}.
+            \item Exceptions: None
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
 
 \subsection{DocumentStorageHandler} 
 \begin{itemize}
