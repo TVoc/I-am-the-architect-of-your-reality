@@ -1,5 +1,16 @@
 \section{Scenarios}\label{sec:scenarios}
-In the following subsection, we discuss a selection of scenario flows. This selection is based on the priority of the use cases or on interesting behaviour of the system they showcase. Note that only essential steps are depicted in the sequence diagrams: some minor details may be omitted for brevity.
+In the following subsection, we discuss a selection of scenario flows. This selection is based on the priority of the non-functional requirements and use cases or on interesting behaviour of the system they showcase. Note that only essential steps are depicted in the sequence diagrams: some minor details may be omitted for brevity.
+
+\subsection{Av2 - PDSDBReplica fails}
+Figure \ref{fig:seq_av2fail} describes how failure of a \ttt{PDSDBReplica} is detected and which actions are taken. If the \ttt{PDSReplicationManager} issues a query to a \ttt{PDSDBReplica} and it does not respond within four seconds, the \ttt{PDSDBReplica} is pinged. If that ping times out, the \ttt{PDSDBReplica} is perceived as having failed and a notification to the eDocs administrators is issued through the \ttt{CommunicationSubsystem}.
+
+\begin{figure}[!htp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/Av2 - PDSDBReplica fails.png}
+    %\missingfigure[figwidth=0.8\textwidth]{Sequence diagram scenario 1}
+    \caption{The system behavior for detection of \ttt{PDSDBReplica failure}.
+        }\label{fig:seq_av2fail}
+\end{figure}
 
 \subsection{Av2 - PDSDBReplica back on-line}
 Figure \ref{fig:seq_av2online} describes what happens when a previously failed replica comes back on-line. When the failed replica responds to a ping from the \ttt{PDSReplicationManager}, the \ttt{PDSReplicationManager} asks another replica for all documents that have been stored since failure was detected. Upon reception of these documents, they are all stored in the previously off-line replica. This way, that replica is brought back up to speed.
@@ -12,16 +23,41 @@ Figure \ref{fig:seq_av2online} describes what happens when a previously failed r
         }\label{fig:seq_av2online}
 \end{figure}
 
-\subsection{Av2 - PDSDBReplica fails}
-Figure \ref{fig:seq_av2fail} describes how failure of a \ttt{PDSReplica} is detected and which actions are taken. If the \ttt{PDSReplicationManager} issues a query to a \ttt{PDSDBReplica} and it does not respond within four seconds, the \ttt{PDSDBReplica} is pinged. If that ping times out, the \ttt{PDSDBReplica} is perceived as having failed and a notification to the eDocs administrators is issued through the \ttt{CommunicationSubsystem}.
+\subsection{Av2b - Detecting PDSDB Failure}
+Figure \ref{fig:seq_av2bfail} describes how failure of the \ttt{PDSDB} is detected and which actions are taken. If the \ttt{GeneratedDocumentHandler} sends a document for storage to the \ttt{PDSDB} and receives no acknowledgement within four seconds, the \ttt{PDSDB} is pinged. If that ping times out, the \ttt{PDSDB} is perceived as having failed and a notification to the eDocs administrators is issued through the \ttt{CommunicationSubsystem}. The Document IDs of all documents then arriving for the \ttt{PDSDB} are cached in the \ttt{PDSCache}, until the \ttt{PDSDB} comes back online.
 
 \begin{figure}[!htp]
     \centering
-    \includegraphics[width=0.8\textwidth]{figures/Av2 - PDSDBReplica fails.png}
+    \includegraphics[width=0.65\textwidth]{figures/Av2b - Detecting PDSDB Failure.png}
     %\missingfigure[figwidth=0.8\textwidth]{Sequence diagram scenario 1}
-    \caption{The system behavior for detection of \ttt{PDSDBReplica failure}.
-        }\label{fig:seq_av2fail}
+    \caption{The system behavior for detection of \ttt{PDSDB failure}.
+        }\label{fig:seq_av2bfail}
 \end{figure}
+
+\subsection{Av2b - PDSDB back on-line}
+Figure \ref{fig:seq_av2bonline} describes what happens when the \ttt{PDSDB} comes back on-line. When it responds to a ping from the \ttt{GeneratedDocumentManager}, the latter will take notice of the fact that it has come back online. It will get all Document IDs out of the \ttt{PDSCache} and retrieves the corresponding documents and metadata from the \ttt{DocumentDB}. It then proceeds to store them in the \ttt{PDSDB}.
+
+\begin{figure}[!htp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/Av2b - PDSDB back on-line.png}
+    %\missingfigure[figwidth=0.8\textwidth]{Sequence diagram scenario 1}
+    \caption{The system behavior for recovery from \ttt{PDSDB failure}.
+        }\label{fig:seq_av2bonline}
+\end{figure}
+
+
+\subsection{Av3 - Zoomit failure}
+Figure \ref{fig:seq_av2bfail} describes how failure of the external \ttt{Zoomit} service is detected and which actions are taken. When the \ttt{ZoomitDeliveryHandler} sends a document to the \ttt{Zoomit} service and does not receive an acknowledgement, it caches the \ttt{documentID} and accompanying \ttt{DeliveryMetaData} in the \ttt{ZoomitDocumentLinkCache}. When the failure is detected for the first time, an exponential backoff timer is started. Every time the timer signals, all documentIDs and metadata are popped from the \ttt{Cache} and a resend is attempted after retrieving the actual documents from the \ttt{DocumentStorageSubsystem}. Every failed delivery goes back into the \ttt{Cache}. After the limit of exponential backoff iterations is reached for a number of different documents (conform \emph{Av3}, a notice is sent to the eDocs Administrator.
+
+\begin{figure}[!htp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/Av3 - Zoomit failure.png}
+    %\missingfigure[figwidth=0.8\textwidth]{Sequence diagram scenario 1}
+    \caption{The system behavior for detection of \ttt{Zoomit failure}.
+        }\label{fig:seq_av3fail}
+\end{figure}
+
+
 
 \subsection{UC1 - Login}\label{sec:seq_uc1}
 Figure \ref{fig:seq_uc1} shows the steps taken to log in a user. Logging in consists of trying to create a session using the credentials supplied by the user. The first concern is verifying the user's credentials, which is the responsibility of the \ttt{AuthenticationManager}. Depending on the type of login request, the login details matching the supplied username are fetched from either the \ttt{RegisteredRecipientDatabase}, \ttt{COAdminDatabase} or \ttt{eDocsAdminDatabase}. After the login details have been received, the supplied credentials and the login details are compared. If successful, the \ttt{AuthenticationManager} returns a login token, upon which the session can be created. If unsuccessful, an AuthException is thrown and it is indicated to the user he supplied invalid credentials.
@@ -161,4 +197,15 @@ Figure \ref{fig:seq_uc22} shows the steps undertaken in order to notify a Custom
     %\missingfigure[figwidth=0.8\textwidth]{Sequence diagram scenario 1}
     \caption{The system behavior for Use Case 22.
         }\label{fig:seq_uc22}
+\end{figure}
+
+\subsection{UC22', Av1a, Av2a - Notify eDocs administrator}
+%TODO write scenario
+
+\begin{figure}[!htp]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figures/Av1a_2a UC22' - Notify eDocs Admin.png}
+    %\missingfigure[figwidth=0.8\textwidth]{Sequence diagram scenario 1}
+    \caption{The system behavior for Use Case 22', \emph{Av1a} and \emph{Av2a}.
+        }\label{fig:seq_uc22'}
 \end{figure}
