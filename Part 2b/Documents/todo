@@ -6,7 +6,3 @@
 
 check:
 -ErrorDeliveryHandler:receiptConfirmation
--GenDocMan -> ErrorSignaling, is interface correct?
--zoomitcache: exponential backoff
--SomeException
--Notify co admin of zoomit failure?

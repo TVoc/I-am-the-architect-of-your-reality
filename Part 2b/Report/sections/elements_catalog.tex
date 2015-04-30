@@ -1029,6 +1029,12 @@ In this section, we provide an alphabetically ordered catalog of all components 
             \item Exceptions: None
         \end{itemize}
 
+        \item \texttt{void notifyOperatorOfPDSDBFailure(TimeStamp dateTime)}
+        \begin{itemize}
+            \item Effect: Notifies the eDocs administrators of the failure of the (whole) \ttt{PDSDB} at the time specified by \ttt{dateTime}
+            \item Exceptions: None
+        \end{itemize}
+
         \item \texttt{void notifyOperatorOfGeneratorFailure(String name, TimeStamp dateTime)}
         \begin{itemize}
             \item Effect: Notifies the eDocs administrators of the failure of the \ttt{Generator} identified by \ttt{name} at the time specified by \ttt{dateTime}

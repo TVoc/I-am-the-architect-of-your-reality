@@ -1,6 +1,17 @@
 \section{Scenarios}\label{sec:scenarios}
 In the following subsection, we discuss a selection of scenario flows. This selection is based on the priority of the non-functional requirements and use cases or on interesting behaviour of the system they showcase. Note that only essential steps are depicted in the sequence diagrams: some minor details may be omitted for brevity.
 
+\subsection{Av2 - PDSDBReplica fails}
+Figure \ref{fig:seq_av2fail} describes how failure of a \ttt{PDSDBReplica} is detected and which actions are taken. If the \ttt{PDSReplicationManager} issues a query to a \ttt{PDSDBReplica} and it does not respond within four seconds, the \ttt{PDSDBReplica} is pinged. If that ping times out, the \ttt{PDSDBReplica} is perceived as having failed and a notification to the eDocs administrators is issued through the \ttt{CommunicationSubsystem}.
+
+\begin{figure}[!htp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/Av2 - PDSDBReplica fails.png}
+    %\missingfigure[figwidth=0.8\textwidth]{Sequence diagram scenario 1}
+    \caption{The system behavior for detection of \ttt{PDSDBReplica failure}.
+        }\label{fig:seq_av2fail}
+\end{figure}
+
 \subsection{Av2 - PDSDBReplica back on-line}
 Figure \ref{fig:seq_av2online} describes what happens when a previously failed replica comes back on-line. When the failed replica responds to a ping from the \ttt{PDSReplicationManager}, the \ttt{PDSReplicationManager} asks another replica for all documents that have been stored since failure was detected. Upon reception of these documents, they are all stored in the previously off-line replica. This way, that replica is brought back up to speed.
 
@@ -12,19 +23,8 @@ Figure \ref{fig:seq_av2online} describes what happens when a previously failed r
         }\label{fig:seq_av2online}
 \end{figure}
 
-\subsection{Av2 - PDSDBReplica fails}
-Figure \ref{fig:seq_av2fail} describes how failure of a \ttt{PDSReplica} is detected and which actions are taken. If the \ttt{PDSReplicationManager} issues a query to a \ttt{PDSDBReplica} and it does not respond within four seconds, the \ttt{PDSDBReplica} is pinged. If that ping times out, the \ttt{PDSDBReplica} is perceived as having failed and a notification to the eDocs administrators is issued through the \ttt{CommunicationSubsystem}.
-
-\begin{figure}[!htp]
-    \centering
-    \includegraphics[width=0.8\textwidth]{figures/Av2 - PDSDBReplica fails.png}
-    %\missingfigure[figwidth=0.8\textwidth]{Sequence diagram scenario 1}
-    \caption{The system behavior for detection of \ttt{PDSDBReplica failure}.
-        }\label{fig:seq_av2fail}
-\end{figure}
-
 \subsection{Av2b - Detecting PDSDB Failure}
-%TODO write scenario
+Figure \ref{fig:seq_av2bfail} describes how failure of the \ttt{PDSDB} is detected and which actions are taken. If the \ttt{GeneratedDocumentHandler} sends a document for storage to the \ttt{PDSDB} and receives no acknowledgement within four seconds, the \ttt{PDSDB} is pinged. If that ping times out, the \ttt{PDSDB} is perceived as having failed and a notification to the eDocs administrators is issued through the \ttt{CommunicationSubsystem}. The Document IDs of all documents then arriving for the \ttt{PDSDB} are cached in the \ttt{PDSCache}, until the \ttt{PDSDB} comes back online.
 
 \begin{figure}[!htp]
     \centering
@@ -35,7 +35,7 @@ Figure \ref{fig:seq_av2fail} describes how failure of a \ttt{PDSReplica} is dete
 \end{figure}
 
 \subsection{Av2b - PDSDB back on-line}
-%TODO write scenario
+Figure \ref{fig:seq_av2bonline} describes what happens when the \ttt{PDSDB} comes back on-line. When it responds to a ping from the \ttt{GeneratedDocumentManager}, the latter will take notice of the fact that it has come back online. It will get all Document IDs out of the \ttt{PDSCache} and retrieves the corresponding documents and metadata from the \ttt{DocumentDB}. It then proceeds to store them in the \ttt{PDSDB}.
 
 \begin{figure}[!htp]
     \centering
@@ -47,7 +47,7 @@ Figure \ref{fig:seq_av2fail} describes how failure of a \ttt{PDSReplica} is dete
 
 
 \subsection{Av3 - Zoomit failure}
-%TODO write scenario
+Figure \ref{fig:seq_av2bfail} describes how failure of the external \ttt{Zoomit} service is detected and which actions are taken. When the \ttt{ZoomitDeliveryHandler} sends a document to the \ttt{Zoomit} service and does not receive an acknowledgement, it caches the \ttt{documentID} and accompanying \ttt{DeliveryMetaData} in the \ttt{ZoomitDocumentLinkCache}. When the failure is detected for the first time, an exponential backoff timer is started. Every time the timer signals, all documentIDs and metadata are popped from the \ttt{Cache} and a resend is attempted after retrieving the actual documents from the \ttt{DocumentStorageSubsystem}. Every failed delivery goes back into the \ttt{Cache}. After the limit of exponential backoff iterations is reached for a number of different documents (conform \emph{Av3}, a notice is sent to the eDocs Administrator.
 
 \begin{figure}[!htp]
     \centering
