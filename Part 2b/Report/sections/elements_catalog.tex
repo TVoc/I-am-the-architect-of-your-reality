@@ -116,6 +116,14 @@ In this section, we provide an alphabetically ordered catalog of all components 
 				\item AuthException: Either the account specified in \ttt{cred} does not exists or the password is incorrect.
 			\end{itemize}
         \end{itemize}
+        \item \texttt{void authenticate(LoginToken token) throws AuthException}
+        \begin{itemize}
+            \item Effect: Tries to authenticate a user to the system with given token to allow certain actions.
+            \item Exceptions:
+			\begin{itemize}
+				\item AuthException: The LoginToken is not valid.
+			\end{itemize}
+        \end{itemize}
     \end{itemize}
 \end{itemize}
 
@@ -137,6 +145,39 @@ In this section, we provide an alphabetically ordered catalog of all components 
 			\begin{itemize}
 				\item AuthException: Either the account specified in \ttt{cred} does not exists or the password is incorrect.
 			\end{itemize}
+        \end{itemize}
+        \item \texttt{void authenticate(LoginToken token) throws AuthException}
+        \begin{itemize}
+            \item Effect: Tries to authenticate a user to the system with given token to allow certain actions.
+            \item Exceptions:
+			\begin{itemize}
+				\item AuthException: The LoginToken is not valid.
+			\end{itemize}
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsection{BillingSubsystem}
+\begin{itemize}
+    \item \textbf{Description:} Record any billing that has to be done to clients.
+    \item \textbf{Super-component:} None
+    \item \textbf{Sub-components:} None
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+    \item Billing
+    \begin{itemize}
+        \item \texttt{void billDelivery(DeliveryMetaData data, int flatDeliveryPrice)}
+        \begin{itemize}
+            \item Effect: Adds a billing entry to the system for the delivery as stipulated in the data, at the flatDeliveryPrice.
+            \item Exceptions: None
+        \end{itemize}
+
+        \item \texttt{void billGeneration(BatchMetaData data)}
+        \begin{itemize}
+            \item Effect: Adds a billing entry to the system for the generation of given batch.
+            \item Exceptions: None
         \end{itemize}
     \end{itemize}
 \end{itemize}
@@ -266,6 +307,12 @@ In this section, we provide an alphabetically ordered catalog of all components 
                 \item Effect: Indicates whether a Customer Organization corresponding to \ttt{coID} has been registered.
                 \item Exceptions: None
             \end{itemize}
+            
+        \item \texttt{boolean verifyAuthToken(AuthToken token)}
+	    \begin{itemize}
+		\item Effect: Verify whether the supplied AuthToken can be used for submission at this moment.
+		\item Exceptions: None
+	    \end{itemize}
 		
         \item \texttt{Template getTemplate(CustomerOrganizationID coID, DocumentType docType, TimeStamp matchTime) throws NoSuchCustomerOrganizationException, NoSuchTemplateException}
         \begin{itemize}
@@ -372,7 +419,7 @@ In this section, we provide an alphabetically ordered catalog of all components 
 
 		\item \texttt{void registerNewCustomerOrganization(CustomerOrganizationRegistrationDetails details) throws IncorrectRegistrationDetailsException}
 		    \begin{itemize}
-                \item Effect: Registers a new Customer Organization with the details specified in \ttt{details}.
+                \item Effect: Registers a new Customer Organization with the details specified in \ttt{details}. Also generates a new AuthToken for the Customer Organisation.
                 \item Exceptions:
 				\begin{itemize}
 					\item IncorrectRegistrationDetailsException: Either \ttt{details} is incomplete (e.g. no signing key) or incorrect (e.g. the e-mail address for a new Customer Administrator has already been used for another Customer Administrator). The exception indicates what exactly went wrong.
@@ -478,30 +525,15 @@ In this section, we provide an alphabetically ordered catalog of all components 
 
 \subsubsection*{Provided interfaces}
 \begin{itemize}
-    \item Compl
+    \item Complete
     \begin{itemize}
-        \item \texttt{returntType1 operation1(ParamType param) throws SomeException}
+        \item \texttt{Tuple<List<Tuple<JobID,RawData>>,BatchMetaData,Key,Template> getComplete(BatchID batchID, List<JobID> jobIDs) throws JobAndBatchIDNotMatchingException}
         \begin{itemize}
-            \item Effect: Describe the effect of the operation
+            \item Effect: Retrieves and return all necessary data for generation of the documents with given IDs.
             \item Exceptions:
             \begin{itemize}
-                \item SomeException: Describe when the exception is thrown.
+                \item JobAndBatchIDNotMatchingException: When a given jobID and batchID are not consistent with one another.
             \end{itemize}
-        \end{itemize}
-
-        \item \texttt{void operation2(ParamType2 param)}
-		    \begin{itemize}
-                \item Effect: Describe the effect of the operation
-                \item Exceptions: None
-            \end{itemize}
-    \end{itemize}
-
-    \item InterfaceB
-    \begin{itemize}
-        \item \texttt{returntType2 operation3()}
-        \begin{itemize}
-            \item Effect: Describe the effect of the operation
-            \item Exceptions: None
         \end{itemize}
     \end{itemize}
 \end{itemize}
@@ -522,6 +554,12 @@ In this section, we provide an alphabetically ordered catalog of all components 
                 \item Effect: Indicates whether a Customer Organization corresponding to \ttt{coID} has been registered.
                 \item Exceptions: None
             \end{itemize}
+            
+           \item \texttt{boolean verifyAuthToken(AuthToken token)}
+	    \begin{itemize}
+		\item Effect: Verify whether the supplied AuthToken can be used for submission at this moment.
+		\item Exceptions: None
+	    \end{itemize}
 
 		\item \texttt{Priority getDefaultPriority(CustomerOrganizationID coID) throws NoSuchCustomerOrganizationException}
 		    \begin{itemize}
@@ -589,7 +627,7 @@ In this section, we provide an alphabetically ordered catalog of all components 
 
 		\item \texttt{void registerNewCustomerOrganization(CustomerOrganizationRegistrationDetails details)}
 		    \begin{itemize}
-                \item Effect: Registers a new Customer Organization with the details specified in \ttt{details}; extracts all information excluding templates, signing key and Customer Administrator details.
+                \item Effect: Registers a new Customer Organization with the details specified in \ttt{details}; extracts all information excluding templates, signing key and Customer Administrator details. Also generates a new AuthToken for the Customer Organisation.
                 \item Exceptions: None
             \end{itemize}
 
@@ -846,17 +884,17 @@ In this section, we provide an alphabetically ordered catalog of all components 
 \subsection{DocumentGenerationManager}
 \begin{itemize}
     \item \textbf{Description:} The component responsible for managing jobs in the \ttt{DocumentGenerationSubsystem}, and handing them to the \ttt{Generator}s. Also monitors these \ttt{Generator}s and signals when one fails. Has capability to query for data of generation jobs.
-    \item \textbf{Super-component:} None.
-    \item \textbf{Sub-components:} \ttt{DocumentGenerationManger}, \ttt{}
+    \item \textbf{Super-component:} \ttt{DocumentGenerationSubsystem}.
+    \item \textbf{Sub-components:} \ttt{Completer}, \ttt{GeneratorManager}, \ttt{KeyCache}, \ttt{Scheduler}, \ttt{TemplateCache}
 \end{itemize}
 
 \subsubsection*{Provided interfaces}
 \begin{itemize}
     \item JobManagement
     \begin{itemize}
-        \item \texttt{void submitJobs(List<Tuple<JobID,TimeStamp>> jobs)}
+        \item \texttt{void submitJobs(List<Tuple<JobID,TimeStamp>> jobs, BatchID batchID)}
         \begin{itemize}
-            \item Effect: Add the list of jobs with given deadline to the internal scheduler of the subsystem so they can be generated.
+            \item Effect: Add the list of jobs with given deadline to the internal scheduler of the subsystem so they can be generated. A list of jobs is accompanied by their batch ID.
             \item Exceptions: None
         \end{itemize}
     \end{itemize}
@@ -866,16 +904,16 @@ In this section, we provide an alphabetically ordered catalog of all components 
 \begin{itemize}
     \item \textbf{Description:} The subsystem responsible for generating a document from Raw Data and Batch Metadata. Retrieves the necessary Raw Data from the \ttt{JobStorageSubsystem}.
     \item \textbf{Super-component:} None.
-    \item \textbf{Sub-components:} \ttt{DocumentGenerationManger}, \ttt{}
+    \item \textbf{Sub-components:} \ttt{DocumentGenerationManager}, \ttt{Generator}
 \end{itemize}
 
 \subsubsection*{Provided interfaces}
 \begin{itemize}
     \item JobManagement
     \begin{itemize}
-        \item \texttt{void submitJobs(List<Tuple<JobID,TimeStamp>> jobs)}
+        \item \texttt{void submitJobs(List<Tuple<JobID,TimeStamp>> jobs, BatchID batchID)}
         \begin{itemize}
-            \item Effect: Add the list of jobs with given deadline to the internal scheduler of the subsystem so they can be generated.
+            \item Effect: Add the list of jobs with given deadline to the internal scheduler of the subsystem so they can be generated. A list of jobs is accompanied by their batch ID.
             \item Exceptions: None
         \end{itemize}
     \end{itemize}
@@ -1114,6 +1152,25 @@ In this section, we provide an alphabetically ordered catalog of all components 
     \end{itemize}
 \end{itemize}
 
+\subsection{eDocs Company Billing System}
+\begin{itemize}
+    \item \textbf{Description:} Responsible for reporting internal system errors/failures to eDocs system administrators. Can inhibit activity of the \ttt{NotificationEmailDeliveryHandler} to ensure that all its notifications leave on time.
+    \item \textbf{Super-component:} \ttt{CommunicationSubsystem}.
+    \item \textbf{Sub-components:} None.
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+    \item Billing
+    \begin{itemize}
+        \item \texttt{void billCompany(CustomerOrganizationBillingDetails details, double amount)}
+        \begin{itemize}
+            \item Effect: Bill the given Customer Organisation (by its details) for the given amount.
+            \item Exceptions: None
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
 \subsection{EmailDeliveryChannel}
 \begin{itemize}
     \item \textbf{Description:} Responsible for composing e-mails containing either a document to be delivered as an attachment or including a unique link through which to download the document if the Customer Organization has enabled receipt tracking. The resulting e-mail is handed off to the \ttt{CommunicationSubsystem} for submission to an external e-mail provider. Also signals to the \ttt{JobStatusDatabase} that the document's status must be updated, indicating whether receipt tracking has been activated or not.
@@ -1179,6 +1236,47 @@ In this section, we provide an alphabetically ordered catalog of all components 
     \end{itemize}
 \end{itemize}
 
+\subsection{External E-mail Provider}
+\begin{itemize}
+    \item \textbf{Description:} External party, accepts e-mails for delivery.
+    \item \textbf{Super-component:} None
+    \item \textbf{Sub-components:} None
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+    \item Email Delivery
+    \begin{itemize}
+        \item \texttt{void submitEmail(Email email) throws SMTPException}
+        \begin{itemize}
+            \item Effect: Accepts the given e-mail for delivery through the E-mail Provider.
+            \item Exceptions:
+            \begin{itemize}
+                \item SMTPException: When something goes wrong with the SMTP protocol, e.g. malformed e-mail.
+            \end{itemize}
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsection{External Information Broker}
+\begin{itemize}
+    \item \textbf{Description:} External party, serves requests for consistency checks of information.
+    \item \textbf{Super-component:} None
+    \item \textbf{Sub-components:} None
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+    \item Consistency Information Checking
+    \begin{itemize}
+        \item \texttt{boolean checkConsistency(CheckableInformationObject info)}
+        \begin{itemize}
+            \item Effect: Accepts the checkable information and runs it through a validity checker, returning the result.
+            \item Exceptions: None
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
 \subsection{ExternalNotificationAcceptor}
 \begin{itemize}
     \item \textbf{Description:} Responsible for receiving all inbound communication not highly specific to the domain of discourse (i.e. document generation and delivery).
@@ -1199,6 +1297,25 @@ In this section, we provide an alphabetically ordered catalog of all components 
             \item Effect: Extracts the \ttt{JobID} from \ttt{doc} (it is assumed that the \ttt{JobID} is a part of the \ttt{DocumentName}) and sets the status of the document to "Delivery confirmed".
             \item Exceptions: None
         \end{itemize}
+\end{itemize}
+
+\subsection{GeneratedDocumentHandler}
+\begin{itemize}
+    \item \textbf{Description:} Accepts generated documents, bills for the generation if necessary, and hands them to the \ttt{DeliverySubsystem} and the \ttt{DocumentStorageSubsystem}. Updats the status of Documents in the \ttt{JobStatusDatabase} when necessary.
+    \item \textbf{Super-component:} None
+    \item \textbf{Sub-components:} None
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+    \item FinalizeDocument
+    \begin{itemize}
+        \item \texttt{void finalizeDocument(JobID jobID, Document doc, BatchMetaData batchData, RawDataMetaData rawMetaData)}
+        \begin{itemize}
+            \item Effect: Generates a DeliveryMetaData object from the rawMetaData, the batchData and the jobID. This is used with the document to hand it to the \ttt{DeliverySubsystem}. Also determines from the rawMetaData where the document has to be stored and hands it over to the \ttt{DocumentStorageSubsystem}. Afterwards, bills the Customer Organisation for the generation of the document. Also updates the status of a job to ``Generated''.
+            \item Exceptions: None
+        \end{itemize}
+    \end{itemize}
 \end{itemize}
 
 \subsection{GeneratedDocumentManager}
@@ -1248,6 +1365,74 @@ In this section, we provide an alphabetically ordered catalog of all components 
 			\end{itemize}
 		\end{itemize}
 	\end{itemize}
+\end{itemize}
+
+\subsection{Generator}
+\begin{itemize}
+    \item \textbf{Description:} Requests document generation data from the \ttt{GeneratorManager} and generates a document. It then hands this document to the \ttt{GeneratedDocumentHandler} and asks the \ttt{GeneratorManager} for more jobs, while acknowledging the generated ones.
+    \item \textbf{Super-component:} DocumentGenerationSubsystem.
+    \item \textbf{Sub-components:} None
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+	\item Ping
+	\begin{itemize}
+		\item \texttt{Echo ping()}
+		\begin{itemize}
+			\item Effect: Returns an Echo to reassure the caller that the callee is still available.
+			\item Exceptions: None.
+		\end{itemize}
+	\end{itemize}
+
+    \item AssignJobs
+    \begin{itemize}
+        \item \texttt{void assignJobs(Tuple<List<Tuple<JobID,RawData>>,BatchMetaData,Key,Template>)}
+        \begin{itemize}
+            \item Effect: Assign given jobs to this \ttt{Generator}.
+            \item Exceptions: None
+        \end{itemize}
+    \end{itemize}
+
+    \item StartupShutdown
+    \begin{itemize}
+        \item \texttt{void startUp()}
+        \begin{itemize}
+            \item Effect: Instantiate a new \ttt{Generator}
+            \item Exceptions: None
+        \end{itemize}
+        
+        \item \texttt{void shutDown()}
+        \begin{itemize}
+            \item Effect: Tells this \ttt{Generator} to shut down after finishing the current generation process.
+            \item Exceptions: None
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsection{GeneratorManager}
+\begin{itemize}
+    \item \textbf{Description:} Manages the \ttt{Generator} components, reports errors with them, serves their requests for new jobs. Also able to start up and shut down \ttt{Generator} components when needed.
+    \item \textbf{Super-component:} \ttt{DocumentGenerationManager}.
+    \item \textbf{Sub-components:} the direct sub-components, if any.
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+    \item NotifyComplete
+    \begin{itemize}
+        \item \texttt{void notifyCompletedAndGiveMeMore(String generatorName)}
+        \begin{itemize}
+            \item Effect: Internally looks up the jobs handled by the \ttt{Generator} with given name, marks them as complete in the internal structure (so the \ttt{Generator}'s timeout is not called) and hands it new jobs, as dictated by the scheduler.
+            \item Exceptions: None
+        \end{itemize}
+
+        \item \texttt{void notifyCompletedAndIAmShuttingDown(String generatorName)}
+		    \begin{itemize}
+                \item Effect: Internally looks up the jobs handled by the \ttt{Generator} with given name, marks them as complete in the internal structure (so the \ttt{Generator}'s timeout is not called) and marks the \ttt{Generator} as inactive.
+                \item Exceptions: None
+            \end{itemize}
+    \end{itemize}
 \end{itemize}
 
 \subsection{JobContentsDatabase}
@@ -1584,6 +1769,25 @@ In this section, we provide an alphabetically ordered catalog of all components 
         \item \texttt{void submitJobs(List<Job> jobs, BatchMetaData batchData)}
         \begin{itemize}
             \item Effect: Stores the given \ttt{Job}s and their corresponding \ttt{batchData}. Sets the status of the \ttt{Job}s to "Initiated".
+            \item Exceptions: None
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsection{KeyCache}
+\begin{itemize}
+    \item \textbf{Description:} Lookup the signing key for a given Customer Organization. Stores keys internally so it should not perform the lookup in the \ttt{UserManagementSubsystem} every time, but can return the Key for a request if it is still cached.
+    \item \textbf{Super-component:} \ttt{DocumentGenerationManager}.
+    \item \textbf{Sub-components:} None.
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+    \item GetKey
+    \begin{itemize}
+        \item \texttt{SigningKey getKey(CustomerOrganizationID coID)}
+        \begin{itemize}
+            \item Effect: Retrieve and return the Signing Key for the Customer Organization with given \ttt{CustomerOrganizationID}.
             \item Exceptions: None
         \end{itemize}
     \end{itemize}
@@ -2155,6 +2359,28 @@ In this section, we provide an alphabetically ordered catalog of all components 
     \end{itemize}
 \end{itemize}
 
+\subsection{Print \& Postal Service}
+\begin{itemize}
+    \item \textbf{Description:} External party, accepts documents for delivery.
+    \item \textbf{Super-component:} None
+    \item \textbf{Sub-components:} None
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+    \item PPS Document Delivery
+    \begin{itemize}
+        \item \texttt{void submitDocument(Document doc, PrintParameterObject params, DeliveryAddress address) throws InvalidSubmissionException}
+        \begin{itemize}
+            \item Effect: Accepts the given document with its details for printing and delivery through the Print \& Postal Service.
+            \item Exceptions:
+            \begin{itemize}
+                \item InvalidSubmissionException: When the submission is invalid, e.g. bad print parameters.
+            \end{itemize}
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
 \subsection{RawDataVerifier}\label{sec:rawdataverifier}
 \begin{itemize}
 	\item \textbf{Description:} Verifies raw data batches and their individual entries.
@@ -2272,6 +2498,58 @@ In this section, we provide an alphabetically ordered catalog of all components 
     \end{itemize}
 \end{itemize}
 
+
+\subsection{Scheduler}
+\begin{itemize}
+    \item \textbf{Description:} Component which accepts and sorts (schedules) submitted jobs according to their deadline. Can be asked for new jobs and statistics about the contents of the \ttt{Scheduler}. Also records which jobs are currently being generated.
+    \item \textbf{Super-component:} \ttt{DocumentGenerationManager}.
+    \item \textbf{Sub-components:} None
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+    \item JobManagement
+    \begin{itemize}
+        \item \texttt{void submitJobs(List<Tuple<JobID,TimeStamp>> jobs, BatchID batchID)}
+        \begin{itemize}
+            \item Effect: Add the list of jobs with given deadline to the internal scheduler of the subsystem so they can be generated. A list of jobs is accompanied by their batch ID.
+            \item Exceptions: None
+        \end{itemize}
+    \end{itemize}
+
+    \item GetStatistics
+    \begin{itemize}
+        \item \texttt{int getAmountOfQueuedJobs()}
+        \begin{itemize}
+            \item Effect: Returns the amount of jobs currently scheduled in the \ttt{Scheduler}.
+        \end{itemize}
+        
+        \item \texttt{TimeStamp getEarliestDeadline()}
+        \begin{itemize}
+            \item Effect: Returns the deadline of the job with the earliest deadline in the \ttt{Scheduler}.
+        \end{itemize}
+    \end{itemize}
+
+    \item GetNextJobs
+    \begin{itemize}
+        \item \texttt{Tuple<BatchID,List<JobID>> getNextJobs()}
+        \begin{itemize}
+            \item Effect: Request the next batch of jobs for generation.
+            \item Exceptions: None
+        \end{itemize}
+        
+        \item \texttt{Tuple<BatchID,List<JobID>> jobsCompletedAndGiveMeMore(List<jobID> jobIDs) throws JobsNotBeingGeneratedException}
+        \begin{itemize}
+            \item Effect: Request the next batch of jobs for generation and remove jobs with given IDs from the scheduler.
+            \item Exceptions:
+            \begin{itemize}
+             \item JobsNotBeingGeneratedException: When trying to acknowledge the generation of a document that has not been handed out by the \ttt{Scheduler} yet.
+            \end{itemize}
+
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
 \subsection{SigningKeyManager}
 \begin{itemize}
     \item \textbf{Description:} Responsible for storing the signing key of all Customer Organizations.
@@ -2384,6 +2662,25 @@ In this section, we provide an alphabetically ordered catalog of all components 
     \end{itemize}
 \end{itemize}
 
+\subsection{TemplateCache}
+\begin{itemize}
+    \item \textbf{Description:} Lookup the \ttt{Template} for a given Customer Organization and Document Type and Submission time of the Job. Stores templates internally so it should not perform the lookup in the \ttt{UserManagementSubsystem} every time, but can return the template for a request if it is still cached. The Template to be used for a Document is dependent on the submission time of the document, so an extra layer of complexity is added to the caching mechanism.
+    \item \textbf{Super-component:} \ttt{DocumentGenerationManager}.
+    \item \textbf{Sub-components:} None.
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+    \item GetTemplate
+    \begin{itemize}
+        \item \texttt{SigningKey getTemplate(CustomerOrganizationID coID, DocumentType type,TimeStamp whenReceived)}
+        \begin{itemize}
+            \item Effect: Retrieve and return the Template for the Customer Organization with given \ttt{CustomerOrganizationID}, for given \ttt{DocumentType} and given \ttt{TimeStamp}. The returned Template is the one with the latest TimeStamp, before the submission of the Job.
+            \item Exceptions: None
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
 \subsection{TemplateDatabase}
 \begin{itemize}
     \item \textbf{Description:} Responsible for storing all templates of all Customer Organizations.
@@ -2411,6 +2708,36 @@ In this section, we provide an alphabetically ordered catalog of all components 
             \end{itemize}
     \end{itemize}
 \end{itemize}
+
+\subsection{UIBehaviourHandler}
+\begin{itemize}
+    \item \textbf{Description:} A component facade for all functional interaction with User Interfaces, except for authentication to the system.
+    \item \textbf{Super-component:} \ttt{UIFacade}
+    \item \textbf{Sub-components:} None
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+Offers all functional interaction used by User Interface entities, except for authentication. This is an aggregate of all public Lookup, Job Submission and Account Management.
+
+\subsection{UIFacade}
+\begin{itemize}
+    \item \textbf{Description:} A facade for all interaction with User Interfaces. Also offers infrastructure for session connections, which support login in turn.
+    \item \textbf{Super-component:} None
+    \item \textbf{Sub-components:} \ttt{UIFunctionality}, \ttt{UIBehaviourHandler}, \ttt{UserSessionManager}
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+Offers all functionality used by User Interface entities. This is an aggregate of the interface of the \ttt{UserSessionManager} and the \ttt{UIBehaviourHandler}
+
+\subsection{UIFunctionality}
+\begin{itemize}
+    \item \textbf{Description:} A component facade for all interaction with User Interfaces.
+    \item \textbf{Super-component:} \ttt{UIFacade}
+    \item \textbf{Sub-components:} None
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+Offers all functionality used by User Interface entities. This is an aggregate of the interface of the \ttt{UserSessionManager} and the \ttt{UIBehaviourHandler}
 
 \subsection{UserInfoEditor}
 \begin{itemize}
@@ -2509,6 +2836,50 @@ In this section, we provide an alphabetically ordered catalog of all components 
     \end{itemize}
 \end{itemize}
 
+\subsection{UserSessionManager}
+\begin{itemize}
+    \item \textbf{Description:} Creates and manages User Sessions. This component offer authentication functionality to users.
+    \item \textbf{Super-component:} \ttt{UIFacade}.
+    \item \textbf{Sub-components:} None
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+    \item SessionManagement
+    \begin{itemize}
+        \item \texttt{LoginToken createSession(LoginCredentials cred) throws AuthException}
+        \begin{itemize}
+            \item Effect: Accept given credentials and check them with the \ttt{UserManagementSubsystem}. If they are valid, construct a new UserSession with a LoginToken and register given token as valid.
+            \item Exceptions:
+            \begin{itemize}
+                \item AuthException: When the supplied credentials are not valid.
+            \end{itemize}
+        \end{itemize}
+        
+        \item \texttt{void logoutSession(LoginToken token) throws NotActiveException}
+        \begin{itemize}
+            \item Effect: Accept given token, and removes it from internal records, also removing any active UserSession with given token.
+            \item Exceptions:
+            \begin{itemize}
+                \item NotActiveException: When the supplied LoginToken is not valid (any more).
+            \end{itemize}
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsection{User Software}
+\begin{itemize}
+    \item \textbf{Description:} External party, represents a UI to interface with the system.
+    \item \textbf{Super-component:} None
+    \item \textbf{Sub-components:} None
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+    \item Session Response
+    An aggregate of all possible responses to the User Software, e.g. Lookup results, Status overview, Login responses...
+\end{itemize}
+
 \subsection{UserManagementSubsystem}
 \begin{itemize}
     \item \textbf{Description:} Responsible for storing information about Customer Organizations and the account details of Customer Administrators, Registered Recipients and eDocs Administrators.
@@ -2522,24 +2893,30 @@ In this section, we provide an alphabetically ordered catalog of all components 
     \begin{itemize}
 		\item \texttt{boolean verifyExists(CustomerOrganizationID coID)}
 		    \begin{itemize}
-                \item Effect: Indicates whether a Customer Organization corresponding to \ttt{coID} has been registered.
-                \item Exceptions: None
-            \end{itemize}
-		
-        \item \texttt{Template getTemplate(CustomerOrganizationID coID, DocumentType docType, TimeStamp matchTime) throws NoSuchCustomerOrganizationException, NoSuchTemplateException}
-        \begin{itemize}
-            \item Effect: Retrieves the \ttt{Template} for documents of the type \ttt{docType} of the Customer Organization identified by \ttt{coID}. The exact version retrieved is the most recent version earlier than \ttt{matchTime}.
-            \item Exceptions:
-            \begin{itemize}
-                \item NoSuchTemplateException: The template as described in the above Effect clause does not exist.
+		\item Effect: Indicates whether a Customer Organization corresponding to \ttt{coID} has been registered.
+		\item Exceptions: None
+	    \end{itemize}
+	
+	\item \texttt{boolean verifyAuthToken(AuthToken token)}
+	    \begin{itemize}
+		\item Effect: Verify whether the supplied AuthToken can be used for submission at this moment.
+		\item Exceptions: None
+	    \end{itemize}
+	
+	\item \texttt{Template getTemplate(CustomerOrganizationID coID, DocumentType docType, TimeStamp matchTime) throws NoSuchCustomerOrganizationException, NoSuchTemplateException}
+	\begin{itemize}
+	    \item Effect: Retrieves the \ttt{Template} for documents of the type \ttt{docType} of the Customer Organization identified by \ttt{coID}. The exact version retrieved is the most recent version earlier than \ttt{matchTime}.
+	    \item Exceptions:
+	    \begin{itemize}
+		\item NoSuchTemplateException: The template as described in the above Effect clause does not exist.
 				\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
-            \end{itemize}
-        \end{itemize}
+	    \end{itemize}
+	\end{itemize}
 
 		\item \texttt{void updateTemplate(CustomerOrganizationID coID, Template template, DocumentType type) throws NoSuchCustomerOrganizationException, InvalidDocumentTypeException}
 		    \begin{itemize}
-                \item Effect: Updates the template for documents of \ttt{type} for the Customer Organization identified by \ttt{coID}.
-                \item Exceptions:
+		\item Effect: Updates the template for documents of \ttt{type} for the Customer Organization identified by \ttt{coID}.
+		\item Exceptions:
 				\begin{itemize}
 					\item InvalidDocumentTypeException: The Customer Organization identified by \ttt{coID} is not allowed to generate documents of \ttt{type}.
 					\item NoSuchCustomerOrganizationException: There is no Customer Organization corresponding to \ttt{coID}.
@@ -2631,7 +3008,7 @@ In this section, we provide an alphabetically ordered catalog of all components 
 
 		\item \texttt{void registerNewCustomerOrganization(CustomerOrganizationRegistrationDetails details) throws IncorrectRegistrationDetailsException}
 		    \begin{itemize}
-                \item Effect: Registers a new Customer Organization with the details specified in \ttt{details}.
+                \item Effect: Registers a new Customer Organization with the details specified in \ttt{details}. Also generates a new AuthToken for the Customer Organisation.
                 \item Exceptions:
 				\begin{itemize}
 					\item IncorrectRegistrationDetailsException: Either \ttt{details} is incomplete (e.g. no signing key) or incorrect (e.g. the e-mail address for a new Customer Administrator has already been used for another Customer Administrator). The exception indicates what exactly went wrong.
@@ -2709,6 +3086,14 @@ In this section, we provide an alphabetically ordered catalog of all components 
 				\item AuthException: Either the account specified in \ttt{cred} does not exists or the password is incorrect.
 			\end{itemize}
         \end{itemize}
+        \item \texttt{void authenticate(LoginToken token) throws AuthException}
+        \begin{itemize}
+            \item Effect: Tries to authenticate a user to the system with given token to allow certain actions.
+            \item Exceptions:
+			\begin{itemize}
+				\item AuthException: The LoginToken is not valid.
+			\end{itemize}
+        \end{itemize}
     \end{itemize}
 \end{itemize}
 
@@ -2727,6 +3112,28 @@ In this section, we provide an alphabetically ordered catalog of all components 
         \begin{itemize}
             \item Effect: Extracts the Recipient's bank account number from \ttt{metaData}. Sends the document to Zoomit along with the identifying bank account number and the Customer Organization's name. If Zoomit does not confirm, retries several times via exponential back-off before giving up and caching the document.
             \item Exceptions: None
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsection{Zoomit}
+\begin{itemize}
+    \item \textbf{Description:} External party, accepts documents for delivery.
+    \item \textbf{Super-component:} None
+    \item \textbf{Sub-components:} None
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+    \item Zoomit Document Delivery
+    \begin{itemize}
+        \item \texttt{void submitDocument(CustomerOrganizationID coID, Document doc, BankAccountNumber accNum, boolean receiptTracking) throws InvalidSubmissionException}
+        \begin{itemize}
+            \item Effect: Accepts the given document with its details for delivery in the Zoomit system.
+            \item Exceptions:
+            \begin{itemize}
+                \item InvalidSubmissionException: When the submission is invalid, e.g. wrong BankAccountNumber.
+            \end{itemize}
         \end{itemize}
     \end{itemize}
 \end{itemize}

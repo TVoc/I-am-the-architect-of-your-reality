@@ -1,2 +1,13 @@
-interfaces:
--ErrorDeliveryHandler:receiptConfirmation
+-Zoomit: Zoomit Document Delivery
+-Print & Postal Service: PPS Document Delivery
+-External E-mail Provider: E-mail Delivery
+-External Information Broker: Consistency Information Checking
+-eDocs Company Billing System: Billing
+-User Software: Session Response
+
+-Consistency checks
+-" <-> ``
+-Proofread
+-Party
+-Fristi
+-Veel glitters

@@ -16,8 +16,10 @@ them alphabetically for ease of navigation.
 	\item \texttt{BatchMetaData}: Contains information such as the CustomerOrganizationID, the document type of the batch, when it was received and the \ttt{RecurringBatchID} if it is a recurring batch.
 	\item \ttt{DeliveryAddress}: The address to which a Document should be delivered.
 	\item \ttt{CapabilityReport}: Contains information about current processing power available to the document databases upon which decisions about load balancing may be based.
+	\item \ttt{CheckableInformationObject}: Container for checkable information for e.g. addressing details consistency.
 	\item \ttt{CustomerAdministratorID}: Corresponds to a Customer Administrator. Concretely, the e-mail address serves as identifier.
 	\item \ttt{CustomerAdministratorRegistrationDetails}: Contains details necessary for Customer Administrator registration such as e-mail address, password and document type he/she is responsible for.
+	\item \ttt{CustomerOrganizationBillingDetails}: Contains the necessary information to bill a Customer Organization.
 	\item \texttt{CustomerOrganizationID}: Corresponds to a certain Customer Organization. Concretely, the Customer Organization's name serves as identifier.
 	\item \texttt{CustomerOrganizationRegistrationDetails}: Encapsulates all information submitted when attempting to register a new Customer Organization. Includes the name (from which the \ttt{CustomerOrganizationID} will be generated), the postal address, the e-mail addresses and passwords of all Customer Administrators, whether the Customer Organization has opted for receipt tracking, the types of documents they will be able to generate, the initial template for every document type, the price per document for every type for non-recurring batches, the default priority, the print parameters used for delivery via print \& postal services, the signing key, the \ttt{RecurringBatchSpecification} for every recurring batch and technical details of the information systems of the Customer Organization used for submitting documents.
 	\item \texttt{DeliveryMetaData}: Contains the delivery channel, recipient address and other required delivery information (e.g. Customer Organization name, whether receipt tracking applies and whether it is from a recurring batch) for an individual document.
@@ -31,20 +33,21 @@ them alphabetically for ease of navigation.
 	\item \texttt{Job}: Encapsulates a RawDataEntry, together with its JobID and BatchID.
 	\item \texttt{JobID}: Corresponds to a Job and later the Document generated from it.
 	\item \texttt{JobStatusEntry}: Encapsulates document state concerning whether it has been generated, delivered, etc. and relevant time stamps.
-    \item \texttt{LoginCredentials}: Used when the user wants to log in. Contains the username, password, function the user wants to log in as and general info about the user attempting the login (e.g. IP address).
+	\item \texttt{LoginCredentials}: Used when the user wants to log in. Contains the username, password, function the user wants to log in as and general info about the user attempting the login (e.g. IP address).
 	\item \texttt{LoginDetails}: A pair of username and password.
-    \item \texttt{LoginToken}: Depending on the type of user, authorises the user to perform certain actions within the system.
-    \item \texttt{PDSLookupLink}: Encoded link which decodes to a JobID and RecipientID.
+	\item \texttt{LoginToken}: Depending on the type of user, authorises the user to perform certain actions within the system.
+	\item \texttt{PDSLookupLink}: Encoded link which decodes to a JobID and RecipientID.
 	\item \texttt{PrintParameterObject}: Encapsulates details in the SLA negotiated with a Customer Organization about printing documents, e.g. paper type, whether they should be printed single-sided or double-sided.
 	\item \texttt{Priority}: Describes the priority a document can have concerning generation. In descending order of importance, they are Critical, Diamond, Gold and Silver.
-    \item \texttt{RawDataBatch}: Contains several entries of raw data as supplied by the user, an indication whether it concerns a recurring batch and an indication if it contains corrections of entries in an earlier submitted recurring batch (and from which month). 
-    \item \texttt{RawDataEntry}: Contains all raw data necessary such that a document can be generated and also the corresponding \ttt{RawDataMetaData}.
-    \item \texttt{RawDataMetaData}: Contains information such as the identifier of the raw data unique within the Customer Organization, the selected delivery channel, the name of the addressee and the address of the addressee (the form of which depends on the selected delivery channel).
-    \item \texttt{RecipientID}: Corresponds to a Registered Recipient. Concretely, it matches the Registered Recipient's e-mail address.
+	\item \texttt{RawDataBatch}: Contains several entries of raw data as supplied by the user, an indication whether it concerns a recurring batch and an indication if it contains corrections of entries in an earlier submitted recurring batch (and from which month). 
+	\item \texttt{RawDataEntry}: Contains all raw data necessary such that a document can be generated and also the corresponding \ttt{RawDataMetaData}.
+	\item \texttt{RawDataMetaData}: Contains information such as the identifier of the raw data unique within the Customer Organization, the selected delivery channel, the name of the addressee and the address of the addressee (the form of which depends on the selected delivery channel).
+	\item \texttt{RecipientID}: Corresponds to a Registered Recipient. Concretely, it matches the Registered Recipient's e-mail address.
 	\item \texttt{RecurringBatchID}: Identifies a recurring batch specified in the SLA negotiated with a Customer Organization
 	\item \texttt{RecurringBatchSpecification}: Contains the details of a recurring batch specified in the SLA negotiated with a Customer Organization, such as document type, day of the month it is submitted and maximal amount of documents allowed.
-    \item \texttt{RegistrationDetails}: Contains details that can be used to register a Recipient such as first name, last name, e-mail address and postal address.
-    \item \texttt{Template}: Contains fields that can be filled out and an indication which fields are mandatory.
-    \item \texttt{UserSession}: Container for login token; keeps state for logged-in user (such as IP address in order to, for example, directly send the answer to document lookup queries to the user).
+	\item \texttt{RegistrationDetails}: Contains details that can be used to register a Recipient such as first name, last name, e-mail address and postal address.
+	\item \ttt{SigningKey}: Key, unique to a Customer Organisation, to sign an invoice of the respective Customer Organisation.
+	\item \texttt{Template}: Contains fields that can be filled out and an indication which fields are mandatory.
+	\item \texttt{UserSession}: Container for login token; keeps state for logged-in user (such as IP address in order to, for example, directly send the answer to document lookup queries to the user).
 	\item \ttt{ZoomitDeliveryErrorReport}: Indicates the reason for failure of document delivery via Zoomit (e.g. invalid Zoomit account identifier or Recipient no longer wishes to receive invoices via Zoomit from the Customer Organization). Contains the \ttt{JobID} of the document under consideration.
 \end{itemize}
