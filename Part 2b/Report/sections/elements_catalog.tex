@@ -469,6 +469,43 @@ In this section, we provide an alphabetically ordered catalog of all components 
     \end{itemize}
 \end{itemize}
 
+\subsection{Completer}
+\begin{itemize}
+    \item \textbf{Description:} Serve request for given jobIDs to return all data concerning the job's generation.
+    \item \textbf{Super-component:} the \ttt{DocumentGenerationManager}.
+    \item \textbf{Sub-components:} None.
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+    \item Compl
+    \begin{itemize}
+        \item \texttt{returntType1 operation1(ParamType param) throws SomeException}
+        \begin{itemize}
+            \item Effect: Describe the effect of the operation
+            \item Exceptions:
+            \begin{itemize}
+                \item SomeException: Describe when the exception is thrown.
+            \end{itemize}
+        \end{itemize}
+
+        \item \texttt{void operation2(ParamType2 param)}
+		    \begin{itemize}
+                \item Effect: Describe the effect of the operation
+                \item Exceptions: None
+            \end{itemize}
+    \end{itemize}
+
+    \item InterfaceB
+    \begin{itemize}
+        \item \texttt{returntType2 operation3()}
+        \begin{itemize}
+            \item Effect: Describe the effect of the operation
+            \item Exceptions: None
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
 \subsection{CustomerOrganizationDatabase}
 \begin{itemize}
     \item \textbf{Description:} Responsible for storing all details of Customer Organizations (excluding templates, signing key and Customer Administrator details).
@@ -806,6 +843,25 @@ In this section, we provide an alphabetically ordered catalog of all components 
     \end{itemize}
 \end{itemize}
 
+\subsection{DocumentGenerationManager}
+\begin{itemize}
+    \item \textbf{Description:} The component responsible for managing jobs in the \ttt{DocumentGenerationSubsystem}, and handing them to the \ttt{Generator}s. Also monitors these \ttt{Generator}s and signals when one fails. Has capability to query for data of generation jobs.
+    \item \textbf{Super-component:} None.
+    \item \textbf{Sub-components:} \ttt{DocumentGenerationManger}, \ttt{}
+\end{itemize}
+
+\subsubsection*{Provided interfaces}
+\begin{itemize}
+    \item JobManagement
+    \begin{itemize}
+        \item \texttt{void submitJobs(List<Tuple<JobID,TimeStamp>> jobs)}
+        \begin{itemize}
+            \item Effect: Add the list of jobs with given deadline to the internal scheduler of the subsystem so they can be generated.
+            \item Exceptions: None
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
 \subsection{DocumentGenerationSubsystem}
 \begin{itemize}
     \item \textbf{Description:} The subsystem responsible for generating a document from Raw Data and Batch Metadata. Retrieves the necessary Raw Data from the \ttt{JobStorageSubsystem}.
@@ -815,29 +871,11 @@ In this section, we provide an alphabetically ordered catalog of all components 
 
 \subsubsection*{Provided interfaces}
 \begin{itemize}
-    \item InterfaceA
+    \item JobManagement
     \begin{itemize}
-        \item \texttt{returntType1 operation1(ParamType param) throws SomeException}
+        \item \texttt{void submitJobs(List<Tuple<JobID,TimeStamp>> jobs)}
         \begin{itemize}
-            \item Effect: Describe the effect of the operation
-            \item Exceptions:
-            \begin{itemize}
-                \item SomeException: Describe when the exception is thrown.
-            \end{itemize}
-        \end{itemize}
-
-        \item \texttt{void operation2(ParamType2 param)}
-		    \begin{itemize}
-                \item Effect: Describe the effect of the operation
-                \item Exceptions: None
-            \end{itemize}
-    \end{itemize}
-
-    \item InterfaceB
-    \begin{itemize}
-        \item \texttt{returntType2 operation3()}
-        \begin{itemize}
-            \item Effect: Describe the effect of the operation
+            \item Effect: Add the list of jobs with given deadline to the internal scheduler of the subsystem so they can be generated.
             \item Exceptions: None
         \end{itemize}
     \end{itemize}
