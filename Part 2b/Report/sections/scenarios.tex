@@ -13,7 +13,7 @@ Figure \ref{fig:seq_av2fail} describes how failure of a \ttt{PDSDBReplica} is de
 \end{figure}
 
 \subsection{Av2 - PDSDBReplica back on-line}
-Figure \ref{fig:seq_av2online} describes what happens when a previously failed replica comes back on-line. When the failed replica responds to a ping from the \ttt{PDSReplicationManager}, the \ttt{PDSReplicationManager} asks another replica for all documents that have been stored since failure was detected. Upon reception of these documents, they are all stored in the previously off-line replica. This way, that replica is brought back up to speed.
+Figure \ref{fig:seq_av2online} describes what happens when a previously failed replica comes back on line. When the failed replica responds to a ping from the \ttt{PDSReplicationManager}, the \ttt{PDSReplicationManager} asks another replica for all documents that have been stored since failure was detected. Upon reception of these documents, they are all stored in the previously off-line replica. This way, that replica is brought back up to speed.
 
 \begin{figure}[!htp]
     \centering
@@ -47,7 +47,7 @@ Figure \ref{fig:seq_av2bonline} describes what happens when the \ttt{PDSDB} come
 
 
 \subsection{Av3 - Zoomit failure}
-Figure \ref{fig:seq_av2bfail} describes how failure of the external \ttt{Zoomit} service is detected and which actions are taken. When the \ttt{ZoomitDeliveryHandler} sends a document to the \ttt{Zoomit} service and does not receive an acknowledgement, it caches the \ttt{documentID} and accompanying \ttt{DeliveryMetaData} in the \ttt{ZoomitDocumentLinkCache}. When the failure is detected for the first time, an exponential backoff timer is started. Every time the timer signals, all documentIDs and metadata are popped from the \ttt{Cache} and a resend is attempted after retrieving the actual documents from the \ttt{DocumentStorageSubsystem}. Every failed delivery goes back into the \ttt{Cache}. After the limit of exponential backoff iterations is reached for a number of different documents (conform \emph{Av3}, a notice is sent to the eDocs Administrator.
+Figure \ref{fig:seq_av2bfail} describes how failure of the external \ttt{Zoomit} service is detected and which actions are taken. When the \ttt{ZoomitDeliveryHandler} sends a document to the \ttt{Zoomit} service and does not receive an acknowledgement, it caches the \ttt{documentID} and accompanying \ttt{DeliveryMetaData} in the \ttt{ZoomitDocumentLinkCache}. When the failure is detected for the first time, an exponential backoff timer is started. Every time the timer signals, all documentIDs and metadata are popped from the \ttt{Cache} and a resend is attempted after retrieving the actual documents from the \ttt{DocumentStorageSubsystem}. Every failed delivery goes back into the \ttt{Cache}. After the limit of exponential backoff iterations is reached for a number of different documents (conform \emph{Av3}), a notice is sent to the eDocs Administrator.
 
 \begin{figure}[!htp]
     \centering
@@ -70,8 +70,8 @@ Figure \ref{fig:seq_uc1} shows the steps taken to log in a user. Logging in cons
         }\label{fig:seq_uc1}
 \end{figure}
 
-\subsection{UC3 - Initiate document processing}\todo{fix sequence diagram: submitJobs}
-Figure \ref{fig:seq_uc3} shows the steps taken to submit raw data, with some minor details omitted for brevity. First, the data submitter sends details about the batch they plan to submit. These batch details are first verified by the \ttt{RawDataVerifier} and an exception is thrown when something is out of order (refer to section \ref{sec:rawdataverifier} for details about when the exception is thrown). When the batch details have been successfully verified, the submitter uploads the batch. Now, the integrity of the batch is verified and thereafter all individual entries. If any individual entries fail verification, an exception is thrown and it is indicated which entries failed and why (again, refer to section \ref{sec:rawdataverifier} as to what exactly is verified). All entries that passed verification are now supplied to the \ttt{JobGenerator}, where \ttt{Job} objects are generated and finally passed to the \ttt{JobSubmitter}, which stores them. The \ttt{Job}s are also passed to the \ttt{Scheduler} so that document generation may begin. 
+\subsection{UC3 - Initiate document processing}
+Figure \ref{fig:seq_uc3} shows the steps taken to submit raw data, with some minor details omitted for brevity. First, the data submitter sends details about the batch they plan to submit. These batch details are verified by the \ttt{RawDataVerifier} and an exception is thrown when something is out of order (refer to section \ref{sec:rawdataverifier} for details about when the exception is thrown). When the batch details have been successfully verified, the submitter uploads the batch. Now, the integrity of the batch is verified and thereafter all individual entries. If any individual entries fail verification, an exception is thrown and it is indicated which entries failed and why (again, refer to section \ref{sec:rawdataverifier} as to what exactly is verified). All entries that passed verification are now supplied to the \ttt{JobGenerator}, where \ttt{Job} objects are generated and finally passed to the \ttt{JobSubmitter}, which stores them. The \ttt{Job}s are also passed to the \ttt{Scheduler} so that document generation may begin. 
 
 \begin{figure}[!htp]
     \centering
@@ -133,7 +133,7 @@ Figure \ref{fig:seq_uc10} shows the steps undertaken when Zoomit confirms receip
         }\label{fig:seq_uc10}
 \end{figure}
 
-\subsection{UC11a - Storing a document in the PDS} \todo{replace PDSContentManager with DocumentStorageHandler in sequence diagram}
+\subsection{UC11a - Storing a document in the PDS}
 Figure \ref{fig:seq_uc11a} shows the steps undertaken in order to store a document in the Personal Document Store. The sequence diagram as shown is fairly straightforward.
 
 \begin{figure}[!htp]
@@ -156,7 +156,7 @@ Figure \ref{fig:seq_uc14} shows the steps undertaken when consulting a document 
 \end{figure}
 
 \subsection{UC15 - Download document via unique link}
-Figure \ref{fig:seq_uc15} shows the steps undertaken if a Recipient looks up document via download link. First, it is checked whether the link is present in the \ttt{DownloadLinkCatalogue}. If not, the link has either expired or never existed in the first place. It is invalid either way, and this is reflected by throwing an exception. If it is valid, the \ttt{LookupLinkCodec} decodes the link and returns the \ttt{JobID}. Now, the \ttt{LoadBalancer} is first asked for permission. If granted, the request is forwarded to the \ttt{DocumentStorageSubsystem} via an asynchronous call. Immediately afterwards, the \ttt{DownloadLinkCatalogue} is notified of the fact that the link has been visited in order to ensure that the expiration of this link will not result in an erroneous notification to the Customer Organization that it has expired without the Recipient ever having viewed the document.
+Figure \ref{fig:seq_uc15} shows the steps undertaken if a Recipient looks up a document via a download link. First, it is checked whether the link is present in the \ttt{DownloadLinkCatalogue}. If not, the link has either expired or never existed in the first place. It is invalid either way, and this is reflected by throwing an exception. If it is valid, the \ttt{LookupLinkCodec} decodes the link and returns the \ttt{JobID}. Now, the \ttt{LoadBalancer} is first asked for permission. If granted, the request is forwarded to the \ttt{DocumentStorageSubsystem} via an asynchronous call. Immediately afterwards, the \ttt{DownloadLinkCatalogue} is notified of the fact that the link has been visited in order to ensure that the expiration of this link will not result in an erroneous notification to the Customer Organization that it has expired without the Recipient ever having viewed the document.
 
 \begin{figure}[!htp]
     \centering
@@ -200,7 +200,7 @@ Figure \ref{fig:seq_uc22} shows the steps undertaken in order to notify a Custom
 \end{figure}
 
 \subsection{UC22', Av1a, Av2a - Notify eDocs administrator}
-%TODO write scenario
+When the \ttt{ErrorEmailDeliveryHandler} receives notice of an internal system error, it uses the throttling interface of the \ttt{NotificationEmailDeliveryHandler} as necessary. It then sends out an e-mail corresponding to the internal error. When the \ttt{ExternalNotificationAcceptor} receives confirmation of the delivery of this e-mail, the throttling is undone.
 
 \begin{figure}[!htp]
     \centering
