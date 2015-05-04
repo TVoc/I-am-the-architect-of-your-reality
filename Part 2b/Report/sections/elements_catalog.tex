@@ -12,12 +12,12 @@ In this section, we provide an alphabetically ordered catalog of all components 
 \begin{itemize}
 	\item COAdminInfoManagement
     \begin{itemize}
-		\item \texttt{void verifyComplete(List<CustomerAdministratorRegistrationDetails> details) throws IncompleteDetailsException}
+		\item \texttt{void verifyComplete(List<CustomerAdministratorRegistrationDetails> details) throws IncompleteCustomerOrganizationDetailsException}
         \begin{itemize}
             \item Effect: Verifies whether all entries in \ttt{details} are complete.
             \item Exceptions:
             \begin{itemize}
-                \item IncompleteDetailsException: Some details are missing (e-mail address, password, document type). It is indicated which entries in \ttt{details} are incomplete.
+                \item IncompleteCustomerOrganizationDetailsException: Some details are missing (e-mail address, password, document type). It is indicated which entries in \ttt{details} are incomplete.
             \end{itemize}
         \end{itemize}
 
@@ -2768,12 +2768,12 @@ Offers all functionality used by User Interface entities. This is an aggregate o
 \begin{itemize}
 	\item COAdminInfoManagement
     \begin{itemize}
-		\item \texttt{void verifyComplete(List<CustomerAdministratorRegistrationDetails> details) throws IncompleteDetailsException}
+		\item \texttt{void verifyComplete(List<CustomerAdministratorRegistrationDetails> details) throws IncompleteRecipientDetailsException}
         \begin{itemize}
             \item Effect: Verifies whether all entries in \ttt{details} are complete.
             \item Exceptions:
             \begin{itemize}
-                \item IncompleteDetailsException: Some details are missing (e-mail address, password, document type). It is indicated which entries in \ttt{details} are incomplete.
+                \item IncompleteRecipientDetailsException: Some details are missing (e-mail address, password, document type). It is indicated which entries in \ttt{details} are incomplete.
             \end{itemize}
         \end{itemize}
 
