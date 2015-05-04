@@ -1655,6 +1655,15 @@ In this section, we provide an alphabetically ordered catalog of all components 
             \item Effect: Extracts the \ttt{CustomerOrganizationID} from \ttt{session}, retrieves the statuses of all its \ttt{Job}s and sends them directly to the user's software via \ttt{session}.
             \item Exceptions: None
         \end{itemize}
+
+        \item \texttt{JobStatusEntry getJobStatus(JobID id) throws NoSuchJobException}
+        \begin{itemize}
+            \item Effect: Retrieves the status of the \ttt{Job} specified by \ttt{JobID}.
+            \item Exceptions:
+            \begin{itemize}
+                \item NoSuchJobException: There is no job corresponding to \ttt{id}.
+            \end{itemize}
+        \end{itemize}
     \end{itemize}
 \end{itemize}
 
@@ -1742,6 +1751,15 @@ In this section, we provide an alphabetically ordered catalog of all components 
         \begin{itemize}
             \item Effect: Extracts the \ttt{CustomerOrganizationID} from \ttt{session}, retrieves the statuses of all its \ttt{Job}s and sends them directly to the user's software via \ttt{session}.
             \item Exceptions: None
+        \end{itemize}
+        
+        \item \texttt{JobStatusEntry getJobStatus(JobID id) throws NoSuchJobException}
+        \begin{itemize}
+            \item Effect: Retrieves the status of the \ttt{Job} specified by \ttt{JobID}.
+            \item Exceptions:
+            \begin{itemize}
+                \item NoSuchJobException: There is no job corresponding to \ttt{id}.
+            \end{itemize}
         \end{itemize}
     \end{itemize}
 
